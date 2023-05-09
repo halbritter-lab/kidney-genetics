@@ -1,0 +1,167 @@
+approved_symbol,hgnc_id,gene_name_reported,source,source_count,source_evidence
+ABCC4,55,ABCC4,36923356,1,abstract
+ABCG2,74,ABCG2,36745138,1,abstract
+ACTN4,166,ACTN4,36815115,2,title; abstract
+AGTR1,336,AGTR1,36982595,1,abstract
+AIM2,357,AIM2,36745138,2,abstract; abstract
+AIRE,360,AIRE,36875114,1,abstract
+ALB,399,ALB,36926036; 36726431; 36731435,3,abstract; abstract; abstract
+ALG6,23157,ALG6,36807342,1,abstract
+ANGPTL2,490,ANGPTL2,36745138,2,abstract; abstract
+APOL1,618,APOL1,36920755; 36816427; 36758113; 36763808; 36747677,8,title | abstract; abstract; abstract; title | abstract; title | abstract; abstract; title | abstract; abstract
+ATP6V1B1,853,ATP6V1B1,37016093,1,abstract
+B3GNT2,15629,B3GNT2,36654513,1,abstract
+BBS2,967,BBS2,37003573,1,title | abstract
+BDNF,1033,BDNF,36782254,3,abstract; abstract; title
+BIRC2,590,BIRC2,36745138,2,abstract; abstract
+BMP2,1069,BMP2,36689521,1,abstract
+C5AR1,1338,C5AR1,36745138,1,abstract
+CARD8,17057,CARD8,36835594; 36745138,3,title | abstract; abstract; abstract
+CASP1,1499,CASP1,36745138,2,abstract; abstract
+CCL3,10627,CCL3,36745138,3,abstract; abstract; abstract
+CD14,1628,CD14,36745138,1,abstract
+CD44,1681,CD44,36745138,1,abstract
+CFH,4883,CFH,36680323,2,abstract; abstract
+CIDEC,24229,CIDEC,36745138,1,abstract
+CIITA,7067,CIITA,36745138,1,abstract
+CLCN5,2023,CLCN5,36873671; 36688186,2,abstract; abstract
+CLCNKB,2027,CLCNKB,36993809; 36882007,2,abstract; abstract
+CLDN10,2033,CLDN10,36890159,1,abstract
+COL4A1,2202,COL4A1,36715773,1,abstract
+COL4A3,2204,COL4A3,36982595; 36923787; 36925663; 36844206; 36774238; 36715773,6,abstract; abstract; title | abstract; abstract; abstract; abstract
+COL4A4,2206,COL4A4,36982595; 36923787; 36925663; 36844206; 36774238; 36715773,6,abstract; abstract; title | abstract; title | abstract; abstract; abstract
+COL4A5,2207,COL4A5,36982595; 36923787; 36968823; 36878861; 36844206; 36714647; 36715773,7,abstract; title | abstract; abstract; abstract; abstract; title | abstract; abstract
+CPT1A,2328,CPT1A,36745138,1,abstract
+CSF2,2434,CSF2,36745138; 34662052,3,abstract; abstract; abstract
+CST3,2475,CST3,36926036,1,abstract
+CUBN,2548,CUBN,36926036,1,title | abstract
+CXCL1,4602,CXCL1,36745138,1,abstract
+CXCL8,6025,CXCL8,36811053,1,abstract
+CYS1,18525,CYS1,36710876,1,abstract
+DDIT4,24944,DDIT4,36745138,1,abstract
+DIABLO,21528,DIABLO,36745138,1,abstract
+DZIP1L,26551,DZIP1L,36938073; 36710876,2,abstract; abstract
+EPO,3415,EPO,36811053,1,abstract
+EPOR,3416,EPOR,36811053,1,abstract
+FGF23,3680,FGF23,36907780,3,title | abstract; abstract; title
+FGFR2,3689,FGFR2,36693108,1,abstract
+FMO3,3771,FMO3,36718298,2,abstract; title | abstract
+FN1,3778,FN1,36774238,3,title | abstract; abstract; title | abstract
+FOXD2,3803,FOXD2,36993625,1,title | abstract
+FOXI1,3815,FOXI1,37016093,1,abstract
+FTO,24678,FTO,36717943,2,title | abstract; abstract
+GALNT18,30488,GALNT18,36693108,1,abstract
+GANAB,4138,GANAB,36938073; 36876010; 36833371,3,abstract; abstract; abstract
+GLA,4296,GLA,37007699; 36725792; 36745055,5,abstract; abstract; abstract; abstract; abstract
+GLIS3,28510,GLIS3,36917836,3,abstract; title; abstract
+HBB,4827,HBB,36646975,1,abstract
+HLA-A,4931,HLA-A,36749126,3,abstract; abstract; abstract
+HLA-DQA1,4942,HLA-DQA1,36749126,1,abstract
+HLA-DRB1,4948,HLA-DRB1,36749126,1,abstract
+HNF1B,11630,HNF1B,37016461; 36938073; 36777702,3,abstract; abstract; title | abstract
+HNF4A,5024,HNF4A,36773065,2,abstract; abstract
+HOGA1,25155,HOGA1,36688940,1,abstract
+HOTAIR,33510,HOTAIR,36745138,1,abstract
+HOXC11,5123,HOXC11,36745138,1,abstract
+HOXC12,5124,HOXC12,36745138,1,abstract
+IFNG,5438,IFNG,36745138; 34662052,3,abstract; abstract; abstract
+IFT140,29077,IFT140,36755831,1,abstract
+IGKV2D-26,5798,IGKV2D-26,36923787; 36714647,3,abstract; abstract; abstract
+IL12B,5970,IL12B,36745138,1,abstract
+IL17A,5981,IL17A,36745138,1,abstract
+IL18,5986,IL18,36745138,2,abstract; abstract
+IL1A,5991,IL1A,34662052,2,abstract; abstract
+IL1B,5992,IL1B,36745138,3,abstract; abstract; abstract
+IL1R1,5993,IL1R1,36745138,1,abstract
+IL1RN,6000,IL1RN,36745138,2,abstract; abstract
+IL22,14900,IL22,36745138,2,abstract; abstract
+IL23A,15488,IL23A,36745138,1,abstract
+IL23R,19100,IL23R,36745138,2,abstract; abstract
+IL33,16028,IL33,36745138,2,abstract; abstract
+IL37,15563,IL37,36745138,1,abstract
+IL6,6018,IL6,36745138; 34662052,3,abstract; abstract; abstract
+INS,6081,INS,36701305,2,title | abstract; abstract
+INSIG1,6083,INSIG1,36745138,2,abstract; abstract
+ITSN2,6184,ITSN2,37032986,2,title | abstract; abstract
+JAK2,6192,JAK2,36811053,2,abstract; abstract
+KIT,6342,KIT,36654513,1,abstract
+LAMA5,6485,LAMA5,36714636,1,abstract
+LAMB2,6487,LAMB2,36829142,2,abstract; abstract
+LRP1B,6693,LRP1B,36725383,2,abstract; abstract
+MAGI2,18957,MAGI2,36693108,1,abstract
+MAP3K7,6859,MAP3K7,36745138,1,abstract
+MAPK1,6871,MAPK1,36745138,3,abstract; abstract; abstract
+MAPK14,6876,MAPK14,37033943,1,abstract
+MAPK8,6881,MAPK8,36745138,1,abstract
+MIR145,31532,MIR145,36745138,1,abstract
+MIR146A,31533,MIR146A,36745138,1,abstract
+MIR20B,32024,MIR20B,36745138,1,abstract
+MIR221,31601,MIR221,36745138,1,abstract
+MIR223,31603,MIR223,36745138,2,abstract; abstract
+MLKL,26617,MLKL,36745138,2,abstract; abstract
+MPPED2,1180,MPPED2,36797372,2,abstract; title | abstract
+MT-TL1,7490,MT-TL1,36865084,1,abstract
+MTOR,3942,MTOR,36745138,1,abstract
+MUC1,7508,MUC1,36682497,2,abstract; abstract
+MYD88,7562,MYD88,36725383,2,abstract; abstract
+MYH9,7579,MYH9,36715773,1,abstract
+NAIP,7634,NAIP,36745138,4,abstract; abstract; abstract; abstract
+NEK7,13386,NEK7,36745138,1,abstract
+NFE2L2,7782,NFE2L2,36731435; 36745138,3,abstract; abstract; abstract
+NFIL3,7787,NFIL3,36745138,2,abstract; abstract
+NFKB1,7794,NFKB1,36725383; 36745138,3,abstract; abstract; abstract
+NFKBIA,7797,NFKBIA,36745138,1,abstract
+NLRC4,16412,NLRC4,36745138,1,abstract
+NLRP3,16400,NLRP3,36835594; 36745138,3,title | abstract; abstract; abstract
+NOD2,5331,NOD2,36745138,1,abstract
+NPHS1,7908,NPHS1,36800604,1,title | abstract
+NR1I2,7968,NR1I2,36923356,1,abstract
+NRBP1,7993,NRBP1,36745138,2,abstract; abstract
+OCRL,8108,OCRL,36873671; 36688186,2,abstract; abstract
+OSGEP,18028,OSGEP,36856752,1,title | abstract
+PGGT1B,8895,PGGT1B,36745138,2,abstract; abstract
+PHGDH,8923,PHGDH,36745138,2,abstract; abstract
+PKD1,9008,PKD1,37003573; 37024601; 36938073; 36854810; 36833371; 36773205; 36804411; 36755831; 36699011; 36646975; 36657418; 36675597; 36680323,15,title | abstract; abstract; abstract; abstract; abstract; abstract; abstract; abstract; abstract; abstract; title | abstract; abstract; abstract; abstract; abstract
+PKD2,9009,PKD2,37003573; 37024601; 36938073; 36854810; 36890159; 36833371; 36773205; 36657418; 36675597,9,abstract; abstract; abstract; abstract; abstract; abstract; abstract; abstract; abstract
+PKHD1,9016,PKHD1,36938073; 36969528; 36835961; 36846174; 36725383; 36710876; 36657418; 36675597; 36691356,13,abstract; abstract; abstract; abstract; abstract; title | abstract; abstract; abstract; abstract; abstract; abstract; title | abstract; abstract
+PMM2,9115,PMM2,36773065,2,title | abstract; title | abstract
+POSTN,16953,POSTN,36689521,1,abstract
+PPARG,9236,PPARG,36745138,2,abstract; abstract
+PPARGC1B,30022,PPARGC1B,36745138,1,abstract
+PRKD1,9407,PRKD1,36773205,1,abstract
+PRTN3,9495,PRTN3,36745138,1,abstract
+PTH,9606,PTH,36919775; 36916904,2,abstract; abstract
+PYCARD,16608,PYCARD,36745138,1,abstract
+RELN,9957,RELN,36693108,1,abstract
+REN,9958,REN,36982595; 36731435; 36745138,3,abstract; abstract; abstract
+RPTOR,30287,RPTOR,36745138,2,abstract; abstract
+SCARB2,1665,SCARB2,26677510,1,abstract
+SGPL1,10817,SGPL1,36873630,1,title | abstract
+SLC22A12,17989,SLC22A12,36745138,2,abstract; abstract
+SLC4A1,11027,SLC4A1,37016093,1,abstract
+SLC5A2,11037,SLC5A2,36982595,1,abstract
+SLC7A11,11059,SLC7A11,36745138,2,abstract; abstract
+SMN1,11117,SMN1,36745138,1,abstract
+SP3,11208,SP3,36745138,2,abstract; abstract
+STK11,11389,STK11,36745138,2,abstract; abstract
+SYK,11491,SYK,36745138,2,abstract; abstract
+TAC1,11517,TAC1,37033943,1,abstract
+TACR1,11526,TACR1,37033943,2,abstract; abstract
+TBCE,11582,TBCE,36919775; 36916904,4,abstract; abstract; abstract; abstract
+TEP1,11726,TEP1,36745138,1,abstract
+TLR2,11848,TLR2,36745138,2,abstract; abstract
+TLR4,11850,TLR4,36745138,2,abstract; abstract
+TMPRSS11D,24059,TMPRSS11D,36654513,1,abstract
+TNF,11892,TNF,36745138; 34662052,4,abstract; abstract; abstract; abstract
+TNFRSF1A,11916,TNFRSF1A,36745138,1,abstract
+TNFRSF1B,11917,TNFRSF1B,36745138,2,abstract; abstract
+TPO,12015,TPO,36926020,1,abstract
+TPSAB1,12019,TPSAB1,36654513,2,abstract; abstract
+TRPV5,3145,TRPV5,36682497,1,title | abstract
+TRPV6,14006,TRPV6,36682497,1,title
+TTR,12405,TTR,37006801,3,abstract; abstract; abstract
+UBAP1,12461,UBAP1,36745138,1,abstract
+UMOD,12559,UMOD,36682497,2,abstract; abstract
+VDAC1,12669,VDAC1,36745138,1,abstract
+WDR72,26790,WDR72,37016093,1,abstract
+WT1,12796,WT1,36980135,2,abstract; abstract
