@@ -48,39 +48,39 @@ pages_request <- pubtator_pages_request(search_query)
 
 # make a tibble of all pages and perform request using thhe page as input
 page_tibble <- 1:pages_request %>%
-	as_tibble() %>%
-	select(page = value) %>%
-	rowwise() %>%
-	mutate(results = list(pubtator_genes_in_request(search_query, page))) %>%
-	ungroup() 
+  as_tibble() %>%
+  select(page = value) %>%
+  rowwise() %>%
+  mutate(results = list(pubtator_genes_in_request(search_query, page))) %>%
+  ungroup() 
 
 page_tibble_unnest <- page_tibble %>%
-	unnest(results) %>%
-	filter(!is.na(text_identifier)) %>%
-	separate_rows(text_identifier, sep = ";")
+  unnest(results) %>%
+  filter(!is.na(text_identifier)) %>%
+  separate_rows(text_identifier, sep = ";")
 
 page_tibble_genes <- page_tibble_unnest %>%
-	mutate(info = gene_info_from_gene_id(text_identifier)) %>%
-	unnest(info)
+  mutate(info = gene_info_from_gene_id(text_identifier)) %>%
+  unnest(info)
 
 # filter for human only, select columns
 pubtator_genes <- page_tibble_genes %>%
-	filter(tax_id == 9606) %>%
-	select(pmid, symbol, text_part) %>%
-	group_by(symbol) %>%
-	summarise(symbol = paste(unique(symbol), collapse = "; "),
-		pmid = paste(unique(pmid), collapse = "; "),
-		text_part = paste(text_part, collapse = "; "),
-		source_count = n(),
-		.groups = "keep") %>%
-	ungroup() 
+  filter(tax_id == 9606) %>%
+  select(pmid, symbol, text_part) %>%
+  group_by(symbol) %>%
+  summarise(symbol = paste(unique(symbol), collapse = "; "),
+    pmid = paste(unique(pmid), collapse = "; "),
+    text_part = paste(text_part, collapse = "; "),
+    source_count = n(),
+    .groups = "keep") %>%
+  ungroup() 
 
 # normalize using same functions as in other analyses, 
 pubtator_genes_normalize <- pubtator_genes %>%
-	mutate(hgnc_id = hgnc_id_from_symbol_grouped(symbol)) %>%
-	filter(!is.na(hgnc_id)) %>%
-	mutate(approved_symbol = symbol_from_hgnc_id_grouped(hgnc_id)) %>%
-	select(approved_symbol, hgnc_id, gene_name_reported = symbol, source = pmid, source_count, source_evidence = text_part)
+  mutate(hgnc_id = hgnc_id_from_symbol_grouped(symbol)) %>%
+  filter(!is.na(hgnc_id)) %>%
+  mutate(approved_symbol = symbol_from_hgnc_id_grouped(hgnc_id)) %>%
+  select(approved_symbol, hgnc_id, gene_name_reported = symbol, source = pmid, source_count, source_evidence = text_part)
 ############################################
 
 
