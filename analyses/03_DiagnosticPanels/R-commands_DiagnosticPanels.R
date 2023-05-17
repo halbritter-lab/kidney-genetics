@@ -299,15 +299,29 @@ all_diagnostic_panels_genes <- bind_rows(centogene_nephrology_genes,
 
 all_diagnostic_panels_genes_format <- all_diagnostic_panels_genes %>%
   select(approved_symbol, hgnc_id, gene_name_reported, source = panel_diagnostic, source_count = panel_diagnostic_count, source_evidence = at_least_two_panels)
+
+# TODO: normalize source_evidence to 0/1 as percentiles
+# TODO: write a function for this normalization step
+
 ############################################
 
 
 ############################################
 ## save results
+# TODO: gzip csv result files
 creation_date <- strftime(as.POSIXlt(Sys.time(),
   "UTC",
   "%Y-%m-%dT%H:%M:%S"), "%Y-%m-%d")
 
-write_csv(all_diagnostic_panels_genes_format, file = paste0("results/03_DiagnosticPanels_genes.", creation_date, ".csv"), na = "NULL")
-write_csv(diagnostic_panels, file = paste0("results/03_DiagnosticPanels_list.", creation_date, ".csv"), na = "NULL")
+write_csv(all_diagnostic_panels_genes_format,
+  file = paste0("results/03_DiagnosticPanels_genes.",
+    creation_date,
+    ".csv"),
+  na = "NULL")
+
+write_csv(diagnostic_panels,
+  file = paste0("results/03_DiagnosticPanels_list.",
+    creation_date,
+    ".csv"),
+  na = "NULL")
 ############################################

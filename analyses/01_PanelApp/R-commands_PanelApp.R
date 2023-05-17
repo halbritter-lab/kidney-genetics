@@ -153,11 +153,16 @@ all_panelapp_genes_format <- all_panelapp_genes %>%
     source_count,
     source_evidence = PanelApp_Green_or_amber)
 
+
+# TODO: normalize source_evidence to 0/1 as percentiles
+# TODO: write a function for this normalization step
+
 ############################################
 
 
 ############################################
 ## save results
+# TODO: gzip csv result files
 creation_date <- strftime(as.POSIXlt(Sys.time(),
   "UTC",
   "%Y-%m-%dT%H:%M:%S"), "%Y-%m-%d")

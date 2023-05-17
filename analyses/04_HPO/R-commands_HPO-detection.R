@@ -159,11 +159,15 @@ hpo_gene_list <- phenotype_hpoa_filter %>%
     source_count,
     source_evidence = at_least_one_database)
 
+# TODO: normalize source_evidence to 0/1 as percentiles
+# TODO: write a function for this normalization step
+
 ############################################
 
 
 ############################################
 ## save results
+# TODO: gzip csv result files
 creation_date <- strftime(as.POSIXlt(Sys.time(),
   "UTC",
   "%Y-%m-%dT%H:%M:%S"), "%Y-%m-%d")

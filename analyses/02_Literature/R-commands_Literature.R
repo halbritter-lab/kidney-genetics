@@ -280,11 +280,15 @@ literature_genes <- kidney_genes_publication_list %>%
     source_count = publication_count,
     source_evidence = at_least_two_publications)
 
+# TODO: normalize source_evidence to 0/1 as percentiles
+# TODO: write a function for this normalization step
+
 ############################################
 
 
 ############################################
 ## save results
+# TODO: gzip csv result files
 # TODO: add kidney_genes_publication_list_download with checksums to results
 creation_date <- strftime(as.POSIXlt(Sys.time(),
   "UTC",

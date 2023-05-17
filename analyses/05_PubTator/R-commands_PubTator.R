@@ -90,11 +90,16 @@ pubtator_genes_normalize <- pubtator_genes %>%
 
 # TODO: normalize source_evidence as in other analyses (maybe pub count > 2)
 
+
+# TODO: normalize source_evidence to 0/1 as percentiles
+# TODO: write a function for this normalization step
+
 ############################################
 
 
 ############################################
 ## save results
+# TODO: gzip csv result files
 creation_date <- strftime(as.POSIXlt(Sys.time(),
   "UTC",
   "%Y-%m-%dT%H:%M:%S"), "%Y-%m-%d")
