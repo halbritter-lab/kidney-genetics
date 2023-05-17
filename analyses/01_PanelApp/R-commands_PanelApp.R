@@ -126,6 +126,6 @@ all_panelapp_genes_format <- all_panelapp_genes %>%
 ############################################
 ## save results
 creation_date <- strftime(as.POSIXlt(Sys.time(), "UTC", "%Y-%m-%dT%H:%M:%S"), "%Y-%m-%d")
-write_csv(panelapp_panels, file = paste0("results/01_PanelApp_panels.",creation_date,".csv"), na = "NULL")
-write_csv(all_panelapp_genes_format, file = paste0("results/01_PanelApp_genes.",creation_date,".csv"), na = "NULL")
+write_csv(panelapp_panels, file = paste0("results/01_PanelApp_panels.", creation_date,".csv"), na = "NULL")
+write_csv(all_panelapp_genes_format, file = paste0("results/01_PanelApp_genes.", creation_date,".csv"), na = "NULL")
 ############################################
