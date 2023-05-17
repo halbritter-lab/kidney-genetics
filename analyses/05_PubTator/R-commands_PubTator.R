@@ -23,7 +23,6 @@ options(scipen = 999)
 
 ############################################
 ## define API key
-# TODO: this has to go into config
 NCBI_API_KEY <- config_vars$ncbi_api_key
 ############################################
 

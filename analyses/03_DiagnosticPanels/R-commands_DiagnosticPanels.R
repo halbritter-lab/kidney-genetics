@@ -239,8 +239,6 @@ mayocliniclabs_renal_genetics_genes <- mayocliniclabs_renal_genetics %>%
 
 
 ## 10) blueprintgenetics_nephrology
-# TODO: Does not work anymore, fix
-# TODO: implement download of all subpanels as files
 url <- (diagnostic_panels %>%
   filter(diagnostic_panel_name == "blueprintgenetics_nephrology"))$diagnostic_panel_source
 
@@ -296,7 +294,7 @@ all_diagnostic_panels_genes <- bind_rows(centogene_nephrology_genes,
     panel_diagnostic_count = n(),
     gene_name_reported = paste(unique(gene_name_reported), collapse = " | ")) %>%
   ungroup() %>%
-  mutate(hgnc_id = paste0("HGNC:", hgnc_id_from_symbol_grouped(approved_symbol))) %>%
+  mutate(hgnc_id = hgnc_id_from_symbol_grouped(approved_symbol)) %>%
   mutate(at_least_two_panels = (panel_diagnostic_count > 1))
 
 all_diagnostic_panels_genes_format <- all_diagnostic_panels_genes %>%

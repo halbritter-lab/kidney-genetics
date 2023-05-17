@@ -271,7 +271,7 @@ literature_genes <- kidney_genes_publication_list %>%
     publication_count = n(),
     .groups = "keep") %>%
   ungroup() %>%
-  mutate(hgnc_id = paste0("HGNC:", hgnc_id_from_symbol_grouped(approved_symbol))) %>%
+  mutate(hgnc_id = hgnc_id_from_symbol_grouped(approved_symbol)) %>%
   mutate(at_least_two_publications = (publication_count > 1)) %>%
   select(approved_symbol,
     hgnc_id,

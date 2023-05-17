@@ -22,7 +22,7 @@ gene_info_from_gene_id <- function(input, api_key = NCBI_API_KEY, request_max = 
   ep_base_url <- "https://api.ncbi.nlm.nih.gov/datasets/v2alpha/gene/id/"
   ep_fields_args <- "?table_fields=gene-id&table_fields=gene-type&table_fields=description"
 
-  # TODO: implement retry if empty  
+  # TODO: implement retry if empty
   # TODO: implement error handling if input not a number or NA
 
   input_list <- as_tibble(input, .name_repair = "unique") %>%
