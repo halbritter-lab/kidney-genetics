@@ -306,7 +306,10 @@ all_diagnostic_panels_genes_format <- all_diagnostic_panels_genes %>%
 
 ############################################
 ## save results
-creation_date <- strftime(as.POSIXlt(Sys.time(), "UTC", "%Y-%m-%dT%H:%M:%S"), "%Y-%m-%d")
+creation_date <- strftime(as.POSIXlt(Sys.time(),
+  "UTC",
+  "%Y-%m-%dT%H:%M:%S"), "%Y-%m-%d")
+
 write_csv(all_diagnostic_panels_genes_format, file = paste0("results/03_DiagnosticPanels_genes.", creation_date, ".csv"), na = "NULL")
 write_csv(diagnostic_panels, file = paste0("results/03_DiagnosticPanels_list.", creation_date, ".csv"), na = "NULL")
 ############################################
