@@ -273,6 +273,9 @@ literature_genes <- kidney_genes_publication_list %>%
     .groups = "keep") %>%
   ungroup() %>%
   mutate(hgnc_id = paste0("HGNC:",hgnc_id_from_symbol_grouped(approved_symbol)))
+
+# TODO: normalize source_evidence as in other analyses (maybe pub count > 1)
+
 ############################################
 
 

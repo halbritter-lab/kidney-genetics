@@ -82,7 +82,7 @@ pubtator_genes_normalize <- pubtator_genes %>%
   mutate(approved_symbol = symbol_from_hgnc_id_grouped(hgnc_id)) %>%
   select(approved_symbol, hgnc_id, gene_name_reported = symbol, source = pmid, source_count, source_evidence = text_part)
 
-# TODO: normalize source_evidence as in other analyses (maybe pub count > 1)
+# TODO: normalize source_evidence as in other analyses (maybe pub count > 2)
 
 ############################################
 
