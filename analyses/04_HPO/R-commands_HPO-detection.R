@@ -150,8 +150,11 @@ hpo_gene_list <- phenotype_hpoa_filter %>%
     .groups = "keep") %>%
   ungroup() %>%
   select(approved_symbol, hgnc_id, gene_name_reported = Approved_Symbol, source = database_id, source_count, source_evidence = abnormality_of_the_kidney_hpo_terms)
-############################################
 
+
+# TODO: normalize source_evidence as in other analyses (maybe database entry count > 1)
+
+############################################
 
 
 ############################################

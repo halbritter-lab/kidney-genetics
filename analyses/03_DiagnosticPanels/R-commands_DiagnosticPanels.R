@@ -276,7 +276,7 @@ blueprintgenetics_nephrology_genes <- blueprintgenetics_panel_panels_genes$gene_
 
 
 ############################################
-## bind all tables and summaize
+## bind all tables and summarize
 ## compute count of panels a gene is reported in
 ## compute diagostic panel evidence as genes reported in at least 2 panel sources
 all_diagnostic_panels_genes <- bind_rows(centogene_nephrology_genes,

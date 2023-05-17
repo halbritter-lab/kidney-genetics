@@ -73,14 +73,17 @@ pubtator_genes <- page_tibble_genes %>%
     text_part = paste(text_part, collapse = "; "),
     source_count = n(),
     .groups = "keep") %>%
-  ungroup() 
+  ungroup()
 
-# normalize using same functions as in other analyses, 
+# normalize using same functions as in other analyses
 pubtator_genes_normalize <- pubtator_genes %>%
   mutate(hgnc_id = hgnc_id_from_symbol_grouped(symbol)) %>%
   filter(!is.na(hgnc_id)) %>%
   mutate(approved_symbol = symbol_from_hgnc_id_grouped(hgnc_id)) %>%
   select(approved_symbol, hgnc_id, gene_name_reported = symbol, source = pmid, source_count, source_evidence = text_part)
+
+# TODO: normalize source_evidence as in other analyses (maybe pub count > 1)
+
 ############################################
 
 
