@@ -23,7 +23,7 @@ options(scipen = 999)
 
 ############################################
 # load global functions
-# hgnc functions 
+# hgnc functions
 source("../functions/hgnc-functions.R", local = TRUE)
 ############################################
 
@@ -35,17 +35,20 @@ source("../functions/hgnc-functions.R", local = TRUE)
 # store all pages in a list first
 baseurl <- "https://panelapp.genomicsengland.co.uk/api/v1/panels/?format=json"
 panelapp_uk_pages <- list()
-for(i in 1:4){
+for (i in 1:4){
   panelapp_uk_page <- fromJSON(paste0(baseurl, "&page=", i))
   message("Retrieving page ", i)
-  panelapp_uk_pages[[i+1]] <- panelapp_uk_page$results
+  panelapp_uk_pages[[i + 1]] <- panelapp_uk_page$results
 }
 
 # combine all into one
 panelapp_uk <- rbind_pages(panelapp_uk_pages) %>%
   tibble() %>%
   select(id, name, version, version_created) %>%
-  mutate(api_call = paste0("https://panelapp.genomicsengland.co.uk/api/v1/panels/", id, "/?format=json")) %>%
+  mutate(api_call = paste0(
+    "https://panelapp.genomicsengland.co.uk/api/v1/panels/",
+    id,
+    "/?format=json")) %>%
   mutate(panel_source = "panelapp_uk") %>%
   filter(str_detect(name, "[Kk]idney|[Rr]enal|[Nn]ephro"))
 
@@ -53,17 +56,19 @@ panelapp_uk <- rbind_pages(panelapp_uk_pages) %>%
 # store all pages in a list first
 baseurl <- "https://panelapp.agha.umccr.org/api/v1/panels/?format=json"
 panelapp_australia_pages <- list()
-for(i in 1:3){
+for (i in 1:3){
   panelapp_australia_page <- fromJSON(paste0(baseurl, "&page=", i))
   message("Retrieving page ", i)
-  panelapp_australia_pages[[i+1]] <- panelapp_australia_page$results
+  panelapp_australia_pages[[i + 1]] <- panelapp_australia_page$results
 }
 
 # combine all into one
 panelapp_australia <- rbind_pages(panelapp_australia_pages) %>%
   tibble() %>%
   select(id, name, version, version_created) %>%
-  mutate(api_call = paste0("https://panelapp.agha.umccr.org/api/v1/panels/", id, "/?format=json")) %>%
+  mutate(api_call = paste0("https://panelapp.agha.umccr.org/api/v1/panels/",
+    id,
+    "/?format=json")) %>%
   mutate(panel_source = "panelapp_australia") %>%
   filter(str_detect(name, "[Kk]idney|[Rr]enal|[Nn]ephro"))
 
@@ -83,10 +88,27 @@ panelapp_genes <- panelapp_panels %>%
   rowwise() %>%
   mutate(panel = list(fromJSON(api_call))) %>%
   unnest_wider(panel, names_repair = "unique") %>%
-  select(id = id...1, name = name...2, version = version...3, version_created = version_created...4, panel_source, genes) %>%
+  select(id = id...1,
+    name = name...2,
+    version = version...3,
+    version_created = version_created...4,
+    panel_source, genes) %>%
   unnest(genes, names_repair = "unique") %>%
   unnest(gene_data, names_repair = "unique") %>%
-  select(panel_id = id, panel_name = name, panel_version = version, panel_version_created = version_created, panel_source, entity_name, entity_type, gene_symbol, hgnc_id, omim_gene, evidence, confidence_level, mode_of_inheritance, phenotypes, publications) %>%
+  select(panel_id = id,
+    panel_name = name,
+    panel_version = version,
+    panel_version_created = version_created,
+    panel_source,
+    entity_name,
+    entity_type,
+    gene_symbol,
+    hgnc_id,
+    omim_gene,
+    evidence,
+    confidence_level,
+    mode_of_inheritance,
+    phenotypes, publications) %>%
   ungroup()
 
 all_panelapp_genes <- panelapp_genes %>%
@@ -104,13 +126,19 @@ all_panelapp_genes <- panelapp_genes %>%
     mode_of_inheritance = paste(unique(mode_of_inheritance), collapse = " | "),
     phenotypes = paste(unique(phenotypes), collapse = " | "),
     publications = paste(unique(publications), collapse = " | "),
-    panel = paste(paste0(panel_name, " (id=", panel_id, ", version=", panel_version, ")"), collapse = " | "),
+    panel = paste(paste0(panel_name,
+      " (id=",
+      panel_id,
+      ", version=",
+      panel_version,
+      ")"), collapse = " | "),
     panel_id = paste(unique(panel_id), collapse = " | "),
     panel_name = paste(unique(panel_name), collapse = " | "),
     panel_version = paste(unique(panel_version), collapse = " | "),
-    panel_version_created = paste(unique(panel_version_created), collapse = " | "),
+    panel_version_created = paste(unique(panel_version_created),
+      collapse = " | "),
     panel_source = paste(unique(panel_source), collapse = " | "),
-    PanelApp_Green_or_amber = grepl('Green|Amber', evidence),
+    PanelApp_Green_or_amber = grepl("Green|Amber", evidence),
     source_count = n(),
     .groups = "keep") %>%
   ungroup() %>%
@@ -118,14 +146,30 @@ all_panelapp_genes <- panelapp_genes %>%
   mutate(approved_symbol = symbol_from_hgnc_id_grouped(hgnc_id))
 
 all_panelapp_genes_format <- all_panelapp_genes %>%
-  select(approved_symbol, hgnc_id, gene_name_reported = gene_symbol, source = panel, source_count, source_evidence = PanelApp_Green_or_amber)
+  select(approved_symbol,
+    hgnc_id,
+    gene_name_reported = gene_symbol,
+    source = panel,
+    source_count,
+    source_evidence = PanelApp_Green_or_amber)
 
 ############################################
 
 
 ############################################
 ## save results
-creation_date <- strftime(as.POSIXlt(Sys.time(), "UTC", "%Y-%m-%dT%H:%M:%S"), "%Y-%m-%d")
-write_csv(panelapp_panels, file = paste0("results/01_PanelApp_panels.", creation_date,".csv"), na = "NULL")
-write_csv(all_panelapp_genes_format, file = paste0("results/01_PanelApp_genes.", creation_date,".csv"), na = "NULL")
+creation_date <- strftime(as.POSIXlt(Sys.time(),
+  "UTC",
+  "%Y-%m-%dT%H:%M:%S"), "%Y-%m-%d")
+
+write_csv(panelapp_panels,
+  file = paste0("results/01_PanelApp_panels.",
+    creation_date,
+    ".csv"),
+  na = "NULL")
+write_csv(all_panelapp_genes_format,
+  file = paste0("results/01_PanelApp_genes.",
+    creation_date,
+    ".csv"),
+  na = "NULL")
 ############################################
