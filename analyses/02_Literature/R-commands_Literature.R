@@ -45,7 +45,7 @@ kidney_genes_publication_list <- read_excel(pub_file, skip = 4, na = "NA") %>%
 # TODO: make a snapshot of the files and calculate md5sum, uplaod to zenodo
 kidney_genes_publication_list_download <- kidney_genes_publication_list %>%
   rowwise() %>%
-  mutate(downloaded = download.file(Download_link, paste0("data/PMID_", PMID, ".", Type), mode = "wb", quiet = TRUE, method = "wininet"))
+  mutate(downloaded = download.file(Download_link, paste0("data/downloads/PMID_", PMID, ".", Type), mode = "wb", quiet = TRUE, method = "wininet"))
 ############################################
 
 

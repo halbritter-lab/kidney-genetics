@@ -57,13 +57,13 @@ file_date <- strftime(as.POSIXlt(Sys.time(), "UTC", "%Y-%m-%dT%H:%M:%S"), "%Y-%m
 
 # disease ontology annotations from HPO
 phenotype_hpoa_url <- "http://purl.obolibrary.org/obo/hp/hpoa/phenotype.hpoa"
-phenotype_hpoa_filename <- paste0("data/phenotype.", file_date, ".hpoa")
+phenotype_hpoa_filename <- paste0("data/downloads/phenotype.", file_date, ".hpoa")
 download.file(phenotype_hpoa_url, phenotype_hpoa_filename, mode = "wb")
 
 # OMIM links to genemap2 file needs to be set in config and applied for at
 # https://www.omim.org/downloads
 omim_genemap2_url <- config_vars$omim_genemap2_url
-omim_genemap2_filename <- paste0("data/omim_genemap2.", file_date, ".txt")
+omim_genemap2_filename <- paste0("data/downloads/omim_genemap2.", file_date, ".txt")
 download.file(omim_genemap2_url, omim_genemap2_filename, mode = "wb")
 ############################################
 
