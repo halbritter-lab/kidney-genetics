@@ -138,6 +138,7 @@ phenotype_hpoa_filter <- phenotype_hpoa %>%
 hpo_gene_list <- phenotype_hpoa_filter %>%
   left_join(omim_genemap2, by = c("database_id" = "disease_ontology_id")) %>%
   filter(!is.na(Approved_Symbol)) %>%
+  mutate(database_and_hpo_id = paste0(database_id, " (", abnormality_of_the_kidney_hpo_terms, ")")) %>%
   mutate(hgnc_id = hgnc_id_from_symbol_grouped(Approved_Symbol)) %>%
   mutate(approved_symbol = symbol_from_hgnc_id_grouped(hgnc_id)) %>%
   select(-disease_ontology_name, -Mapping_key, -hpo_mode_of_inheritance_term_name) %>%
@@ -146,13 +147,17 @@ hpo_gene_list <- phenotype_hpoa_filter %>%
     hgnc_id = paste(unique(hgnc_id), collapse = " | "),
     abnormality_of_the_kidney_hpo_terms = paste(abnormality_of_the_kidney_hpo_terms, collapse = "; "),
     database_id = paste(database_id, collapse = "; "),
+    database_and_hpo_id = paste(database_and_hpo_id, collapse = "; "),
     source_count = n(),
     .groups = "keep") %>%
   ungroup() %>%
-  select(approved_symbol, hgnc_id, gene_name_reported = Approved_Symbol, source = database_id, source_count, source_evidence = abnormality_of_the_kidney_hpo_terms)
-
-
-# TODO: normalize source_evidence as in other analyses (maybe database entry count > 1)
+  mutate(at_least_one_database = (source_count > 0)) %>%
+  select(approved_symbol,
+    hgnc_id,
+    gene_name_reported = Approved_Symbol,
+    source = database_and_hpo_id,
+    source_count,
+    source_evidence = at_least_one_database)
 
 ############################################
 
@@ -163,6 +168,15 @@ creation_date <- strftime(as.POSIXlt(Sys.time(),
   "UTC",
   "%Y-%m-%dT%H:%M:%S"), "%Y-%m-%d")
 
-write_csv(hpo_gene_list, file = paste0("results/04_HPO_genes.", creation_date, ".csv"), na = "NULL")
-write_csv(hpo_list, file = paste0("results/04_children-from-terms.", creation_date, ".csv"), na = "NULL")
+write_csv(hpo_gene_list,
+  file = paste0("results/04_HPO_genes.",
+    creation_date,
+    ".csv"),
+  na = "NULL")
+
+write_csv(hpo_list,
+  file = paste0("results/04_children-from-terms.",
+    creation_date,
+    ".csv"),
+  na = "NULL")
 ############################################
