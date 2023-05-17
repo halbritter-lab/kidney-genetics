@@ -32,6 +32,8 @@ NCBI_API_KEY <- config_vars$ncbi_api_key
 # load global functions
 # hgnc functions
 source("../functions/hgnc-functions.R", local = TRUE)
+# Pubtator functions
+source("../functions/PubTator-functions.R", local = TRUE)
 # NCBI functions
 source("../functions/NCBI-datasets-v2-API-functions.R", local = TRUE)
 ############################################
@@ -80,7 +82,12 @@ pubtator_genes_normalize <- pubtator_genes %>%
   mutate(hgnc_id = hgnc_id_from_symbol_grouped(symbol)) %>%
   filter(!is.na(hgnc_id)) %>%
   mutate(approved_symbol = symbol_from_hgnc_id_grouped(hgnc_id)) %>%
-  select(approved_symbol, hgnc_id, gene_name_reported = symbol, source = pmid, source_count, source_evidence = text_part)
+  select(approved_symbol,
+    hgnc_id,
+    gene_name_reported = symbol,
+    source = pmid,
+    source_count,
+    source_evidence = text_part)
 
 # TODO: normalize source_evidence as in other analyses (maybe pub count > 2)
 
