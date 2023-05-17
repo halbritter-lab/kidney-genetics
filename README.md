@@ -38,8 +38,8 @@ This project is licensed under the terms of the MIT license. For more informatio
 
 **Jan Halbritter**
 
+- <https://orcid.org/0000-0002-1377-9880>
+
 ## Contact
 
 If you have any questions, suggestions, or feedback, please feel free to [contact us](contact.md).
-
-- <https://orcid.org/0000-0002-1377-9880>
