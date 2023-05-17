@@ -31,7 +31,7 @@ source("../functions/hpo-functions.R", local = TRUE)
 
 
 ############################################
-## get all children of term Abnormality of the kidney HP:0000077 and annotating them with name and definition. 
+## get all children of term Abnormality of the kidney HP:0000077 and annotating them with name and definition.
 
 query_date <- strftime(as.POSIXlt(Sys.time(), "UTC", "%Y-%m-%dT%H:%M:%S"), "%Y-%m-%d")
 
@@ -105,7 +105,7 @@ omim_genemap2 <- read_delim(omim_genemap2_filename, "\t",
   mutate(MIM_Number = str_replace_all(MIM_Number, " ", "")) %>%
   filter(!is.na(MIM_Number))  %>%
   filter(!is.na(Approved_Symbol))  %>%
-  mutate(disease_ontology_id = paste0("OMIM:",MIM_Number)) %>%
+  mutate(disease_ontology_id = paste0("OMIM:", MIM_Number)) %>%
   separate_rows(hpo_mode_of_inheritance_term_name, sep = ", ") %>%
   mutate(hpo_mode_of_inheritance_term_name = str_replace_all(hpo_mode_of_inheritance_term_name, "\\?", "")) %>%
   select(-MIM_Number) %>%

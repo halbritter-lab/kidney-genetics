@@ -9,7 +9,7 @@ library(config)
 
 
 ############################################
-## define relativescript path
+## define relative script path
 project_name <- "kidney-genetics"
 script_path <- "/analyses/05_PubTator/"
 ## read config
@@ -30,9 +30,9 @@ NCBI_API_KEY <- config_vars$ncbi_api_key
 
 ############################################
 # load global functions
-# hgnc functions 
+# hgnc functions
 source("../functions/hgnc-functions.R", local = TRUE)
-# NCBI functions 
+# NCBI functions
 source("../functions/NCBI-datasets-v2-API-functions.R", local = TRUE)
 ############################################
 
@@ -46,13 +46,13 @@ search_query <- '("kidney disease" OR "renal disease") AND (gene OR syndrome) AN
 # get number of pages for search query
 pages_request <- pubtator_pages_request(search_query)
 
-# make a tibble of all pages and perform request using thhe page as input
+# make a tibble of all pages and perform request using the page as input
 page_tibble <- 1:pages_request %>%
   as_tibble() %>%
   select(page = value) %>%
   rowwise() %>%
   mutate(results = list(pubtator_genes_in_request(search_query, page))) %>%
-  ungroup() 
+  ungroup()
 
 page_tibble_unnest <- page_tibble %>%
   unnest(results) %>%
@@ -90,5 +90,5 @@ pubtator_genes_normalize <- pubtator_genes %>%
 ############################################
 ## save results
 creation_date <- strftime(as.POSIXlt(Sys.time(), "UTC", "%Y-%m-%dT%H:%M:%S"), "%Y-%m-%d")
-write_csv(pubtator_genes_normalize, file = paste0("results/05_PubTator_genes.", creation_date,".csv"), na = "NULL")
+write_csv(pubtator_genes_normalize, file = paste0("results/05_PubTator_genes.", creation_date, ".csv"), na = "NULL")
 ############################################
