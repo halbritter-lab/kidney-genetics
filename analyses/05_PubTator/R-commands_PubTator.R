@@ -93,5 +93,9 @@ creation_date <- strftime(as.POSIXlt(Sys.time(),
   "UTC",
   "%Y-%m-%dT%H:%M:%S"), "%Y-%m-%d")
 
-write_csv(pubtator_genes_normalize, file = paste0("results/05_PubTator_genes.", creation_date, ".csv"), na = "NULL")
+write_csv(pubtator_genes_normalize,
+  file = paste0("results/05_PubTator_genes.",
+    creation_date,
+    ".csv"),
+  na = "NULL")
 ############################################

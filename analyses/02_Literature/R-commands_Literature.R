@@ -10,7 +10,7 @@ library(config) # needed for config loading
 
 
 ############################################
-## define relativescript path
+## define relative script path
 script_path <- "kidney-genetics/analyses/02_Literature/"
 ## read config
 config_vars <- config::get(file = Sys.getenv("CONFIG_FILE"))
@@ -39,10 +39,8 @@ kidney_genes_publication_list <- read_excel(pub_file, skip = 4, na = "NA") %>%
 
 ############################################
 ## download all files
-
 # TODO: replace wininet method
 # TODO: make download of supplements more stable (2,7,15,16), maybe get links from website
-# TODO: make a snapshot of the files and calculate md5sum, uplaod to zenodo
 kidney_genes_publication_list_download <- kidney_genes_publication_list %>%
   rowwise() %>%
   mutate(downloaded = download.file(Download_link, paste0("data/downloads/PMID_", PMID, ".", Type), mode = "wb", quiet = TRUE, method = "wininet"))
@@ -72,7 +70,8 @@ number1_pmid_35325889_genes <- read_docx("data/PMID_35325889.docx") %>%
 # Publication number 2: for PMID 34264297
 number2_pmid_34264297_genes <- unzip("data/PMID_34264297.zip", list = TRUE, exdir = "data", overwrite = TRUE) %>%
   rowwise() %>%
-  mutate(genes = list(read_excel(unzip("data/PMID_34264297.zip", files = Name, exdir = "data"), skip = 2) %>% select(Gene))) %>%
+  mutate(genes = list(read_excel(unzip("data/PMID_34264297.zip", files = Name, exdir = "data"), skip = 2) %>%
+  select(Gene))) %>%
   ungroup() %>%
   unnest(genes) %>%
   select(gene = Gene) %>%
@@ -105,7 +104,7 @@ number3_pmid_36035137_genes <- read_excel("data/PMID_36035137.xlsx", skip = 1) %
 
 
 ###############
-# Publication number 5: 
+# Publication number 5:
 number5_pmid_33664247_genes <- pdf_text("data/PMID_33664247.pdf") %>%
   read_lines(skip = 15) %>%
   str_squish() %>%
@@ -269,12 +268,17 @@ literature_genes <- kidney_genes_publication_list %>%
   group_by(approved_symbol, hgnc_id) %>%
   summarise(gene_name_reported = paste(unique(gene_name_reported), collapse = " | "),
     source = paste(unique(source), collapse = " | "),
-    Publication_count = n(),
+    publication_count = n(),
     .groups = "keep") %>%
   ungroup() %>%
-  mutate(hgnc_id = paste0("HGNC:",hgnc_id_from_symbol_grouped(approved_symbol)))
-
-# TODO: normalize source_evidence as in other analyses (maybe pub count > 1)
+  mutate(hgnc_id = paste0("HGNC:", hgnc_id_from_symbol_grouped(approved_symbol))) %>%
+  mutate(at_least_two_publications = (publication_count > 1)) %>%
+  select(approved_symbol,
+    hgnc_id,
+    gene_name_reported,
+    source,
+    source_count = publication_count,
+    source_evidence = at_least_two_publications)
 
 ############################################
 
@@ -286,5 +290,9 @@ creation_date <- strftime(as.POSIXlt(Sys.time(),
   "UTC",
   "%Y-%m-%dT%H:%M:%S"), "%Y-%m-%d")
 
-write_csv(literature_genes, file = paste0("results/02_Literature_genes.", creation_date,".csv"), na="NULL")
+write_csv(literature_genes,
+  file = paste0("results/02_Literature_genes.",
+    creation_date,
+    ".csv"),
+  na = "NULL")
 ############################################
