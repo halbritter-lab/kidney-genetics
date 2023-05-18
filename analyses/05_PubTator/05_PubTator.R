@@ -81,15 +81,15 @@ pubtator_genes_normalize <- pubtator_genes %>%
   mutate(hgnc_id = hgnc_id_from_symbol_grouped(symbol)) %>%
   filter(!is.na(hgnc_id)) %>%
   mutate(approved_symbol = symbol_from_hgnc_id_grouped(hgnc_id)) %>%
+  mutate(at_least_three_pub = (source_count > 2)) %>%
   select(approved_symbol,
     hgnc_id,
     gene_name_reported = symbol,
     source = pmid,
     source_count,
-    source_evidence = text_part)
+    source_evidence = at_least_three_pub)
 
-# TODO: normalize source_evidence as in other analyses (maybe pub count > 2)
-
+# TODO: normalize PMID representation
 
 # TODO: normalize source_evidence to 0/1 as percentiles
 # TODO: write a function for this normalization step
