@@ -12,7 +12,7 @@ Welcome to the GitHub repository  "Kidney-Genetics", a systematically curated, r
 
 ## Overview and Methods
 
-The Kidney-Genetics Atlas contains information about > 1.400 of kidney-associated genes. This information was gathered from various reliable sources, such as Genomics England PanelApp, PanelApp Australia, PubTator, OMIM, Orphanet, clinical diagnostic panels, and comprehensive literature review.
+The Kidney-Genetics Atlas contains information for about 3.000 kidney-associated genes. This information was gathered from various reable sources, such as Genomics England PanelApp, PanelApp Australia, PubTator, OMIM, Orphanet, clinical diagnostic panels, and comprehensive literature review.
 
 ## Usage
 
