@@ -25,6 +25,8 @@ cd kidney-genetics/analyses/02_Literature/
 Rscript 02_Literature.R
 ```
 
+## Configuration
+
 Before running the script, set the `CONFIG_FILE` environment variable to the path of your config file.
 
 ```bash
