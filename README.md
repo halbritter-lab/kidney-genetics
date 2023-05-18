@@ -5,6 +5,7 @@ Welcome to the GitHub repository  "Kidney-Genetics", a systematically curated, r
 
 - [Overview and Methods](#overview-and-methods)
 - [Usage](#usage)
+- [File structure](#file-structure)
 - [License](#license)
 - [Creators](#creators-and-contributors)
 - [Contact](#contact)

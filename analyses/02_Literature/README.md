@@ -13,6 +13,8 @@ Make sure you have the following libraries installed:
 - `pdftools`: Required for pdf files.
 - `config`: Needed for config loading.
 
+For this analysis you need to have access (VPN) to to respective journals to download the supplement files.
+
 ## Usage
 
 Clone the repository and run the R script located in `analyses/02_Literature/`. 
