@@ -17,6 +17,48 @@ The Kidney-Genetics Atlas contains information about > 1.400 of kidney-associate
 
 The Kidney-Genetics Atlas is publicly available and accessible through GitHub. Furthermore, the database is automatically and regularly updated to ensure its currency and relevance.
 
+## File Structure
+
+The repository has the following structure:
+
+```
+.
+├── analyses/
+│   ├── 01_PanelApp/
+│   │   ├── data/
+│   │   ├── results/
+│   │   └── 01_PanelApp.R
+│   ├── 02_Literature/
+│   │   ├── data/
+│   │   ├── results/
+│   │   └── 02_Literature.R
+│   ├── 03_DiagnosticPanels/
+│   │   ├── data/
+│   │   ├── results/
+│   │   └── 03_DiagnosticPanels.R
+│   ├── 04_HPO/
+│   │   ├── data/
+│   │   ├── results/
+│   │   └── 04_HPO.R
+│   └── 05_PubTator/
+│       ├── data/
+│       ├── results/
+│       └── 05_PubTator.R
+└── functions/
+    ├── blueprintgenetics-functions.R
+    ├── hgnc-functions.R
+    ├── hpo-functions.R
+    ├── natera-functions.R
+    ├── NCBI-datasets-v2-API-functions.R
+    ├── phantomjs-functions.R
+    └── PubTator-functions.R
+```
+
+- The `analyses/` directory contains the R scripts for different analyses.
+- The `functions/` directory contains the necessary functions for HGNC processing.
+- The `data/` sub-directory in each analysis folder stores the input data files, including the publication-specific files and the curated overview Excel table.
+- The `results/` sub-directory in each analysis folder stores the generated results.
+
 ## License
 
 This project is licensed under the terms of the MIT license. For more information, please refer to the [License](LICENSE.md) file.
