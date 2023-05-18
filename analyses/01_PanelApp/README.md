@@ -39,19 +39,6 @@ The output of the script is two CSV files:
 - `01_PanelApp_panels.<date>.csv`: Contains the data for each kidney-related panel retrieved from PanelApp.
 - `01_PanelApp_genes.<date>.csv`: Contains the data for each gene related to kidney diseases, processed and formatted for further analysis.
 
-## Config File
-
-The script requires a configuration file to run. This file should define the following variables:
-
-- `projectsdir`: The directory where the "kidney-genetics" project is located.
-
-## TODO
-
-- Download API call data for reproducibility.
-- Normalize source_evidence to 0/1 as percentiles.
-- Write a function for the normalization step.
-- Implement gzip compression for csv result files.
-
 ## License
 
 This project is licensed under the terms of the MIT license. See the LICENSE file for details.
