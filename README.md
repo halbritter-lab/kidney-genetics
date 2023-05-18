@@ -41,10 +41,11 @@ The repository has the following structure:
 │   │   ├── data/
 │   │   ├── results/
 │   │   └── 04_HPO.R
-│   └── 05_PubTator/
-│       ├── data/
-│       ├── results/
-│       └── 05_PubTator.R
+│   ├── 05_PubTator/
+│   │   ├── data/
+│   │   ├── results/
+│   │   └── 05_PubTator.R
+│   └── MergeAnalysesSources.R
 └── functions/
     ├── blueprintgenetics-functions.R
     ├── hgnc-functions.R
