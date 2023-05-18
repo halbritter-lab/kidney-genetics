@@ -28,7 +28,11 @@ Rscript 03_DiagnosticPanels.R
 
 ## Configuration
 
-This script uses a configuration file to set up some parameters. The configuration file should be specified as an environment variable `CONFIG_FILE`. The configuration file should contain the projects directory.
+Before running the script, set the `CONFIG_FILE` environment variable to the path of your config file.
+
+```bash
+export CONFIG_FILE="/path/to/your/config/file"
+```
 
 ## Description
 
