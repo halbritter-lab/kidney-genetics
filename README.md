@@ -1,3 +1,7 @@
+<p align="center">
+    <img src="edit_docs/static/img/kidney-genetics_logo.png" alt="Kidney-Genetics logo" width="192" height="192">
+</p>
+
 # Kidney-Genetics - Designing a reproducible and curated database of kidney-related genes
 Welcome to the GitHub repository  "Kidney-Genetics", a systematically curated, reproducible list of all relevant kidney-related genes known to date. This project aims to provide a unified and standardized database of kidney disease-associated genes, contributing to improved diagnosis, treatment selection, and monitoring of kidney diseases. The database is designed to be automatically updated on a regular basis, ensuring the incorporation of the most up-to-date genetic findings in kidney research.
 
@@ -12,7 +16,7 @@ Welcome to the GitHub repository  "Kidney-Genetics", a systematically curated, r
 
 ## Overview and Methods
 
-The Kidney-Genetics Atlas contains information for about 3.000 kidney-associated genes. This information was gathered from various reable sources, such as Genomics England PanelApp, PanelApp Australia, PubTator, OMIM, Orphanet, clinical diagnostic panels, and comprehensive literature review.
+The Kidney-Genetics Atlas contains information for about 3.000 kidney-associated genes. This information was gathered from various reliable sources, such as Genomics England PanelApp, PanelApp Australia, PubTator, OMIM, Orphanet, clinical diagnostic panels, and comprehensive literature review.
 
 ## Usage
 
