@@ -1,0 +1,10 @@
+results
+conclusion
+outlook
+analyses-tables
+main-table-merged-analyses-sources
+result-table-panelapp
+result-table-literature
+result-table-diagnostic-panels
+result-table-hpo-in-rare-disease-databases
+result-table-pubtator
