@@ -8,3 +8,10 @@ result-table-literature
 result-table-diagnostic-panels
 result-table-hpo-in-rare-disease-databases
 result-table-pubtator
+analyses-plots
+upset-plot-of-merged-analyses-sources
+bar-plot-of-panelapp-results
+bar-plot-of-literature-results
+bar-plot-of-diagnostic-panels-results
+bar-plot-of-hpo-in-rare-disease-databases-results
+bar-plot-of-pubtator-results
