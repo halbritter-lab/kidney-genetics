@@ -1,0 +1,58 @@
+--- 
+title: "The Kidney-Genetics Documentation"
+author: "Bernt Popp, Nina Rank, Constantin Wolff, Jan Halbritter"
+date: "`r Sys.Date()`"
+site: bookdown::bookdown_site
+output: bookdown::gitbook
+bibliography: [kidney-genetics.bib]
+csl: apa.csl
+link-citations: yes
+colorlinks: yes
+description: "This documentation is intended to describe the Kidney-Genetics project"
+graphics: yes
+github-repo: halbritter-lab/kidney-genetics
+url: https://halbritter-lab.github.io/kidney-genetics/
+---
+
+# Preface {-}
+
+---------------------------------------
+
+This documentation is intended to describe the [Kidney-Genetics](https://github.com/halbritter-lab/kidney-genetics) project.
+
+
+## Objective {-}
+
+How can we address the lack of a unified and standardized database of kidney disease-associated genes, which hampers diagnosis, treatment, and research comparability in the field of kidney diseases?
+
+
+## Methods {-}
+
+To create a comprehensive and standardized database of kidney-related genes, we employed the following methods:
+
+1. Utilized data from Genomics England and Australia PanelApp.
+2. Conducted a comprehensive literature review of published gene lists.
+3. Collected information from clinical diagnostic panels for kidney disease.
+4. Performed a Human Phenotype Ontology (HPO)-based search in rare disease databases (OMIM, Orphanet).
+5. Employed a PubTator API-based automated literature extraction from PubMed.
+
+We also developed an evidence-scoring system to differentiate highly confirmed disease genes from candidate genes.
+
+
+## Results
+
+The "Kidney-Genetics" database currently includes detailed information on 2,906 kidney-associated genes. Notably, 439 genes (15.1%) are present in three or more of the analyzed information sources, indicating high confidence and their potential for diagnostic use.
+
+To ensure currency, Kidney-Genetics will be regularly and automatically updated. We will also provide phenotypic and functional clustering results to facilitate gene grouping.
+
+
+## Conclusion
+
+Kidney-Genetics is a comprehensive and freely accessible database that researchers can use to analyze genomic data related to kidney diseases. The database is regularly updated through a standardized pipeline and an automated system, ensuring it remains up-to-date with the latest advancements in kidney research and diagnostics.
+
+By utilizing Kidney-Genetics, clinicians and researchers can enhance their understanding of the genetic aspects of kidney disorders.
+
+
+## Outlook
+
+Future goals include manual curation and the assignment of diagnostic genes to specific nephrological disease groups, such as syndromic vs. isolated, adult- vs. pediatric-onset, and cystic vs. nephrotic, among others.

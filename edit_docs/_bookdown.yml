@@ -1,0 +1,19 @@
+book_filename: "KidneyGenetics_documentation.Rmd"
+toc:
+  collapse: none
+rmd_files: 
+    - "index.Rmd"
+    - "01-analyses-tables.Rmd"
+    - "references.Rmd"
+delete_merged_file: true
+language:
+  ui:
+    edit: "Edit"
+    chapter_name: "Chapter | "
+download:
+  - ["KidneyGenetics_documentation.pdf", "PDF"]
+  - ["KidneyGenetics_documentation.epub", "EPUB"]
+  - ["KidneyGenetics_documentation.docx", "DOCX"]
+view: https://github.com/halbritter-lab/kidney-genetics/tree/master/docs/%s
+edit: https://github.com/halbritter-lab/kidney-genetics/tree/master/edit_docs/%s
+output_dir: "../docs"
