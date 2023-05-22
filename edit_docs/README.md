@@ -37,3 +37,7 @@ webshot::install_phantomjs()
 ```
 
 The CSL file is [American Psychological Association 7th edition, from Zotero](https://www.zotero.org/styles/apa).
+
+## TODO
+- automatic loading and filtering of current result tables in all Rmd files
+- make a script that runs the above commands to re-generate the pages website
