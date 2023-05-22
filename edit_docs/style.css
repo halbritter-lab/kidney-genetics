@@ -19,3 +19,6 @@ mark {
   font-weight: bold;
   background-color: #EAADBA;
 }
+.book .book-body .page-wrapper .page-inner {
+  max-width: 1200px !important;
+}

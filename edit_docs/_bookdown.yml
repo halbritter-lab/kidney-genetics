@@ -4,6 +4,7 @@ toc:
 rmd_files: 
     - "index.Rmd"
     - "01-analyses-tables.Rmd"
+    - "02-analyses-plots.Rmd"
     - "references.Rmd"
 delete_merged_file: true
 language:

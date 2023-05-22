@@ -6,6 +6,7 @@ knitr::opts_chunk$set(echo = TRUE)
 library(readr) # needed to import CSV result files
 library(tidyverse) # needed to transform the tables
 library(DT) # needed to generate nice data tables in html
+library(plotly) # needed for upset plots
 ```
 
 ```{r, echo=FALSE, message=FALSE, warning=FALSE}
@@ -23,7 +24,7 @@ PubTator_genes <- read_csv("../analyses/05_PubTator/results/05_PubTator_genes.20
 
 ## Main table: Merged analyses sources
 
-This table shows the merged results of all analyses files as  a wide table with summarized information.
+This table shows the merged results of all analyses files as a wide table with summarized information.
 
 ```{r, echo=FALSE}
 merge_analyses_sources_reformat <- merge_analyses_sources %>%
@@ -98,14 +99,14 @@ datatable(DiagnosticPanels_genes_reformat,
 This table shows results of the fourth analysis searching kidney disease associated genes from a Human Phenotype Ontology (HPO)-based search in rare disease databases (OMIM, Orphanet).
 
 ```{r, echo=FALSE}
-DiagnosticPanels_genes_reformat <- DiagnosticPanels_genes %>%
+HPO_genes_reformat <- HPO_genes %>%
   mutate(hgnc_id = paste0('<a href="https://www.genenames.org/data/gene-symbol-report/#!/hgnc_id/HGNC:',
     hgnc_id,
     '" target="_blank" >',
     hgnc_id,
     '</a>'))
 
-datatable(DiagnosticPanels_genes_reformat,
+datatable(HPO_genes_reformat,
           filter = 'top', # this argument positions the filtering input at the top of the table
           escape = FALSE) # this argument renders the links as HTML
 ```
