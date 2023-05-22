@@ -94,6 +94,7 @@ This project is licensed under the terms of the MIT license. For more informatio
 **Constantin Aaron Wolff**
 
 - <https://github.com/ConstantinWolff>
+- <https://orcid.org/0000-0002-3277-4559>
 
 **Nina Rank**
 

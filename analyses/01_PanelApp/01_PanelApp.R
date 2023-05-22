@@ -156,6 +156,7 @@ all_panelapp_genes_format <- all_panelapp_genes %>%
 
 # TODO: normalize source_evidence to 0/1 as percentiles
 # TODO: write a function for this normalization step
+# TODO: add green/amber/red status to source
 
 ############################################
 
