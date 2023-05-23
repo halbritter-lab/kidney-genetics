@@ -32,7 +32,10 @@ merge_analyses_sources_reformat <- merge_analyses_sources %>%
     hgnc_id,
     '" target="_blank" >',
     hgnc_id,
-    '</a>'))
+    '</a>')) %>%
+  mutate(approved_symbol = paste0('<i>',
+    approved_symbol,
+    '</i>'))
 
 datatable(merge_analyses_sources_reformat,
           filter = 'top', # this argument positions the filtering input at the top of the table
@@ -50,7 +53,10 @@ PanelApp_genes_reformat <- PanelApp_genes %>%
     hgnc_id,
     '" target="_blank" >',
     hgnc_id,
-    '</a>'))
+    '</a>')) %>%
+  mutate(approved_symbol = paste0('<i>',
+    approved_symbol,
+    '</i>'))
 
 datatable(PanelApp_genes_reformat,
           filter = 'top', # this argument positions the filtering input at the top of the table
@@ -68,7 +74,10 @@ Literature_genes_reformat <- Literature_genes %>%
     hgnc_id,
     '" target="_blank" >',
     hgnc_id,
-    '</a>'))
+    '</a>')) %>%
+  mutate(approved_symbol = paste0('<i>',
+    approved_symbol,
+    '</i>'))
 
 datatable(Literature_genes_reformat,
           filter = 'top', # this argument positions the filtering input at the top of the table
@@ -86,7 +95,10 @@ DiagnosticPanels_genes_reformat <- DiagnosticPanels_genes %>%
     hgnc_id,
     '" target="_blank" >',
     hgnc_id,
-    '</a>'))
+    '</a>')) %>%
+  mutate(approved_symbol = paste0('<i>',
+    approved_symbol,
+    '</i>'))
 
 datatable(DiagnosticPanels_genes_reformat,
           filter = 'top', # this argument positions the filtering input at the top of the table
@@ -104,7 +116,10 @@ HPO_genes_reformat <- HPO_genes %>%
     hgnc_id,
     '" target="_blank" >',
     hgnc_id,
-    '</a>'))
+    '</a>')) %>%
+  mutate(approved_symbol = paste0('<i>',
+    approved_symbol,
+    '</i>'))
 
 datatable(HPO_genes_reformat,
           filter = 'top', # this argument positions the filtering input at the top of the table
@@ -122,7 +137,10 @@ PubTator_genes_reformat <- PubTator_genes %>%
     hgnc_id,
     '" target="_blank" >',
     hgnc_id,
-    '</a>'))
+    '</a>')) %>%
+  mutate(approved_symbol = paste0('<i>',
+    approved_symbol,
+    '</i>'))
 
 datatable(PubTator_genes_reformat,
           filter = 'top', # this argument positions the filtering input at the top of the table
