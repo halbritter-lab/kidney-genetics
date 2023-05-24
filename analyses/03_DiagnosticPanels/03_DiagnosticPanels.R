@@ -303,6 +303,9 @@ all_diagnostic_panels_genes_format <- all_diagnostic_panels_genes %>%
 # TODO: normalize source_evidence to 0/1 as percentiles
 # TODO: write a function for this normalization step
 
+all_diagnostic_panels_genes_formats_norm <- all_diagnostic_panels_genes_format %>%
+         mutate(source_count_percent_rank = percent_rank(source_count))
+
 ############################################
 
 
