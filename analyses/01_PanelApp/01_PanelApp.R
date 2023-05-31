@@ -10,12 +10,19 @@ library(config)
 
 ############################################
 ## define relative script path
+project_topic <- "nephrology"
 project_name <- "kidney-genetics"
 script_path <- "/analyses/01_PanelApp/"
-## read config
-config_vars <- config::get(file = Sys.getenv("CONFIG_FILE"))
+
+## read configs
+config_vars <- config::get(file = Sys.getenv("CONFIG_FILE"),
+    config = "default")
+config_vars_path <- config::get(file = Sys.getenv("CONFIG_FILE"),
+    config = project_topic)
+
 ## set working directory
-setwd(paste0(config_vars$projectsdir, project_name, script_path))
+setwd(paste0(config_vars_path$projectsdir, project_name, script_path))
+
 ## set global options
 options(scipen = 999)
 ############################################
@@ -30,6 +37,8 @@ source("../functions/hgnc-functions.R", local = TRUE)
 
 ############################################
 ## get a list of all PanelApp panels and filter
+
+# TODO: add logic to find all pages through API call
 
 ## PanelApp UK
 # store all pages in a list first
@@ -49,8 +58,7 @@ panelapp_uk <- rbind_pages(panelapp_uk_pages) %>%
     "https://panelapp.genomicsengland.co.uk/api/v1/panels/",
     id,
     "/?format=json")) %>%
-  mutate(panel_source = "panelapp_uk") %>%
-  filter(str_detect(name, "[Kk]idney|[Rr]enal|[Nn]ephro"))
+  mutate(panel_source = "panelapp_uk")
 
 ## PanelApp Australia
 # store all pages in a list first
@@ -69,11 +77,15 @@ panelapp_australia <- rbind_pages(panelapp_australia_pages) %>%
   mutate(api_call = paste0("https://panelapp.agha.umccr.org/api/v1/panels/",
     id,
     "/?format=json")) %>%
-  mutate(panel_source = "panelapp_australia") %>%
-  filter(str_detect(name, "[Kk]idney|[Rr]enal|[Nn]ephro"))
+  mutate(panel_source = "panelapp_australia")
 
 # combine into one tibble
-panelapp_panels <- bind_rows(panelapp_uk, panelapp_australia)
+# filter for kidney related panels
+panelapp_panels <- bind_rows(panelapp_uk, panelapp_australia) %>%
+  mutate(kidney_disease = str_detect(name, "[Kk]idney|[Rr]enal|[Nn]ephro"))
+
+panelapp_panels_kidney <- panelapp_panels %>%
+  filter(kidney_disease == TRUE)
 
 ############################################
 
@@ -84,7 +96,7 @@ panelapp_panels <- bind_rows(panelapp_uk, panelapp_australia)
 
 # TODO: download API call data for reproducibility
 
-panelapp_genes <- panelapp_panels %>%
+panelapp_genes <- panelapp_panels_kidney %>%
   rowwise() %>%
   mutate(panel = list(fromJSON(api_call))) %>%
   unnest_wider(panel, names_repair = "unique") %>%
@@ -168,7 +180,7 @@ creation_date <- strftime(as.POSIXlt(Sys.time(),
   "UTC",
   "%Y-%m-%dT%H:%M:%S"), "%Y-%m-%d")
 
-write_csv(panelapp_panels,
+write_csv(panelapp_panels_kidney,
   file = paste0("results/01_PanelApp_panels.",
     creation_date,
     ".csv"),

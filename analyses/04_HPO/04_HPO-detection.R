@@ -11,12 +11,19 @@ library(config) # needed for config loading
 
 ############################################
 ## define relative script path
+project_topic <- "nephrology"
 project_name <- "kidney-genetics"
 script_path <- "/analyses/04_HPO/"
-## read config
-config_vars <- config::get(file = Sys.getenv("CONFIG_FILE"))
+
+## read configs
+config_vars <- config::get(file = Sys.getenv("CONFIG_FILE"),
+    config = "default")
+config_vars_path <- config::get(file = Sys.getenv("CONFIG_FILE"),
+    config = project_topic)
+
 ## set working directory
-setwd(paste0(config_vars$projectsdir, project_name, script_path))
+setwd(paste0(config_vars_path$projectsdir, project_name, script_path))
+
 ## set global options
 options(scipen = 999)
 ############################################
