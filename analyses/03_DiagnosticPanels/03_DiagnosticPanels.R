@@ -46,7 +46,7 @@ source("../functions/blueprintgenetics-functions.R", local = TRUE)
 ## download web urls
 
 # load the list of sources
-diagnostic_panels_list <- read_excel("data/diagnostic_panels_list.xlsx") %>%
+diagnostic_panels_list <- read_excel("data/kidney_diagnostic_panels_list.xlsx") %>%
   filter(use == "yes")
 
 # download using phantomJS
