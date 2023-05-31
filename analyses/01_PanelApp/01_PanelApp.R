@@ -81,8 +81,10 @@ panelapp_australia <- rbind_pages(panelapp_australia_pages) %>%
 
 # combine into one tibble
 # filter for kidney related panels
+filter_string <- "[Kk]idney|[Rr]enal|[Nn]ephro"
+
 panelapp_panels <- bind_rows(panelapp_uk, panelapp_australia) %>%
-  mutate(kidney_disease = str_detect(name, "[Kk]idney|[Rr]enal|[Nn]ephro"))
+  mutate(kidney_disease = str_detect(name, filter_string))
 
 panelapp_panels_kidney <- panelapp_panels %>%
   filter(kidney_disease == TRUE)
