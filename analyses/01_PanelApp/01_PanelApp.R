@@ -145,6 +145,8 @@ all_panelapp_genes <- panelapp_genes %>%
       panel_id,
       ", version=",
       panel_version,
+      ", confidence=",
+      confidence_level,
       ")"), collapse = " | "),
     panel_id = paste(unique(panel_id), collapse = " | "),
     panel_name = paste(unique(panel_name), collapse = " | "),
@@ -170,7 +172,6 @@ all_panelapp_genes_format <- all_panelapp_genes %>%
 
 # TODO: normalize source_evidence to 0/1 as percentiles
 # TODO: write a function for this normalization step
-# TODO: add green/amber/red status to source
 
 ############################################
 
