@@ -96,13 +96,13 @@ omim_genemap2 <- read_delim(omim_genemap2_filename, "\t",
     MIM_Number = X6,
     Gene_Symbols = X7,
     Gene_Name = X8,
-    Approved_Symbol = X9,
+    approved_symbol = X9,
     Entrez_Gene_ID = X10,
     Ensembl_Gene_ID = X11,
     Comments = X12,
     Phenotypes = X13,
     Mouse_Gene_Symbol_ID = X14) %>%
-  select(Approved_Symbol, Phenotypes) %>%
+  select(approved_symbol, Phenotypes) %>%
   separate_rows(Phenotypes, sep = "; ") %>%
   separate(Phenotypes, c("disease_ontology_name", "hpo_mode_of_inheritance_term_name"), "\\), (?!.+\\))") %>%
   separate(disease_ontology_name, c("disease_ontology_name", "Mapping_key"), "\\((?!.+\\()") %>%
@@ -111,7 +111,7 @@ omim_genemap2 <- read_delim(omim_genemap2_filename, "\t",
   mutate(Mapping_key = str_replace_all(Mapping_key, " ", "")) %>%
   mutate(MIM_Number = str_replace_all(MIM_Number, " ", "")) %>%
   filter(!is.na(MIM_Number))  %>%
-  filter(!is.na(Approved_Symbol))  %>%
+  filter(!is.na(approved_symbol)) %>%
   mutate(disease_ontology_id = paste0("OMIM:", MIM_Number)) %>%
   separate_rows(hpo_mode_of_inheritance_term_name, sep = ", ") %>%
   mutate(hpo_mode_of_inheritance_term_name = str_replace_all(hpo_mode_of_inheritance_term_name, "\\?", "")) %>%
@@ -144,13 +144,13 @@ phenotype_hpoa_filter <- phenotype_hpoa %>%
 
 hpo_gene_list <- phenotype_hpoa_filter %>%
   left_join(omim_genemap2, by = c("database_id" = "disease_ontology_id")) %>%
-  filter(!is.na(Approved_Symbol)) %>%
+  filter(!is.na(approved_symbol)) %>%
   mutate(database_and_hpo_id = paste0(database_id, " (", abnormality_of_the_kidney_hpo_terms, ")")) %>%
-  mutate(hgnc_id = hgnc_id_from_symbol_grouped(Approved_Symbol)) %>%
+  mutate(hgnc_id = hgnc_id_from_symbol_grouped(approved_symbol)) %>%
   mutate(approved_symbol = symbol_from_hgnc_id_grouped(hgnc_id)) %>%
   select(-disease_ontology_name, -Mapping_key, -hpo_mode_of_inheritance_term_name) %>%
   group_by(approved_symbol) %>%
-  summarise(Approved_Symbol = paste(unique(Approved_Symbol), collapse = " | "),
+  summarise(approved_symbol = paste(unique(approved_symbol), collapse = " | "),
     hgnc_id = paste(unique(hgnc_id), collapse = " | "),
     abnormality_of_the_kidney_hpo_terms = paste(abnormality_of_the_kidney_hpo_terms, collapse = "; "),
     database_id = paste(database_id, collapse = "; "),
@@ -161,7 +161,7 @@ hpo_gene_list <- phenotype_hpoa_filter %>%
   mutate(at_least_one_database = (source_count > 0)) %>%
   select(approved_symbol,
     hgnc_id,
-    gene_name_reported = Approved_Symbol,
+    gene_name_reported = approved_symbol,
     source = database_and_hpo_id,
     source_count,
     source_evidence = at_least_one_database)
