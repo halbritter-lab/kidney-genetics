@@ -409,20 +409,74 @@ hpo_gene_list_all_kidney_groups_summarized_for_join <- hpo_gene_list_all_kidney_
   ungroup()
 
 # TODO: check if we need to do this analysis per entity instead of per gene
+# TODO: workflow: if the respective gene/entity from our kidney list is in the geneCC curated list apply this group, if not apply the group with the highest score after reviewing the groups manually
 ############################################
 
 
 
 ############################################
+# TODO: syndromic vs non-syndromic
 # syndromic vs non-syndromic (categories in OMIM: GROWTH, SKELETAL, NEUROLOGIC, HEAD & NECK; exclude: CARDIOVASCULAR, ABDOMEN, GENITOURINARY)
+
+############################################
+
+
+############################################
+# TODO: pediatric vs adult onset
 # pediatric vs adult onset (OMIM: HPO terms Adult onset HP:0003581, Pediatric onset HP:0410280, maybe othe terms children of terms)
+
+############################################
+
+
+############################################
+# TODO: annotate with OMIM P numbers
+
 ############################################
 
 
+############################################
+# TODO: annotate with GeneCC
 
 ############################################
-#TODO: annotate with OMIM P numbers
-#TODO: annotate with GeneCC
+
+
+############################################
+# TODO: annotate ClinVar variant counts
+
+############################################
+
+
+############################################
+# TODO: annotate MGI mouse phenotypes kidney
+
+############################################
+
+
+############################################
+# TODO: annotate StringDB interactions with strong evidence kidney genes
+
+############################################
+
+
+############################################
+# TODO: annotate GTEx kidney expression
+# TODO: maybe add expression in embryonic kidney from somewhere (e.g. https://descartes.brotmanbaty.org/)
+
+############################################
+
+
+############################################
+# TODO: annotate gnomAD pLI and missense Z scores
+
+############################################
+
+
+############################################
+# TODO: add a column in the final table for publication (screening = 1 point, first clinical description = 2 points, clinical replication = 3 points)
+# TODO: scoring logic: if only screening publication then the category cant be more then Limited, if there is a clinical description then the category can be Moderate, if there is a clinical replication then the category can be Definitive
+# TODO: scoring logic: we further use the category "no known relation" for genes that are not trustworthy associated with kidney disease
+# TODO: maybe annotate with publications (from OMIM) and GeneReviews
+
 ############################################
 
 
