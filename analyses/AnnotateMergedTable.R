@@ -110,6 +110,66 @@ download.file(omim_genemap2_url, omim_genemap2_filename, mode = "wb")
 
 
 ############################################
+## load OMIM and terms files and reformat them
+phenotype_hpoa <- read_delim(phenotype_hpoa_filename,
+    delim = "\t",
+  escape_double = FALSE,
+    trim_ws = TRUE,
+  skip = 4)
+
+omim_genemap2 <- read_delim(omim_genemap2_filename, "\t",
+    escape_double = FALSE,
+    col_names = FALSE,
+    comment = "#",
+    trim_ws = TRUE) %>%
+  select(Chromosome = X1,
+    Genomic_Position_Start = X2,
+    Genomic_Position_End = X3,
+    Cyto_Location = X4,
+    Computed_Cyto_Location = X5,
+    MIM_Number = X6,
+    Gene_Symbols = X7,
+    Gene_Name = X8,
+    approved_symbol = X9,
+    Entrez_Gene_ID = X10,
+    Ensembl_Gene_ID = X11,
+    Comments = X12,
+    Phenotypes = X13,
+    Mouse_Gene_Symbol_ID = X14) %>%
+  select(approved_symbol, Phenotypes) %>%
+  separate_rows(Phenotypes, sep = "; ") %>%
+  separate(Phenotypes, c("disease_ontology_name", "hpo_mode_of_inheritance_term_name"), "\\), (?!.+\\))") %>%
+  separate(disease_ontology_name, c("disease_ontology_name", "Mapping_key"), "\\((?!.+\\()") %>%
+  mutate(Mapping_key = str_replace_all(Mapping_key, "\\)", "")) %>%
+  separate(disease_ontology_name, c("disease_ontology_name", "MIM_Number"), ", (?=[0-9][0-9][0-9][0-9][0-9][0-9])") %>%
+  mutate(Mapping_key = str_replace_all(Mapping_key, " ", "")) %>%
+  mutate(MIM_Number = str_replace_all(MIM_Number, " ", "")) %>%
+  filter(!is.na(MIM_Number))  %>%
+  filter(!is.na(approved_symbol)) %>%
+  mutate(disease_ontology_id = paste0("OMIM:", MIM_Number)) %>%
+  separate_rows(hpo_mode_of_inheritance_term_name, sep = ", ") %>%
+  mutate(hpo_mode_of_inheritance_term_name = str_replace_all(hpo_mode_of_inheritance_term_name, "\\?", "")) %>%
+  select(-MIM_Number) %>%
+  unique() %>%
+  mutate(hpo_mode_of_inheritance_term_name = case_when(hpo_mode_of_inheritance_term_name == "Autosomal dominant" ~ "Autosomal dominant inheritance",
+    hpo_mode_of_inheritance_term_name == "Autosomal recessive" ~ "Autosomal recessive inheritance",
+    hpo_mode_of_inheritance_term_name == "Digenic dominant" ~ "Digenic inheritance",
+    hpo_mode_of_inheritance_term_name == "Digenic recessive" ~ "Digenic inheritance",
+    hpo_mode_of_inheritance_term_name == "Isolated cases" ~ "Sporadic",
+    hpo_mode_of_inheritance_term_name == "Mitochondrial" ~ "Mitochondrial inheritance",
+    hpo_mode_of_inheritance_term_name == "Multifactorial" ~ "Multifactorial inheritance",
+    hpo_mode_of_inheritance_term_name == "Pseudoautosomal dominant" ~ "X-linked dominant inheritance",
+    hpo_mode_of_inheritance_term_name == "Pseudoautosomal recessive" ~ "X-linked recessive inheritance",
+    hpo_mode_of_inheritance_term_name == "Somatic mosaicism" ~ "Somatic mosaicism",
+    hpo_mode_of_inheritance_term_name == "Somatic mutation" ~ "Somatic mutation",
+    hpo_mode_of_inheritance_term_name == "X-linked" ~ "X-linked inheritance",
+    hpo_mode_of_inheritance_term_name == "X-linked dominant" ~ "X-linked dominant inheritance",
+    hpo_mode_of_inheritance_term_name == "X-linked recessive" ~ "X-linked recessive inheritance",
+    hpo_mode_of_inheritance_term_name == "Y-linked" ~ "Y-linked inheritance"))
+############################################
+
+
+############################################
 # annotate kidney groups from:
 # https://clinicalgenome.org/working-groups/clinical-domain/clingen-kidney-disease-clinical-domain-working-group/
 
@@ -298,62 +358,8 @@ all_kidney_groups <- bind_rows(complement_mediated_kidney_diseases_gene_list,
 
 # B) get phenotype annotation table from HPO, group by gene and filter for kidney phenotypes
 # C) compute for each list in A) the relative frequency of kidney phenotypes in 2), this will be the kidney group score
-# D) compute for each gene a list of all kidney group scores and sort by the highest score (the gene is in the kidney group with the highest score, but this needs to be checked manually)
-phenotype_hpoa <- read_delim(phenotype_hpoa_filename,
-    delim = "\t",
-  escape_double = FALSE,
-    trim_ws = TRUE,
-  skip = 4)
-
-omim_genemap2 <- read_delim(omim_genemap2_filename, "\t",
-    escape_double = FALSE,
-    col_names = FALSE,
-    comment = "#",
-    trim_ws = TRUE) %>%
-  select(Chromosome = X1,
-    Genomic_Position_Start = X2,
-    Genomic_Position_End = X3,
-    Cyto_Location = X4,
-    Computed_Cyto_Location = X5,
-    MIM_Number = X6,
-    Gene_Symbols = X7,
-    Gene_Name = X8,
-    approved_symbol = X9,
-    Entrez_Gene_ID = X10,
-    Ensembl_Gene_ID = X11,
-    Comments = X12,
-    Phenotypes = X13,
-    Mouse_Gene_Symbol_ID = X14) %>%
-  select(approved_symbol, Phenotypes) %>%
-  separate_rows(Phenotypes, sep = "; ") %>%
-  separate(Phenotypes, c("disease_ontology_name", "hpo_mode_of_inheritance_term_name"), "\\), (?!.+\\))") %>%
-  separate(disease_ontology_name, c("disease_ontology_name", "Mapping_key"), "\\((?!.+\\()") %>%
-  mutate(Mapping_key = str_replace_all(Mapping_key, "\\)", "")) %>%
-  separate(disease_ontology_name, c("disease_ontology_name", "MIM_Number"), ", (?=[0-9][0-9][0-9][0-9][0-9][0-9])") %>%
-  mutate(Mapping_key = str_replace_all(Mapping_key, " ", "")) %>%
-  mutate(MIM_Number = str_replace_all(MIM_Number, " ", "")) %>%
-  filter(!is.na(MIM_Number))  %>%
-  filter(!is.na(approved_symbol)) %>%
-  mutate(disease_ontology_id = paste0("OMIM:", MIM_Number)) %>%
-  separate_rows(hpo_mode_of_inheritance_term_name, sep = ", ") %>%
-  mutate(hpo_mode_of_inheritance_term_name = str_replace_all(hpo_mode_of_inheritance_term_name, "\\?", "")) %>%
-  select(-MIM_Number) %>%
-  unique() %>%
-  mutate(hpo_mode_of_inheritance_term_name = case_when(hpo_mode_of_inheritance_term_name == "Autosomal dominant" ~ "Autosomal dominant inheritance",
-    hpo_mode_of_inheritance_term_name == "Autosomal recessive" ~ "Autosomal recessive inheritance",
-    hpo_mode_of_inheritance_term_name == "Digenic dominant" ~ "Digenic inheritance",
-    hpo_mode_of_inheritance_term_name == "Digenic recessive" ~ "Digenic inheritance",
-    hpo_mode_of_inheritance_term_name == "Isolated cases" ~ "Sporadic",
-    hpo_mode_of_inheritance_term_name == "Mitochondrial" ~ "Mitochondrial inheritance",
-    hpo_mode_of_inheritance_term_name == "Multifactorial" ~ "Multifactorial inheritance",
-    hpo_mode_of_inheritance_term_name == "Pseudoautosomal dominant" ~ "X-linked dominant inheritance",
-    hpo_mode_of_inheritance_term_name == "Pseudoautosomal recessive" ~ "X-linked recessive inheritance",
-    hpo_mode_of_inheritance_term_name == "Somatic mosaicism" ~ "Somatic mosaicism",
-    hpo_mode_of_inheritance_term_name == "Somatic mutation" ~ "Somatic mutation",
-    hpo_mode_of_inheritance_term_name == "X-linked" ~ "X-linked inheritance",
-    hpo_mode_of_inheritance_term_name == "X-linked dominant" ~ "X-linked dominant inheritance",
-    hpo_mode_of_inheritance_term_name == "X-linked recessive" ~ "X-linked recessive inheritance",
-    hpo_mode_of_inheritance_term_name == "Y-linked" ~ "Y-linked inheritance")) %>%
+# D) compute for each gene a list of all kidney group scores and sort by the highest score (the gene is in the kidney group with the highest score, but this needs to be checked manually) 
+omim_genemap2_disease_and_gene <- omim_genemap2 %>%
   select(disease_ontology_id, approved_symbol)
 
 phenotype_hpoa_filter <- phenotype_hpoa %>%
@@ -362,7 +368,7 @@ phenotype_hpoa_filter <- phenotype_hpoa %>%
    unique()
 
 hpo_gene_list <- phenotype_hpoa_filter %>%
-  left_join(omim_genemap2, by = c("database_id" = "disease_ontology_id"), relationship = "many-to-many") %>%
+  left_join(omim_genemap2_disease_and_gene, by = c("database_id" = "disease_ontology_id"), relationship = "many-to-many") %>%
   filter(!is.na(approved_symbol)) %>%
   unique()
 
@@ -401,6 +407,8 @@ hpo_gene_list_all_kidney_groups_summarized_for_join <- hpo_gene_list_all_kidney_
   summarise(approved_symbol = unique(approved_symbol),
     groups_p = paste(kidney_disease_group_short, ": ", hpo_id_group_p, collapse = " | ")) %>%
   ungroup()
+
+# TODO: check if we need to do this analysis per entity instead of per gene
 ############################################
 
 
