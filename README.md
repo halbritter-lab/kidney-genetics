@@ -60,7 +60,8 @@ The repository has the following structure:
 │   │   ├── data/
 │   │   ├── results/
 │   │   └── 05_PubTator.R
-│   └── MergeAnalysesSources.R
+│   ├── MergeAnalysesSources.R
+│   └── AnnotateMergedTable.R
 └── functions/
     ├── blueprintgenetics-functions.R
     ├── hgnc-functions.R
