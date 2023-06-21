@@ -60,8 +60,44 @@ non_alt_loci_set <- read_delim(paste0(hgnc_file, ".gz"),
     "\t",
     col_names = TRUE) %>%
   mutate(update_date = file_date)
+############################################
 
-non_alt_loci_set_coordinates <- non_alt_loci_set %>%
+
+############################################
+## load STRINGdb database
+string_db <- STRINGdb$new(version = "11.5",
+  species = 9606,
+  score_threshold = 200,
+  input_directory = "data/")
+############################################
+
+
+############################################
+## map gene symbols to StringDB identifiers
+non_alt_loci_set_table <- non_alt_loci_set %>% 
+  dplyr::select(symbol) %>%
+  unique()
+
+non_alt_loci_set_df <- non_alt_loci_set_table %>% 
+    as.data.frame()
+
+non_alt_loci_set_mapped <- string_db$map(non_alt_loci_set_df, "symbol")
+non_alt_loci_set_mapped_tibble <- as_tibble(non_alt_loci_set_mapped) %>%
+  filter(!is.na(STRING_id)) %>%
+  group_by(symbol) %>%
+  summarise(STRING_id = str_c(STRING_id, collapse=";")) %>%
+  ungroup %>%
+  unique()
+
+## join with String identifiers
+non_alt_loci_set_string <- non_alt_loci_set %>% 
+  left_join(non_alt_loci_set_mapped_tibble, by="symbol")
+############################################
+
+
+############################################
+## add gene coordinates from ensembl
+non_alt_loci_set_coordinates <- non_alt_loci_set_string %>%
   mutate(hg19_coordinates_from_ensembl =
     gene_coordinates_from_ensembl(ensembl_gene_id)) %>%
   mutate(hg19_coordinates_from_symbol =
@@ -90,6 +126,18 @@ non_alt_loci_set_coordinates <- non_alt_loci_set %>%
     -hg19_coordinates_from_symbol,
     -hg38_coordinates_from_ensembl,
     -hg38_coordinates_from_symbol)
+
+############################################
+
+
+############################################
+# TODO: annotate with GeneCC classification
+
+############################################
+
+
+############################################
+# TODO: annotate gnomAD pLI and missense Z-scores
 
 ############################################
 
