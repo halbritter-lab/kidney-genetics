@@ -2,29 +2,25 @@
 
 The repository subfolder for the Kidney-Genetics documentation.
 
-First change the work directory:
-
-```
-## workfolder <- "path/to/the/edit_docs/"
-setwd(workfolder)
-```
-
-Then build the documentation:
+Tto build the documentation execute following commands:
 
 ```
 ## load libraries
 library(bookdown)
 library(config)
 
-## define relative script path
+project_topic <- "nephrology"
 project_name <- "kidney-genetics"
 script_path <- "/edit_docs/"
 
-## read config
-config_vars <- config::get(file = Sys.getenv("CONFIG_FILE"))
+## read configs
+config_vars <- config::get(file = Sys.getenv("CONFIG_FILE"),
+    config = "default")
+config_vars_path <- config::get(file = Sys.getenv("CONFIG_FILE"),
+    config = project_topic)
 
 ## set working directory
-setwd(paste0(config_vars$projectsdir, project_name, script_path))
+setwd(paste0(config_vars_path$projectsdir, project_name, script_path))
 
 # render the book
 bookdown::render_book("index.Rmd", "all")
