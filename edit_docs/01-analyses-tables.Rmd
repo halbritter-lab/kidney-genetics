@@ -1,5 +1,6 @@
 # Analyses result tables {#analyses-tables}
 
+<!-- here we load required libraries -->
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 ## Load libraries
@@ -9,6 +10,7 @@ library(DT) # needed to generate nice data tables in html
 library(plotly) # needed for upset plots
 ```
 
+<!-- here we load the result csv files -->
 ```{r, echo=FALSE, message=FALSE, warning=FALSE}
 ## load the CSV data
 # TODO: load and filter (newest) the files automatically 
@@ -39,7 +41,18 @@ merge_analyses_sources_reformat <- merge_analyses_sources %>%
 
 datatable(merge_analyses_sources_reformat,
           filter = 'top', # this argument positions the filtering input at the top of the table
-          escape = FALSE) # this argument renders the links as HTML
+          escape = FALSE, # this argument renders the links as HTML
+          extensions = 'Buttons', # this argument adds an extension for download buttons
+          options = list(
+            dom = 'Blfrtip',
+            buttons = c('copy',
+              'csv',
+              'excel',
+              'pdf'), # here we add the download buttons for different formats
+            lengthMenu = list(c(10, 30, 50, -1), 
+                              c('10', '30', '50', 'All')) # here we change the selection options
+          )
+        )
 ```
 
 
