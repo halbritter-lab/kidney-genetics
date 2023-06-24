@@ -37,6 +37,7 @@ source("../functions/hgnc-functions.R", local = TRUE)
 
 ############################################
 ## load manually curated overview Excel table with download links and filter
+# TODO: the file location should be a config variable
 pub_file <- "data/230220_Kidney_Genes_Publication_List.xlsx"
 
 kidney_genes_publication_list <- read_excel(pub_file, skip = 4, na = "NA") %>%
@@ -50,7 +51,11 @@ kidney_genes_publication_list <- read_excel(pub_file, skip = 4, na = "NA") %>%
 # TODO: make download of supplements more stable (2,7,15,16), maybe get links from website
 kidney_genes_publication_list_download <- kidney_genes_publication_list %>%
   rowwise() %>%
-  mutate(downloaded = download.file(Download_link, paste0("data/downloads/PMID_", PMID, ".", Type), mode = "wb", quiet = TRUE, method = "wininet"))
+  mutate(downloaded = download.file(Download_link,
+    paste0("data/downloads/PMID_", PMID, ".", Type),
+    mode = "wb",
+    quiet = TRUE,
+    method = "wininet"))
 ############################################
 
 
@@ -297,7 +302,6 @@ literature_genes <- kidney_genes_publication_list %>%
 
 ############################################
 ## save results
-# TODO: gzip csv result files
 # TODO: add kidney_genes_publication_list_download with checksums to results
 creation_date <- strftime(as.POSIXlt(Sys.time(),
   "UTC",

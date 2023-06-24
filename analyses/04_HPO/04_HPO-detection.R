@@ -44,6 +44,7 @@ query_date <- strftime(as.POSIXlt(Sys.time(), "UTC", "%Y-%m-%dT%H:%M:%S"), "%Y-%
 
 # walk through the ontology tree and add all unique terms descending from
 # Abnormality of the upper urinary tract (HP:0010935)
+# TODO: implement a logic to save the results of the walk through the ontology tree and load it if not older then 1 month
 all_hpo_children_list_kidney <- HPO_all_children_from_term("HP:0010935")
 
 # transform hte list into a tibble
