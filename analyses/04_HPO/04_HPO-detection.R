@@ -39,18 +39,15 @@ source("../functions/hpo-functions.R", local = TRUE)
 ############################################
 ## get all children of term Abnormality of the kidney HP:0000077 and annotating them with name and definition.
 
+# TODO: implement the query date as a column in the table
 query_date <- strftime(as.POSIXlt(Sys.time(), "UTC", "%Y-%m-%dT%H:%M:%S"), "%Y-%m-%d")
 
-# define an empty list holding the HPO terms
-all_children_list <- list()
-
-#  TODO: make this automatic for multiple terms and naming the output files
 # walk through the ontology tree and add all unique terms descending from
 # Abnormality of the upper urinary tract (HP:0010935)
-HPO_all_children_from_term("HP:0010935")
+all_hpo_children_list_kidney <- HPO_all_children_from_term("HP:0010935")
 
 # transform hte list into a tibble
-hpo_list <- all_children_list %>%
+hpo_list <- all_hpo_children_list_kidney %>%
   unlist() %>%
   tibble(`term` = .) %>%
   unique()
