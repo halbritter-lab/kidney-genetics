@@ -5,6 +5,7 @@ library(jsonlite)  ##needed for HGNC requests
 library(rvest)    ##needed for scraping
 library(httr)    ##needed for scraping
 library(kableExtra)  ##needed to present scraped data
+library("R.utils")  ## gzip downloaded and result files
 library(config) # needed for config loading
 ############################################
 
@@ -172,7 +173,6 @@ hpo_gene_list <- phenotype_hpoa_filter %>%
 
 ############################################
 ## save results
-# TODO: gzip csv result files
 creation_date <- strftime(as.POSIXlt(Sys.time(),
   "UTC",
   "%Y-%m-%dT%H:%M:%S"), "%Y-%m-%d")
@@ -183,9 +183,15 @@ write_csv(hpo_gene_list,
     ".csv"),
   na = "NULL")
 
+gzip(paste0("results/04_HPO_genes.", creation_date, ".csv"),
+  overwrite = TRUE)
+
 write_csv(hpo_list,
   file = paste0("results/04_children-from-terms.",
     creation_date,
     ".csv"),
   na = "NULL")
+
+gzip(paste0("results/04_children-from-terms.", creation_date, ".csv"),
+  overwrite = TRUE)
 ############################################

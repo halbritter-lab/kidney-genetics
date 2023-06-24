@@ -4,6 +4,7 @@ library(readr)
 library(tidyverse)
 library(httr)
 library(jsonlite)
+library("R.utils")  ## gzip downloaded and result files
 library(config)
 ############################################
 
@@ -70,6 +71,7 @@ page_tibble_genes <- page_tibble_unnest %>%
   unnest(info)
 
 # filter for human only, select columns
+# TODO: tax id should be a parameter in a config file (no magic numbers)
 pubtator_genes <- page_tibble_genes %>%
   filter(tax_id == 9606) %>%
   select(pmid, symbol, text_part) %>%
@@ -104,7 +106,6 @@ pubtator_genes_normalize <- pubtator_genes %>%
 
 ############################################
 ## save results
-# TODO: gzip csv result files
 creation_date <- strftime(as.POSIXlt(Sys.time(),
   "UTC",
   "%Y-%m-%dT%H:%M:%S"), "%Y-%m-%d")
@@ -114,4 +115,7 @@ write_csv(pubtator_genes_normalize,
     creation_date,
     ".csv"),
   na = "NULL")
+
+gzip(paste0("results/05_PubTator_genes.", creation_date, ".csv"),
+  overwrite = TRUE)
 ############################################

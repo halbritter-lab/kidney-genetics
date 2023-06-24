@@ -4,6 +4,7 @@ library(readr)
 library(tidyverse)
 library(rvest)
 library(jsonlite)
+library("R.utils")  ## gzip downloaded and result files
 library(config)
 ############################################
 
@@ -176,7 +177,6 @@ all_panelapp_genes_format <- all_panelapp_genes %>%
 
 ############################################
 ## save results
-# TODO: gzip csv result files
 creation_date <- strftime(as.POSIXlt(Sys.time(),
   "UTC",
   "%Y-%m-%dT%H:%M:%S"), "%Y-%m-%d")
@@ -187,9 +187,15 @@ write_csv(panelapp_panels_kidney,
     ".csv"),
   na = "NULL")
 
+gzip(paste0("results/01_PanelApp_panels.", creation_date, ".csv"),
+  overwrite = TRUE)
+
 write_csv(all_panelapp_genes_format,
   file = paste0("results/01_PanelApp_genes.",
     creation_date,
     ".csv"),
   na = "NULL")
+
+gzip(paste0("results/01_PanelApp_genes.", creation_date, ".csv"),
+  overwrite = TRUE)
 ############################################

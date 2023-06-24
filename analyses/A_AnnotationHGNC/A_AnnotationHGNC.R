@@ -3,7 +3,7 @@
 library(tidyverse)  ## needed for general table operations
 library(biomaRt)    ## needed to get gene coordinates
 library(STRINGdb)  ## needed to compute StringDB identifiers
-library("R.utils")  ## gzip downloaded files
+library("R.utils")  ## gzip downloaded and result files
 library(config)     ## needed for config loading
 ############################################
 

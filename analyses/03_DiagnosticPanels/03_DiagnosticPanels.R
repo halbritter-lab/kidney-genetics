@@ -7,8 +7,9 @@ library(rvest)
 library(jsonlite)
 library(curl)
 library(httr)
-library(config) # needed for config loading
 library(webdriver) # needed for headless browsing
+library("R.utils")  ## gzip downloaded and result files
+library(config) # needed for config loading
 ############################################
 
 
@@ -44,6 +45,7 @@ source("../functions/blueprintgenetics-functions.R", local = TRUE)
 ## download web urls
 
 # load the list of sources
+# TODO: the file location should be in a config file
 diagnostic_panels_list <- read_excel("data/kidney_diagnostic_panels_list.xlsx") %>%
   filter(use == "yes")
 
@@ -317,7 +319,6 @@ all_diagnostic_panels_genes_formats_norm <- all_diagnostic_panels_genes_format %
 
 ############################################
 ## save results
-# TODO: gzip csv result files
 creation_date <- strftime(as.POSIXlt(Sys.time(),
   "UTC",
   "%Y-%m-%dT%H:%M:%S"), "%Y-%m-%d")
@@ -328,9 +329,15 @@ write_csv(all_diagnostic_panels_genes_format,
     ".csv"),
   na = "NULL")
 
+gzip(paste0("results/03_DiagnosticPanels_genes.", creation_date, ".csv"),
+  overwrite = TRUE)
+
 write_csv(diagnostic_panels,
   file = paste0("results/03_DiagnosticPanels_list.",
     creation_date,
     ".csv"),
   na = "NULL")
+
+gzip(paste0("results/03_DiagnosticPanels_list.", creation_date, ".csv"),
+  overwrite = TRUE)
 ############################################

@@ -5,6 +5,7 @@ library(tidyverse) # needed for data processing
 library(jsonlite) # needed for HGNC functions
 library(officer) # needed for docx files
 library(pdftools) # needed for pdf files
+library("R.utils")  ## gzip downloaded and result files
 library(config) # needed for config loading
 ############################################
 
@@ -307,4 +308,7 @@ write_csv(literature_genes,
     creation_date,
     ".csv"),
   na = "NULL")
+
+gzip(paste0("results/02_Literature_genes.", creation_date, ".csv"),
+  overwrite = TRUE)
 ############################################

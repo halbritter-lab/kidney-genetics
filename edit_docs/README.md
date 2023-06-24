@@ -34,4 +34,5 @@ The CSL file is [American Psychological Association 7th edition, from Zotero](ht
 
 ## TODO
 - automatic loading and filtering of current result tables in all Rmd files
+- change scripts to load the gzipped files
 - make a script that runs the above commands to re-generate the pages website

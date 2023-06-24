@@ -3,6 +3,8 @@
 library(tidyverse)  ## needed for general table operations
 library(readr)  ## needed to read files
 library(tools)  ## needed for checksums
+library("R.utils")  ## gzip downloaded and result files
+library(config)
 ############################################
 
 
@@ -124,4 +126,7 @@ write_csv(results_genes_wider,
     creation_date,
     ".csv"),
   na = "NULL")
+
+gzip(paste0("results/KidneyGenetics_MergeAnalysesSources.", creation_date, ".csv"),
+  overwrite = TRUE)
 ############################################
