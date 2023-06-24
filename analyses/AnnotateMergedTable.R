@@ -15,13 +15,11 @@ project_name <- "kidney-genetics"
 script_path <- "/analyses/"
 
 ## read configs
-config_vars <- config::get(file = Sys.getenv("CONFIG_FILE"),
-    config = "default")
-config_vars_path <- config::get(file = Sys.getenv("CONFIG_FILE"),
+config_vars_proj <- config::get(file = Sys.getenv("CONFIG_FILE"),
     config = project_topic)
 
 ## set working directory
-setwd(paste0(config_vars_path$projectsdir, project_name, script_path))
+setwd(paste0(config_vars_proj$projectsdir, project_name, script_path))
 
 ## set global options
 options(scipen = 999)
@@ -72,20 +70,67 @@ merged_genes <- merged_csv_table %>%
 
 
 ############################################
-## get all children of term Abnormality of the kidney HP:0000077 and annotating them with name and definition.
+## get relevant HPO terms for kidney disease classification
 
+# TODO: implement the query date as a column in the table
 query_date <- strftime(as.POSIXlt(Sys.time(), "UTC", "%Y-%m-%dT%H:%M:%S"), "%Y-%m-%d")
 
-# define an empty list holding the HPO terms
-all_children_list <- list()
-
-#  TODO: make this automatic for multiple terms and naming the output files
+# 1) get all children of term upper urinary tract (HP:0010935) for classification into kidney disease groups
 # walk through the ontology tree and add all unique terms descending from
 # Abnormality of the upper urinary tract (HP:0010935)
-HPO_all_children_from_term("HP:0010935")
+all_hpo_children_list_kidney <- HPO_all_children_from_term("HP:0010935")
 
-# transform hte list into a tibble
-hpo_list <- all_children_list %>%
+# transform the list into a tibble
+hpo_list_kidney <- all_hpo_children_list_kidney %>%
+  unlist() %>%
+  tibble(`term` = .) %>%
+  unique()
+
+# 2) get all children of term Adult onset (HP:0003581) for classification into adult vs pediatric onset
+# walk through the ontology tree and add all unique terms descending from
+# Adult onset (HP:0003581)
+all_hpo_children_list_adult <- HPO_all_children_from_term("HP:0003581")
+
+# transform the list into a tibble
+hpo_list_adult <- all_hpo_children_list_adult %>%
+  unlist() %>%
+  tibble(`term` = .) %>%
+  unique()
+
+# walk through the ontology tree and add all unique terms descending from
+# Onset HP:0003674
+all_hpo_children_list_onset <- HPO_all_children_from_term("HP:0003674")
+
+# then remove all terms that are children of Adult onset (HP:0003581) to get
+# all terms that are children of Pediatric onset (HP:0410280), etc.
+# and transform the list into a tibble
+hpo_list_non_adult <- setdiff(all_hpo_children_list_onset, all_hpo_children_list_adult) %>%
+  unlist() %>%
+  tibble(`term` = .) %>%
+  unique()
+
+# 3) syndromic vs non-syndromic (categories in OMIM: GROWTH, SKELETAL, NEUROLOGIC, HEAD & NECK; exclude: CARDIOVASCULAR, ABDOMEN, GENITOURINARY)
+# walk through the ontology tree and add all unique terms descending from
+# Growth abnormality (HP:0001507)
+all_hpo_children_list_growth <- HPO_all_children_from_term("HP:0001507")
+
+# walk through the ontology tree and add all unique terms descending from
+# Skeletal system abnormality (HP:0000924)
+all_hpo_children_list_skeletal <- HPO_all_children_from_term("HP:0000924")
+
+# walk through the ontology tree and add all unique terms descending from
+# Neurologic abnormality (HP:0000707)
+all_hpo_children_list_neurologic <- HPO_all_children_from_term("HP:0000707")
+
+# walk through the ontology tree and add all unique terms descending from
+# Head and neck abnormality (HP:0000152)
+all_hpo_children_list_head_and_neck <- HPO_all_children_from_term("HP:0000152")
+
+# merge all lists and transform the list into a tibble
+hpo_list_syndromic <- bind_rows(all_hpo_children_list_growth,
+    all_hpo_children_list_skeletal,
+    all_hpo_children_list_neurologic,
+    all_hpo_children_list_head_and_neck) %>%
   unlist() %>%
   tibble(`term` = .) %>%
   unique()
@@ -103,7 +148,7 @@ download.file(phenotype_hpoa_url, phenotype_hpoa_filename, mode = "wb")
 
 # OMIM links to genemap2 file needs to be set in config and applied for at
 # https://www.omim.org/downloads
-omim_genemap2_url <- config_vars$omim_genemap2_url
+omim_genemap2_url <- config_vars_proj$omim_genemap2_url
 omim_genemap2_filename <- paste0("annotated/data/downloads/omim_genemap2.", file_date, ".txt")
 download.file(omim_genemap2_url, omim_genemap2_filename, mode = "wb")
 ############################################
@@ -327,7 +372,7 @@ tubulopathy_gene_list <- tubulopathy_page %>%
     kidney_disease_group,
     kidney_disease_group_short)
 
-# 6) Hereditary Cancer Gene Curation Expert Panel: https://clingen.info/affiliation/40023/ 
+# 6) Hereditary Cancer Gene Curation Expert Panel: https://clingen.info/affiliation/40023/
 # API call: https://search.clinicalgenome.org/api/affiliates/10023?queryParams
 
 api_call <- "https://search.clinicalgenome.org/api/affiliates/10023?queryParams"
@@ -358,12 +403,12 @@ all_kidney_groups <- bind_rows(complement_mediated_kidney_diseases_gene_list,
 
 # B) get phenotype annotation table from HPO, group by gene and filter for kidney phenotypes
 # C) compute for each list in A) the relative frequency of kidney phenotypes in 2), this will be the kidney group score
-# D) compute for each gene a list of all kidney group scores and sort by the highest score (the gene is in the kidney group with the highest score, but this needs to be checked manually) 
+# D) compute for each gene a list of all kidney group scores and sort by the highest score (the gene is in the kidney group with the highest score, but this needs to be checked manually)
 omim_genemap2_disease_and_gene <- omim_genemap2 %>%
   select(disease_ontology_id, approved_symbol)
 
 phenotype_hpoa_filter <- phenotype_hpoa %>%
-   filter(hpo_id %in% hpo_list$term) %>%
+   filter(hpo_id %in% hpo_list_kidney$term) %>%
    select(database_id, hpo_id) %>%
    unique()
 
@@ -413,6 +458,13 @@ hpo_gene_list_all_kidney_groups_summarized_for_join <- hpo_gene_list_all_kidney_
 ############################################
 
 
+############################################
+# TODO: pediatric vs adult onset
+# annotate pediatric vs adult onset (OMIM: HPO terms Adult onset HP:0003581, Pediatric onset HP:0410280, maybe other terms children of terms)
+
+############################################
+
+
 
 ############################################
 # TODO: syndromic vs non-syndromic
@@ -422,32 +474,24 @@ hpo_gene_list_all_kidney_groups_summarized_for_join <- hpo_gene_list_all_kidney_
 
 
 ############################################
-# TODO: pediatric vs adult onset
-# pediatric vs adult onset (OMIM: HPO terms Adult onset HP:0003581, Pediatric onset HP:0410280, maybe othe terms children of terms)
-
-############################################
-
-
-############################################
 # TODO: annotate with OMIM P numbers
-
-############################################
-
-
-############################################
-# TODO: annotate with GeneCC
+# use omim tables
 
 ############################################
 
 
 ############################################
 # TODO: annotate ClinVar variant counts
+# use the clinvar API
+# use https://gnomad.broadinstitute.org/api/
 
 ############################################
 
 
 ############################################
 # TODO: annotate MGI mouse phenotypes kidney
+# use https://www.mousemine.org/mousemine/begin.do
+# https://www.mousemine.org/mousemine/results.do?trail=%257Cquery%257Cresults.0&queryBuilder=true
 
 ############################################
 
@@ -460,13 +504,9 @@ hpo_gene_list_all_kidney_groups_summarized_for_join <- hpo_gene_list_all_kidney_
 
 ############################################
 # TODO: annotate GTEx kidney expression
+# use https://gtexportal.org/api/v2/redoc#tag/GTEx-Portal-API-Info
+# see GitHub issue for cutoffs
 # TODO: maybe add expression in embryonic kidney from somewhere (e.g. https://descartes.brotmanbaty.org/)
-
-############################################
-
-
-############################################
-# TODO: annotate gnomAD pLI and missense Z scores
 
 ############################################
 
