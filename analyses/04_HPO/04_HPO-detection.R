@@ -16,13 +16,11 @@ project_name <- "kidney-genetics"
 script_path <- "/analyses/04_HPO/"
 
 ## read configs
-config_vars <- config::get(file = Sys.getenv("CONFIG_FILE"),
-    config = "default")
-config_vars_path <- config::get(file = Sys.getenv("CONFIG_FILE"),
+config_vars_proj <- config::get(file = Sys.getenv("CONFIG_FILE"),
     config = project_topic)
 
 ## set working directory
-setwd(paste0(config_vars_path$projectsdir, project_name, script_path))
+setwd(paste0(config_vars_proj$projectsdir, project_name, script_path))
 
 ## set global options
 options(scipen = 999)
@@ -69,7 +67,7 @@ download.file(phenotype_hpoa_url, phenotype_hpoa_filename, mode = "wb")
 
 # OMIM links to genemap2 file needs to be set in config and applied for at
 # https://www.omim.org/downloads
-omim_genemap2_url <- config_vars$omim_genemap2_url
+omim_genemap2_url <- config_vars_proj$omim_genemap2_url
 omim_genemap2_filename <- paste0("data/downloads/omim_genemap2.", file_date, ".txt")
 download.file(omim_genemap2_url, omim_genemap2_filename, mode = "wb")
 ############################################

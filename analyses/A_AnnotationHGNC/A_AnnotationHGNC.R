@@ -15,13 +15,11 @@ project_name <- "kidney-genetics"
 script_path <- "/analyses/A_AnnotationHGNC/"
 
 ## read configs
-config_vars <- config::get(file = Sys.getenv("CONFIG_FILE"),
-    config = "default")
-config_vars_path <- config::get(file = Sys.getenv("CONFIG_FILE"),
+config_vars_proj <- config::get(file = Sys.getenv("CONFIG_FILE"),
     config = project_topic)
 
 ## set working directory
-setwd(paste0(config_vars_path$projectsdir, project_name, script_path))
+setwd(paste0(config_vars_proj$projectsdir, project_name, script_path))
 
 ## set global options
 options(scipen = 999)
@@ -74,24 +72,24 @@ string_db <- STRINGdb$new(version = "11.5",
 
 ############################################
 ## map gene symbols to StringDB identifiers
-non_alt_loci_set_table <- non_alt_loci_set %>% 
+non_alt_loci_set_table <- non_alt_loci_set %>%
   dplyr::select(symbol) %>%
   unique()
 
-non_alt_loci_set_df <- non_alt_loci_set_table %>% 
+non_alt_loci_set_df <- non_alt_loci_set_table %>%
     as.data.frame()
 
 non_alt_loci_set_mapped <- string_db$map(non_alt_loci_set_df, "symbol")
 non_alt_loci_set_mapped_tibble <- as_tibble(non_alt_loci_set_mapped) %>%
   filter(!is.na(STRING_id)) %>%
   group_by(symbol) %>%
-  summarise(STRING_id = str_c(STRING_id, collapse=";")) %>%
+  summarise(STRING_id = str_c(STRING_id, collapse = ";")) %>%
   ungroup %>%
   unique()
 
 ## join with String identifiers
-non_alt_loci_set_string <- non_alt_loci_set %>% 
-  left_join(non_alt_loci_set_mapped_tibble, by="symbol")
+non_alt_loci_set_string <- non_alt_loci_set %>%
+  left_join(non_alt_loci_set_mapped_tibble, by = "symbol")
 ############################################
 
 
@@ -138,6 +136,7 @@ non_alt_loci_set_coordinates <- non_alt_loci_set_string %>%
 
 ############################################
 # TODO: annotate gnomAD pLI and missense Z-scores
+# use https://gnomad.broadinstitute.org/api/
 
 ############################################
 
