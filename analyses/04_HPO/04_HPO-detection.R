@@ -48,7 +48,7 @@ query_date <- strftime(as.POSIXlt(Sys.time(), "UTC", "%Y-%m-%dT%H:%M:%S"), "%Y-%
 all_hpo_children_list_kidney <- HPO_all_children_from_term("HP:0010935")
 
 # transform hte list into a tibble
-hpo_list <- all_hpo_children_list_kidney %>%
+hpo_list_kidney <- all_hpo_children_list_kidney %>%
   unlist() %>%
   tibble(`term` = .) %>%
   unique()
@@ -131,7 +131,7 @@ omim_genemap2 <- read_delim(omim_genemap2_filename, "\t",
     hpo_mode_of_inheritance_term_name == "Y-linked" ~ "Y-linked inheritance"))
 
 phenotype_hpoa_filter <- phenotype_hpoa %>%
-   filter(hpo_id %in% hpo_list$term) %>%
+   filter(hpo_id %in% hpo_list_kidney$term) %>%
    select(database_id, hpo_id) %>%
    unique() %>%
   group_by(database_id) %>%
@@ -155,13 +155,14 @@ hpo_gene_list <- phenotype_hpoa_filter %>%
     source_count = n(),
     .groups = "keep") %>%
   ungroup() %>%
-  mutate(at_least_one_database = (source_count > 0)) %>%
+  mutate(gene_name_reported = approved_symbol) %>%
+  mutate(source_evidence = (source_count > 0)) %>%
   select(approved_symbol,
     hgnc_id,
-    gene_name_reported = approved_symbol,
+    gene_name_reported,
     source = database_and_hpo_id,
     source_count,
-    source_evidence = at_least_one_database)
+    source_evidence)
 
 # TODO: normalize source_evidence to 0/1 as percentiles
 # TODO: write a function for this normalization step
@@ -184,7 +185,7 @@ write_csv(hpo_gene_list,
 gzip(paste0("results/04_HPO_genes.", creation_date, ".csv"),
   overwrite = TRUE)
 
-write_csv(hpo_list,
+write_csv(hpo_list_kidney,
   file = paste0("results/04_children-from-terms.",
     creation_date,
     ".csv"),
