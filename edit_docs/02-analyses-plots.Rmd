@@ -3,12 +3,12 @@
 ```{r, echo=FALSE, message=FALSE, warning=FALSE}
 ## load the CSV data
 # TODO: load and filter (newest) the files automatically 
-merge_analyses_sources <- read_csv("../analyses/merged/KidneyGenetics_MergeAnalysesSources.2023-05-18.csv")
-PanelApp_genes <- read_csv("../analyses/01_PanelApp/results/01_PanelApp_genes.2023-05-18.csv")
-Literature_genes <- read_csv("../analyses/02_Literature/results/02_Literature_genes.2023-05-18.csv")
-DiagnosticPanels_genes <- read_csv("../analyses/03_DiagnosticPanels/results/03_DiagnosticPanels_genes.2023-05-18.csv")
-HPO_genes <- read_csv("../analyses/04_HPO/results/04_HPO_genes.2023-05-18.csv")
-PubTator_genes <- read_csv("../analyses/05_PubTator/results/05_PubTator_genes.2023-05-18.csv")
+merge_analyses_sources <- read_csv("../analyses/A_MergeAnalysesSources/A_MergeAnalysesSources.2023-05-18.csv.gz")
+PanelApp_genes <- read_csv("../analyses/01_PanelApp/results/01_PanelApp_genes.2023-05-18.csv.gz")
+Literature_genes <- read_csv("../analyses/02_Literature/results/02_Literature_genes.2023-05-18.csv.gz")
+DiagnosticPanels_genes <- read_csv("../analyses/03_DiagnosticPanels/results/03_DiagnosticPanels_genes.2023-05-18.csv.gz")
+HPO_genes <- read_csv("../analyses/04_HPO/results/04_HPO_genes.2023-05-18.csv.gz")
+PubTator_genes <- read_csv("../analyses/05_PubTator/results/05_PubTator_genes.2023-05-18.csv.gz")
 ```
 ---
 
