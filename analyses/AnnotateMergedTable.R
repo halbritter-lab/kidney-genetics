@@ -5,6 +5,8 @@ library(jsonlite)  ##needed for HGNC requests
 library(rvest)  ## needed for scraping
 library(readr)  ## needed to read files
 library(tools)  ## needed for checksums
+library("R.utils")  ## gzip downloaded and result files
+library(config)
 ############################################
 
 
@@ -78,6 +80,7 @@ query_date <- strftime(as.POSIXlt(Sys.time(), "UTC", "%Y-%m-%dT%H:%M:%S"), "%Y-%
 # 1) get all children of term upper urinary tract (HP:0010935) for classification into kidney disease groups
 # walk through the ontology tree and add all unique terms descending from
 # Abnormality of the upper urinary tract (HP:0010935)
+# TODO: implement a logic to save the results of the walk through the ontology tree and load it if not older then 1 month
 all_hpo_children_list_kidney <- HPO_all_children_from_term("HP:0010935")
 
 # transform the list into a tibble
@@ -104,7 +107,8 @@ all_hpo_children_list_onset <- HPO_all_children_from_term("HP:0003674")
 # then remove all terms that are children of Adult onset (HP:0003581) to get
 # all terms that are children of Pediatric onset (HP:0410280), etc.
 # and transform the list into a tibble
-hpo_list_non_adult <- setdiff(all_hpo_children_list_onset, all_hpo_children_list_adult) %>%
+hpo_list_non_adult <- setdiff(all_hpo_children_list_onset,
+    all_hpo_children_list_adult) %>%
   unlist() %>%
   tibble(`term` = .) %>%
   unique()
@@ -531,4 +535,7 @@ write_csv(results_genes_wider,
     creation_date,
     ".csv"),
   na = "NULL")
+
+gzip(paste0("results/KidneyGenetics_AnnotateMergedTable.", creation_date, ".csv"),
+  overwrite = TRUE)
 ############################################
