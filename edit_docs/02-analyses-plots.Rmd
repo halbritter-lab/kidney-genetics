@@ -18,9 +18,12 @@ PubTator_genes <- read_csv("../analyses/05_PubTator/results/05_PubTator_genes.20
 UpSet plot of the merged analyses.
 
 ```{r, echo=FALSE, warning=FALSE}
-analyses <- colnames(merge_analyses_sources)[5:9]
+merge_analyses_sources_with_evidence <- merge_analyses_sources %>%
+  filter(evidence_count > 0)
 
-ComplexUpset::upset(merge_analyses_sources, analyses)
+analyses <- colnames(merge_analyses_sources_with_evidence)[5:9]
+
+ComplexUpset::upset(merge_analyses_sources_with_evidence, analyses)
 ```
 
 
