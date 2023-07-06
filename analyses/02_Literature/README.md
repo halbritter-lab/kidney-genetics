@@ -1,6 +1,8 @@
 # 02. Kidney-Genetics Analysis: Literature
 
-This repository contains an R script for analyzing kidney genetics literature. The script downloads and processes data from various publications, and generates a summary of the analyzed genes.
+This repository contains an R script for analyzing kidney genetics literature. The script downloads and processes data from various publications, and generates a summary of the analyzed genes. We assesed the publications using following search query: 
+        (1)	"Kidney"[Mesh] OR "Kidney Diseases"[Mesh] OR kidney OR renal
+	AND (2)	"Genetic Structures"[Mesh] OR "Genes"[Mesh] OR genetic test OR gene panel OR gene panels OR multigene panel OR multigene panels OR targeted panel*
 
 ## Prerequisites
 

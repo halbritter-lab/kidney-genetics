@@ -1,6 +1,17 @@
 # 03. Kidney-Genetics Analysis: Diagnostic Panels
 
-This repository contains a script that performs data extraction and analysis for Kidney-Genetics Diagnostic Panels. The script downloads data from different web URLs, identifies and extracts genes related to kidney diseases, standardizes the gene list per panel, and then summarizes the data.
+This repository contains a script that performs data extraction and analysis for Kidney-Genetics Diagnostic Panels. The script downloads data from different web URLs, identifies and extracts genes related to kidney diseases, standardizes the gene list per panel, and then summarizes the data. Following Diagnostic Panels are included:
+
+1. [Centogene Nephrology](https://www.centogene.com/diagnostics/our-tests/ngs-panels/nephrology)
+2. [CeGaT kidney diseases](https://cegat.com/diagnostics/rare-diseases/kidney-diseases/)
+3. [Preventiongenetics comprehensive inherited kidney diseases](https://www.preventiongenetics.com/testInfo?val=Comprehensive-Inherited-Kidney-Diseases-Panel)
+4. [Invitae progressive renal diseases](https://www.invitae.com/en/providers/test-catalog/test-75000)
+5. [Invitae expanded renal diseases](https://www.invitae.com/en/providers/test-catalog/test-633100)
+6. [MGZ Nephrology](https://www.mgz-muenchen.de/gen-panels/panel/nierenerkrankungen-und-elektrolyte-gesamtpanel.html)
+7. [MVZ kidney diseases](https://www.medizinische-genetik.de/diagnostik/humangenetik/panelinformation?panel=229)
+8. [Natera renasight comprehensive kidney genes](https://www.natera.com/organ-health/renasight-genetic-testing/gene-conditions-list/)
+9. [Mayocliniclabs renal genetics](https://www.mayocliniclabs.com/test-catalog/Overview/618086)
+10. [Blueprintgenetics Nephrology](https://blueprintgenetics.com/tests/panels/nephrology/)
 
 ## Required Libraries
 
