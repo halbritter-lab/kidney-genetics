@@ -29,7 +29,7 @@ The script performs the following actions:
 
 1. Sets up the working directory based on the configuration file.
 2. Loads HGNC (HUGO Gene Nomenclature Committee) functions from an external R script.
-3. Retrieves kidney disease related panels from both PanelApp UK and PanelApp Australia.
+3. Retrieves kidney disease related panels from both PanelApp UK and PanelApp Australia, meaning all panels that include "renal" or "kidney" in its name.
 4. Combines all kidney related PanelApp panels into a single tibble (data frame).
 5. Processes the panels to create a unified format for all genes.
 6. Saves the processed data into CSV files. 
