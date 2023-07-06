@@ -2,7 +2,7 @@
 
 The repository subfolder for the Kidney-Genetics documentation.
 
-Tto build the documentation execute following commands:
+To build the documentation execute following commands:
 
 ```
 ## load libraries
