@@ -1,0 +1,6 @@
+default:
+  omim_genemap2_url: "<fill in your omim url>"
+  ncbi_api_key: "<fill in your ncbi api key>"
+  drawio_path: "<fill the local path to your drawio executable>"
+nephrology:
+  projectsdir: "<fill in your local project dir>"
