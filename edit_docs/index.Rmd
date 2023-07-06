@@ -14,6 +14,60 @@ github-repo: halbritter-lab/kidney-genetics
 url: https://halbritter-lab.github.io/kidney-genetics/
 ---
 
+<!-- here we load required libraries -->
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+## Load libraries
+library(readr) # needed to import CSV result files
+library(tidyverse) # needed to transform the tables
+library(DT) # needed to generate nice data tables in html
+library(plotly) # needed for upset plots
+library(knitr) # needed for draw.io files
+library(knitrdrawio) # needed for draw.io files
+library(config) # needed to load the config file
+```
+
+<!-- here we load the config file -->
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
+project_topic <- "nephrology"
+project_name <- "kidney-genetics"
+script_path <- "/edit_docs/"
+
+## read configs
+config_vars_proj <- config::get(file = Sys.getenv("CONFIG_FILE"),
+    config = project_topic)
+```
+
+<!-- here we load global functions libraries -->
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
+# load global functions
+# file functions
+source("../analyses/functions/file-functions.R", local = TRUE)
+```
+
+<!-- here we load the result csv file and compute numbers to update the diagrams -->
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
+## load the CSV data
+# TODO: load and filter (newest) the files automatically 
+merge_analyses_sources <- read_csv("../analyses/A_MergeAnalysesSources/results/A_MergeAnalysesSources.2023-05-18.csv.gz")
+
+# compute numbers for the diagrams
+# TODO: also for other numbers with placeholders
+# TODO: version the files with the date
+high_evidence_genes <- merge_analyses_sources %>%
+    filter(evidence_count > 2) %>%
+    nrow()
+clingen_genes <- "XXX"
+manualscoring_genes <- "YYY"
+
+replace_strings("static/img/figures/raw/curation_flow_diagram_raw.drawio",
+    "static/img/figures/updated/curation_flow_diagram_current.drawio",
+    c("HIGHEVIDENCE_GENES", "CLINGEN_GENES", "MANUALSCORING_GENES"),
+    c(high_evidence_genes, clingen_genes, manualscoring_genes))
+```
+
+---
+
 # Preface {-}
 
 ---------------------------------------
@@ -39,7 +93,8 @@ To create a comprehensive and standardized database of kidney-related genes, we 
 We also developed an evidence-scoring system to differentiate highly confirmed disease genes from candidate genes.
 
 In order to make our approach more transparent and thus more comprehensible, we have attached our current workflow as a chart.
-![Flowchart](edit_docs/static/img/figures/curation_flow_diagram.png "Curation process flow diagram")
+```{drawio curation_flow_diagram, src="static/img/figures/updated/curation_flow_diagram_current.drawio", fig.cap = "Curation process flow diagram", engine.path = config_vars_proj$drawio_path}
+```
 
 ## Results
 
@@ -57,4 +112,4 @@ By utilizing Kidney-Genetics, clinicians and researchers can enhance their under
 
 ## Outlook
 
-Future goals include manual curation and the assignment of diagnostic genes to specific nephrological disease groups, such as syndromic vs. isolated, adult- vs. pediatric-onset, and cystic vs. nephrotic, among others.
+Future goals include manual curation and the assignment of diagnostic genes to specific nephrology disease groups, such as syndromic vs. isolated, adult- vs. pediatric-onset, and cystic vs. nephrotic, among others.

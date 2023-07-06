@@ -1,15 +1,5 @@
 # Analyses result tables {#analyses-tables}
 
-<!-- here we load required libraries -->
-```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
-## Load libraries
-library(readr) # needed to import CSV result files
-library(tidyverse) # needed to transform the tables
-library(DT) # needed to generate nice data tables in html
-library(plotly) # needed for upset plots
-```
-
 <!-- here we load the result csv files -->
 ```{r, echo=FALSE, message=FALSE, warning=FALSE}
 ## load the CSV data
