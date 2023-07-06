@@ -60,6 +60,8 @@ high_evidence_genes <- merge_analyses_sources %>%
 clingen_genes <- "XXX"
 manualscoring_genes <- "YYY"
 
+# TODO: create folder if not existent
+# TODO: replace merged_sources in raw file, add to replacement list
 replace_strings("static/img/figures/raw/curation_flow_diagram_raw.drawio",
     "static/img/figures/updated/curation_flow_diagram_current.drawio",
     c("HIGHEVIDENCE_GENES", "CLINGEN_GENES", "MANUALSCORING_GENES"),
@@ -96,20 +98,20 @@ In order to make our approach more transparent and thus more comprehensible, we 
 ```{drawio curation_flow_diagram, src="static/img/figures/updated/curation_flow_diagram_current.drawio", fig.cap = "Curation process flow diagram", engine.path = config_vars_proj$drawio_path}
 ```
 
-## Results
+## Results {-}
 
 The "Kidney-Genetics" database currently includes detailed information on 2,906 kidney-associated genes. Notably, 439 genes (15.1%) are present in three or more of the analyzed information sources, indicating high confidence and their potential for diagnostic use.
 
 To ensure currency, Kidney-Genetics will be regularly and automatically updated. We will also provide phenotypic and functional clustering results to facilitate gene grouping.
 
 
-## Conclusion
+## Conclusion {-}
 
 Kidney-Genetics is a comprehensive and freely accessible database that researchers can use to analyze genomic data related to kidney diseases. The database is regularly updated through a standardized pipeline and an automated system, ensuring it remains up-to-date with the latest advancements in kidney research and diagnostics.
 
 By utilizing Kidney-Genetics, clinicians and researchers can enhance their understanding of the genetic aspects of kidney disorders.
 
 
-## Outlook
+## Outlook {-}
 
 Future goals include manual curation and the assignment of diagnostic genes to specific nephrology disease groups, such as syndromic vs. isolated, adult- vs. pediatric-onset, and cystic vs. nephrotic, among others.

@@ -15,7 +15,7 @@ require(tidyverse)
 #'
 #' @examples
 #' \dontrun{
-#'   gene_data <- getGeneData("ENSG00000008710")
+#'   gene_data <- get_gene_data_from_gnomad("ENSG00000008710")
 #'   print(gene_data)
 #' }
 #'
