@@ -17,7 +17,7 @@ PubTator_genes <- read_csv("../analyses/05_PubTator/results/05_PubTator_genes.20
 
 UpSet plot of the merged analyses.
 
-```{r, echo=FALSE, warning=FALSE}
+```{r, echo=FALSE, warning=FALSE, out.width = "100%"}
 merge_analyses_sources_with_evidence <- merge_analyses_sources %>%
   filter(evidence_count > 0)
 
@@ -31,7 +31,7 @@ ComplexUpset::upset(merge_analyses_sources_with_evidence, analyses)
 
 Bar plot of the PanelApp analysis.
 
-```{r, echo=FALSE, warning=FALSE}
+```{r, echo=FALSE, warning=FALSE, out.width = "100%"}
 # compute counts
 PanelApp_genes_counts <- PanelApp_genes %>%
   group_by(source_count) %>%
@@ -51,7 +51,7 @@ ggplotly(PanelApp_genes_counts_plot)
 
 Bar plot of the Literature analysis.
 
-```{r, echo=FALSE, warning=FALSE}
+```{r, echo=FALSE, warning=FALSE, out.width = "100%"}
 # compute counts
 Literature_genes_counts <- Literature_genes %>%
   group_by(source_count) %>%
@@ -71,7 +71,7 @@ ggplotly(Literature_genes_counts_plot)
 
 Bar plot of the Diagnostic panels analysis.
 
-```{r, echo=FALSE, warning=FALSE}
+```{r, echo=FALSE, warning=FALSE, out.width = "100%"}
 # compute counts
 DiagnosticPanels_genes_counts <- DiagnosticPanels_genes %>%
   group_by(source_count) %>%
@@ -91,7 +91,7 @@ ggplotly(DiagnosticPanels_genes_counts_plot)
 
 Bar plot of the HPO in rare disease databases analysis.
 
-```{r, echo=FALSE, warning=FALSE}
+```{r, echo=FALSE, warning=FALSE, out.width = "100%"}
 # compute counts
 HPO_genes_counts <- HPO_genes %>%
   group_by(source_count) %>%
@@ -111,7 +111,7 @@ ggplotly(HPO_genes_counts_plot)
 
 Bar plot of thePubTator analysis.
 
-```{r, echo=FALSE, warning=FALSE}
+```{r, echo=FALSE, warning=FALSE, out.width = "100%"}
 # compute counts
 PubTator_genes_counts <- PubTator_genes %>%
   group_by(source_count) %>%
