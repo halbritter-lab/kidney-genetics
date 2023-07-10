@@ -39,7 +39,7 @@ height_ratio = 0.5, width_ratio = 0.3, )
 We retrieved all kidney disease related panels from both PanelApp UK and PanelApp Australia, meaning all panels that include "renal" or "kidney" in its name.
 - The y axis shows the number of Genes in the different panels, which is also visualized by the height of the bars. 
 - The x axis displays the number of panels (source_count), i.e. in how many different panels a single Gene occurred. 
-- For example **38 Genes** occured in just one panel and **2 Genes** were present in all thirty different panels.
+- For example **38 Genes** occurred in just one panel and **2 Genes** were present in all thirty different panels.
 
 ```{r, echo=FALSE, warning=FALSE, out.width = "100%"}
 # compute counts
@@ -65,7 +65,7 @@ We identified Genes associated with kidney disease in a systematic Literature se
   AND *(2)	"Genetic Structures"[Mesh] OR "Genes"[Mesh] OR genetic test OR gene panel OR gene panels OR multigene panel OR multigene panels OR targeted panel*
 - The y axis shows the number of Genes in different publications, which is also visualized by the height of the bars. 
 - The x axis displays the number of publications (source_count), i.e. in how many different publications a single Gene occurred. 
-- For example **331 Genes** occured in just one of the publications and **1 Gene** was present in all 13 different publications.
+- For example **331 Genes** occurred in just one of the publications and **1 Gene** was present in all 13 different publications.
 
 ```{r, echo=FALSE, warning=FALSE, out.width = "100%"}
 # compute counts
@@ -89,7 +89,7 @@ ggplotly(Literature_genes_counts_plot)
 We used ten common diagnostic panels that can be purchased for genome analysis and extracted the screened Genes from them.
 - The y axis shows the number of Genes in the different diagnostic panels, which is also visualized by the height of the bars. 
 - The x axis displays the number of panels (source_count), i.e. in how many different panels a single Gene occurred. 
-- For example **371 Genes** occured in just one panel and **56 Genes** were present in all ten different panels.
+- For example **371 Genes** occurred in just one panel and **56 Genes** were present in all ten different panels.
 
 ```{r, echo=FALSE, warning=FALSE, out.width = "100%"}
 # compute counts
@@ -111,11 +111,11 @@ ggplotly(DiagnosticPanels_genes_counts_plot)
 
 > Below you can see a Bar plot of the HPO-term based query in rare disease databases (OMIM, Orphanet).
 We used eight common databases for rare diseases and screened them for kidney disease associated Genes from a Human Phenotype Ontology (HPO) based search query.
-The most comprehensive HPO term used was *"Abnormality of the upper urinary tract" (HP:0010935)* and included all subgrouped terms.
+The most comprehensive HPO term used was *"Abnormality of the upper urinary tract" (HP:0010935)* and included all sub group terms.
 We deliberately chose these to be somewhat broader in order to fully include all relevant kidney diseases such as CAKUT, among others.
 - The y axis shows the number of Genes in the different rare disease databases, which is also visualized by the height of the bars. 
 - The x axis displays the number of databases (source_count), i.e. in how many different databases a single Gene occurred. 
-- For example **652 Genes** occured in just one databse and **1 Gene** was present in all eight different databases.
+- For example **652 Genes** occurred in just one database and **1 Gene** was present in all eight different databases.
 
 ```{r, echo=FALSE, warning=FALSE, out.width = "100%"}
 # compute counts
@@ -139,7 +139,7 @@ ggplotly(HPO_genes_counts_plot)
 We retrieved all kidney disease associated Genes from a PubTator API-based automated literature extraction of publications available on PubMed.
 - The y axis shows the number of Genes in the different publications, which is also visualized by the height of the bars.
 - The x axis displays the number of publications (source_count), i.e. in how many different publications a single Gene occurred.
-- For example **914 Genes** occured in just one publication and **1 Gene** was present in **1221** different publications.
+- For example **914 Genes** occurred in just one publication and **1 Gene** was present in **1221** different publications.
 
 ```{r, echo=FALSE, warning=FALSE, out.width = "100%"}
 # compute counts

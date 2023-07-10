@@ -54,6 +54,8 @@ merge_analyses_sources <- read_csv("../analyses/A_MergeAnalysesSources/results/A
 # compute numbers for the diagrams
 # TODO: also for other numbers with placeholders
 # TODO: version the files with the date
+all_genes <- merge_analyses_sources %>%
+    nrow()
 high_evidence_genes <- merge_analyses_sources %>%
     filter(evidence_count > 2) %>%
     nrow()
@@ -64,8 +66,8 @@ manualscoring_genes <- "YYY"
 # TODO: replace merged_sources in raw file, add to replacement list
 replace_strings("static/img/figures/raw/curation_flow_diagram_raw.drawio",
     "static/img/figures/updated/curation_flow_diagram_current.drawio",
-    c("HIGHEVIDENCE_GENES", "CLINGEN_GENES", "MANUALSCORING_GENES"),
-    c(high_evidence_genes, clingen_genes, manualscoring_genes))
+    c("ALL_GENES", "HIGHEVIDENCE_GENES", "CLINGEN_GENES", "MANUALSCORING_GENES"),
+    c(all_genes, high_evidence_genes, clingen_genes, manualscoring_genes))
 ```
 
 ---
