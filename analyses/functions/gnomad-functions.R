@@ -87,3 +87,68 @@ get_gene_data_from_gnomad <- function(ensemble_id) {
     stop("Request failed with status code ", response$status_code)
   }
 }
+
+
+#' Fetch ClinVar Variants Data from gnomAD GraphQL API
+#'
+#' This function takes an Ensemble gene identifier as input, makes a POST request
+#' to the gnomAD GraphQL API, and returns the ClinVar variants data as a tibble.
+#'
+#' @param ensemble_id A character string representing the Ensemble gene identifier.
+#'
+#' @return A tibble with columns for each field returned by the API. This includes
+#'         fields such as clinical_significance, clinvar_variation_id, and others, as well as nested
+#'         fields under gnomad and exome/genome.
+#'
+#' @examples
+#' \dontrun{
+#'   variants_data <- getClinVarVariants("ENSG00000008710")
+#'   print(variants_data)
+#' }
+#'
+#' @export
+getClinVarVariants <- function(ensemble_id) {
+
+  # API URL
+  api_url <- "https://gnomad.broadinstitute.org/api/"
+
+  # Request Body
+  body <- list(
+    query = paste0(
+      '{
+        gene(gene_id: "', ensemble_id,'", reference_genome: GRCh37) {
+          clinvar_variants {
+            clinical_significance
+            clinvar_variation_id
+            gold_stars
+            hgvsc
+            hgvsp
+            in_gnomad
+            major_consequence
+            pos
+            review_status
+            transcript_id
+            variant_id
+          }
+        }
+      }'
+    )
+  )
+
+  # Send POST request
+  response <- POST(api_url, body = body, encode = "json")
+
+  # Check if request was successful
+  if (response$status_code == 200) {
+    # Parse the JSON response
+    data <- fromJSON(content(response, "text", encoding = "UTF-8"), flatten = TRUE)
+
+    # Convert the nested list to a flat data frame
+    df <- as.data.frame(data$data$gene)
+
+    # Convert the data frame to a tibble and return
+    return(as_tibble(df))
+  } else {
+    stop("Request failed with status code ", response$status_code)
+  }
+}
