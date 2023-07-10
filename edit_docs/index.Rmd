@@ -45,25 +45,27 @@ config_vars_proj <- config::get(file = Sys.getenv("CONFIG_FILE"),
 source("../analyses/functions/file-functions.R", local = TRUE)
 ```
 
+<!-- TODO: load and filter (newest) the files automatically  -->
+<!-- TODO: also compute other numbers with placeholders -->
+<!-- TODO: version the image files with their computation date -->
+<!-- TODO: create output folder if not existent -->
+
 <!-- here we load the result csv file and compute numbers to update the diagrams -->
 ```{r, echo=FALSE, message=FALSE, warning=FALSE}
 ## load the CSV data
-# TODO: load and filter (newest) the files automatically 
 merge_analyses_sources <- read_csv("../analyses/A_MergeAnalysesSources/results/A_MergeAnalysesSources.2023-05-18.csv.gz")
 
 # compute numbers for the diagrams
-# TODO: also for other numbers with placeholders
-# TODO: version the files with the date
 all_genes <- merge_analyses_sources %>%
     nrow()
+
 high_evidence_genes <- merge_analyses_sources %>%
     filter(evidence_count > 2) %>%
     nrow()
+
 clingen_genes <- "XXX"
 manualscoring_genes <- "YYY"
 
-# TODO: create folder if not existent
-# TODO: replace merged_sources in raw file, add to replacement list
 replace_strings("static/img/figures/raw/curation_flow_diagram_raw.drawio",
     "static/img/figures/updated/curation_flow_diagram_current.drawio",
     c("ALL_GENES", "HIGHEVIDENCE_GENES", "CLINGEN_GENES", "MANUALSCORING_GENES"),
@@ -78,6 +80,10 @@ replace_strings("static/img/figures/raw/curation_flow_diagram_raw.drawio",
 
 This documentation is intended to describe the [Kidney-Genetics](https://github.com/halbritter-lab/kidney-genetics) project.
 
+<!-- here we place the logo -->
+```{r, out.width='25%', fig.align='center', echo=FALSE, message=FALSE, warning=FALSE}
+knitr::include_graphics("static/img/logo/kidney-genetics_logo.svg")
+```
 
 ## Objective {-}
 

@@ -1,8 +1,12 @@
 # Analyses plots {#analyses-plots}
 
+<!-- TODO: replace hardcoded, magic numbers in text with actual computed numbers from the data -->
+<!-- TODO: make UpSet Plot interactive -->
+<!-- TODO: load and filter (newest) the files automatically -->
+<!-- TODO: move file loading to first RmD file (Index.Rmd) -->
+
 ```{r, echo=FALSE, message=FALSE, warning=FALSE}
 ## load the CSV data
-# TODO: load and filter (newest) the files automatically 
 merge_analyses_sources <- read_csv("../analyses/A_MergeAnalysesSources/results/A_MergeAnalysesSources.2023-05-18.csv.gz")
 PanelApp_genes <- read_csv("../analyses/01_PanelApp/results/01_PanelApp_genes.2023-05-18.csv.gz")
 Literature_genes <- read_csv("../analyses/02_Literature/results/02_Literature_genes.2023-05-18.csv.gz")
