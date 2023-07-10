@@ -1,6 +1,3 @@
-results
-conclusion
-outlook
 analyses-tables
 main-table-merged-analyses-sources
 result-table-panelapp

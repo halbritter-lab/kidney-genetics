@@ -43,6 +43,7 @@ file_date <- strftime(as.POSIXlt(Sys.time(),
 # TODO: this should be a config variable
 hgnc_link <-
   "http://ftp.ebi.ac.uk/pub/databases/genenames/hgnc/tsv/non_alt_loci_set.txt"
+
 hgnc_file <- "data/non_alt_loci_set.txt"
 
 # download and gzip file to save space
@@ -128,14 +129,14 @@ non_alt_loci_set_coordinates <- non_alt_loci_set_string %>%
 
 
 ############################################
-# TODO: annotate with GeneCC classification
-
-############################################
-
-
-############################################
 # TODO: annotate gnomAD pLI and missense Z-scores
 # use https://gnomad.broadinstitute.org/api/
+
+############################################
+
+
+############################################
+# TODO: annotate with GeneCC classification
 
 ############################################
 
