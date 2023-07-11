@@ -11,24 +11,38 @@ require(tidyverse)
 #'
 #' @importFrom jsonlite fromJSON
 #' @importFrom magrittr %>%
-#' @importFrom dpylr select
+#' @importFrom dplyr select
 #' @importFrom tidyr as_tibble
 #'
 #' @return A tibble with the HPO name corresponding to the input HPO term ID.
 #'
 #' @examples
-#' HPO_name_from_term("HPO:1234567")
+#' HPO_name_from_term("HP:1234567")
 #'
 #' @export
 HPO_name_from_term <- function(term_input_id) {
-  hpo_term_response <- jsonlite::fromJSON(
-    paste0("https://hpo.jax.org/api/hpo/term/",
-    URLencode(term_input_id, reserved = TRUE)))
+  retries <- 3  # Number of retries before giving up
+  retry_delay <- 5  # Delay in seconds between retries
 
-  hpo_term_name <- tidyr::as_tibble(hpo_term_response$details$name) %>%
-    dpylr::select(hpo_mode_of_inheritance_term_name = value)
+  for (attempt in 1:retries) {
+    tryCatch({
+      hpo_term_response <- jsonlite::fromJSON(
+        paste0("https://hpo.jax.org/api/hpo/term/",
+               URLencode(term_input_id, reserved = TRUE)))
 
-  return(hpo_term_name)
+      hpo_term_name <- tidyr::as_tibble(hpo_term_response$details$name) %>%
+        dplyr::select(hpo_mode_of_inheritance_term_name = value)
+
+      return(hpo_term_name)
+    }, error = function(e) {
+      if (attempt < retries) {
+        message("Retrying after error:", conditionMessage(e))
+        Sys.sleep(retry_delay)
+      } else {
+        stop("Failed after multiple retries:", conditionMessage(e))
+      }
+    })
+  }
 }
 
 
@@ -40,24 +54,38 @@ HPO_name_from_term <- function(term_input_id) {
 #'
 #' @importFrom jsonlite fromJSON
 #' @importFrom magrittr %>%
-#' @importFrom dpylr select
+#' @importFrom dplyr select
 #' @importFrom tidyr as_tibble
 #'
 #' @return A tibble with the HPO definition corresponding to the input HPO term ID.
 #'
 #' @examples
-#' HPO_definition_from_term("HPO:1234567")
+#' HPO_definition_from_term("HP:1234567")
 #'
 #' @export
 HPO_definition_from_term <- function(term_input_id) {
-  hpo_term_response <- jsonlite::fromJSON(
-    paste0("https://hpo.jax.org/api/hpo/term/",
-    URLencode(term_input_id, reserved = TRUE)))
+  retries <- 3  # Number of retries before giving up
+  retry_delay <- 5  # Delay in seconds between retries
 
-  hpo_term_definition <- tidyr::as_tibble(hpo_term_response$details$definition) %>%
-    dpylr::select(hpo_mode_of_inheritance_term_definition = value)
+  for (attempt in 1:retries) {
+    tryCatch({
+      hpo_term_response <- jsonlite::fromJSON(
+        paste0("https://hpo.jax.org/api/hpo/term/",
+               URLencode(term_input_id, reserved = TRUE)))
 
-  return(hpo_term_definition)
+      hpo_term_definition <- tidyr::as_tibble(hpo_term_response$details$definition) %>%
+        dplyr::select(hpo_mode_of_inheritance_term_definition = value)
+
+      return(hpo_term_definition)
+    }, error = function(e) {
+      if (attempt < retries) {
+        message("Retrying after error:", conditionMessage(e))
+        Sys.sleep(retry_delay)
+      } else {
+        stop("Failed after multiple retries:", conditionMessage(e))
+      }
+    })
+  }
 }
 
 
@@ -69,23 +97,37 @@ HPO_definition_from_term <- function(term_input_id) {
 #'
 #' @importFrom jsonlite fromJSON
 #' @importFrom magrittr %>%
-#' @importFrom dpylr select
+#' @importFrom dplyr select
 #' @importFrom tidyr as_tibble
 #'
 #' @return An integer representing the count of HPO children terms.
 #'
 #' @examples
-#' HPO_children_count_from_term("HPO:1234567")
+#' HPO_children_count_from_term("HP:1234567")
 #'
 #' @export
 HPO_children_count_from_term <- function(term_input_id) {
-  hpo_term_response <- fromJSON(
-    paste0("https://hpo.jax.org/api/hpo/term/",
-    URLencode(term_input_id, reserved = TRUE)))
+  retries <- 3  # Number of retries before giving up
+  retry_delay <- 5  # Delay in seconds between retries
 
-  hpo_term_children_count <- tidyr::as_tibble(hpo_term_response$relations$children)
+  for (attempt in 1:retries) {
+    tryCatch({
+      hpo_term_response <- jsonlite::fromJSON(
+        paste0("https://hpo.jax.org/api/hpo/term/",
+               URLencode(term_input_id, reserved = TRUE)))
 
-  return(length(hpo_term_children_count))
+      hpo_term_children_count <- length(hpo_term_response$relations$children)
+
+      return(hpo_term_children_count)
+    }, error = function(e) {
+      if (attempt < retries) {
+        message("Retrying after error:", conditionMessage(e))
+        Sys.sleep(retry_delay)
+      } else {
+        stop("Failed after multiple retries:", conditionMessage(e))
+      }
+    })
+  }
 }
 
 
@@ -95,24 +137,39 @@ HPO_children_count_from_term <- function(term_input_id) {
 #'
 #' @importFrom jsonlite fromJSON
 #' @importFrom magrittr %>%
-#' @importFrom dpylr select
+#' @importFrom dplyr select
 #' @importFrom tidyr as_tibble
 #'
 #' @return A tibble with the HPO children terms corresponding to the input HPO term ID.
 #'
 #' @examples
-#' HPO_children_from_term("HPO:1234567")
+#' HPO_children_from_term("HP:1234567")
 #'
 #' @export
 HPO_children_from_term <- function(term_input_id) {
-  hpo_term_response <- jsonlite::fromJSON(
-    paste0("https://hpo.jax.org/api/hpo/term/",
-    URLencode(term_input_id, reserved = TRUE)))
+  retries <- 3  # Number of retries before giving up
+  retry_delay <- 5  # Delay in seconds between retries
 
-  hpo_term_children <- tidyr::as_tibble(hpo_term_response$relations$children)
+  for (attempt in 1:retries) {
+    tryCatch({
+      hpo_term_response <- jsonlite::fromJSON(
+        paste0("https://hpo.jax.org/api/hpo/term/",
+               URLencode(term_input_id, reserved = TRUE)))
 
-  return(hpo_term_children)
+      hpo_term_children <- tidyr::as_tibble(hpo_term_response$relations$children)
+
+      return(hpo_term_children)
+    }, error = function(e) {
+      if (attempt < retries) {
+        message("Retrying after error:", conditionMessage(e))
+        Sys.sleep(retry_delay)
+      } else {
+        stop("Failed after multiple retries:", conditionMessage(e))
+      }
+    })
+  }
 }
+
 
 
 #' Retrieve all HPO descendants and the term itself from term ID
@@ -127,7 +184,7 @@ HPO_children_from_term <- function(term_input_id) {
 #'   corresponding to the input HPO term ID.
 #'
 #' @examples
-#' HPO_all_children_from_term("HPO:1234567", list())
+#' HPO_all_children_from_term("HP:1234567", list())
 #'
 #' @export
 HPO_all_children_from_term <- function(term_input, all_children_list = list()) {
