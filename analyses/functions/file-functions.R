@@ -72,7 +72,7 @@ replace_strings <- function(input_file, output_file, find_vector, replace_vector
 #'
 #' @examples
 #' \dontrun{
-#' check_file_age("hpo_list_kidney.", "shared/", 1)
+#' check_file_age("hpo_list_kidney", "shared/", 1)
 #' }
 #'
 #' @importFrom fs dir_ls
@@ -83,7 +83,7 @@ replace_strings <- function(input_file, output_file, find_vector, replace_vector
 check_file_age <- function(file_basename, folder, months) {
 
   # Construct the regex pattern for the files
-  pattern <- paste0(file_basename, "\\d{4}-\\d{2}-\\d{2}\\.csv\\.gz$")
+  pattern <- paste0(file_basename, "\\.\\d{4}-\\d{2}-\\d{2}")
 
   # Get the list of files
   files <- dir_ls(folder, regexp = pattern)
@@ -110,4 +110,56 @@ check_file_age <- function(file_basename, folder, months) {
 
   # Return TRUE if the newest file is older than the specified number of months, and FALSE otherwise
   return(time_diff < months)
+}
+
+
+#' Get the name of the most recent file in a directory
+#'
+#' This function gets the name of the most recent file with a given basename in a
+#' specified directory. It returns the full name of the most recent file.
+#'
+#' @param file_basename A string. The basename of the files to check.
+#' This should be in the format "filename.", e.g. "hpo_list_kidney."
+#'
+#' @param folder A string. The directory where the files are located.
+#'
+#' @return A string. Returns the full name of the most recent file.
+#'
+#' @examples
+#' \dontrun{
+#' get_newest_file("hpo_list_kidney", "shared/")
+#' }
+#'
+#' @importFrom fs dir_ls
+#' @importFrom stringr str_extract
+#' @importFrom lubridate as.Date
+#'
+#' @export
+get_newest_file <- function(file_basename, folder) {
+
+  # Construct the regex pattern for the files
+  pattern <- paste0(file_basename, "\\.\\d{4}-\\d{2}-\\d{2}")
+
+  # Get the list of files
+  files <- dir_ls(folder, regexp = pattern)
+
+  # If there are no files, return NULL
+  if (length(files) == 0) {
+    return(NULL)
+  } else {
+    # Extract the dates from the file names
+    dates <- str_extract(files, "\\d{4}-\\d{2}-\\d{2}")
+
+    # Convert the dates to Date objects
+    dates <- as.Date(dates)
+
+    # Get the newest date
+    newest_date <- max(dates, na.rm = TRUE)
+
+    # Get the file(s) with the newest date
+    newest_files <- files[dates == newest_date]
+
+    # Return the full name of the most recent file
+    return(newest_files)
+  }
 }
