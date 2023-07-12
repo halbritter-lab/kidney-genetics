@@ -1,6 +1,7 @@
 require(httr)
 require(jsonlite)
 require(tidyverse)
+require(purrr)
 
 #' Fetch Gene Data from gnomAD GraphQL API
 #'
@@ -151,4 +152,35 @@ getClinVarVariants <- function(ensemble_id) {
   } else {
     stop("Request failed with status code ", response$status_code)
   }
+}
+
+
+#' Fetch Gene Data from gnomAD GraphQL API for multiple genes
+#'
+#' This function takes a vector of Ensemble gene identifiers as input,
+#' makes a POST request for each gene identifier
+#' to the gnomAD GraphQL API, and returns the gene data as a tibble.
+#'
+#' @param ensemble_ids A character vector representing the Ensemble gene identifiers.
+#'
+#' @return A tibble with rows for each gene and columns for each field returned by the API.
+#'         This includes fields such as gene_id, gene_version, symbol, and others, 
+#'         as well as nested fields under gnomad_constraint.
+#'
+#' @examples
+#' \dontrun{
+#'   gene_data <- get_multiple_gene_data_from_gnomad(c("ENSG00000008710", "ENSG00000012048"))
+#'   print(gene_data)
+#' }
+#'
+#' @export
+get_multiple_gene_data_from_gnomad <- function(ensemble_ids) {
+  # Use purrr::map to iterate over ensemble_ids and get a list of tibbles
+  list_of_tibbles <- purrr::map(ensemble_ids, get_gene_data_from_gnomad)
+  
+  # Use purrr::reduce to bind all tibbles into a single tibble
+  gene_data <- purrr::reduce(list_of_tibbles, dplyr::bind_rows)
+
+  # Return the combined tibble
+  return(gene_data)
 }
