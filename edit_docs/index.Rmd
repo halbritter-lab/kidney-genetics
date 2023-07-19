@@ -102,7 +102,9 @@ To create a comprehensive and standardized database of kidney-related genes, we 
 
 We also developed an evidence-scoring system to differentiate highly confirmed disease genes from candidate genes.
 
-In order to make our approach more transparent and thus more comprehensible, we have attached our current workflow as a chart.
+In order to make our approach more transparent and thus more comprehensible, we have attached our current workflow as a chart.  
+
+
 ```{drawio curation_flow_diagram, src="static/img/figures/updated/curation_flow_diagram_current.drawio", fig.cap = "Curation process flow diagram", engine.path = config_vars_proj$drawio_path}
 ```
 
