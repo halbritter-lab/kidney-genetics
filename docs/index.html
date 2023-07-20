@@ -23,7 +23,7 @@
 <meta name="author" content="Bernt Popp, Nina Rank, Constantin Wolff, Jan Halbritter" />
 
 
-<meta name="date" content="2023-07-19" />
+<meta name="date" content="2023-07-20" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -147,7 +147,7 @@
 <div id="header">
 <h1 class="title">The Kidney-Genetics Documentation</h1>
 <p class="author"><em>Bernt Popp, Nina Rank, Constantin Wolff, Jan Halbritter</em></p>
-<p class="date"><em>2023-07-19</em></p>
+<p class="date"><em>2023-07-20</em></p>
 </div>
 <div id="preface" class="section level1 unnumbered hasAnchor">
 <h1>Preface<a href="index.html#preface" class="anchor-section" aria-label="Anchor link to header"></a></h1>
@@ -157,20 +157,83 @@
 <p><img src="static/img/logo/kidney-genetics_logo.svg" width="25%" style="display: block; margin: auto;" /></p>
 <div id="objective" class="section level2 unnumbered hasAnchor">
 <h2>Objective<a href="index.html#objective" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<blockquote>
 <p>How can we address the lack of a unified and standardized database of kidney disease-associated genes, which hampers diagnosis, treatment, and research comparability in the field of kidney diseases?</p>
+</blockquote>
+<p>Genetic insights are becoming increasingly influential in the understanding and treatment of various kidney diseases (KD). Hundreds of genes associated with monogenic kidney disease have been identified, providing valuable insights into their diagnosis, management, and monitoring.
+However, the lack of a unified and standardized database of genes assigned to kidney diseases has led to diagnostic blind spots and comparability issues among current studies of kidney genetics.
+To address this gap, we created the <strong>“Kidney-Genetics”</strong> a regularly updated, automated and publicly accessible database which aims to provide a comprehensive list of all relevant genes associated with kidney disease.</p>
+<blockquote>
+<p><strong>Key issues:</strong></p>
+</blockquote>
+<ul>
+<li>Create a unified and standardized database of kidney disease-associated genes and provide a valuable resource for the diagnosis, treatment, and monitoring of those diseases<br />
+</li>
+<li>Allow clinicians and researchers to gain a deeper understanding of the genetic factors underlying different KDs<br />
+</li>
+<li>Compile, organize and curate important information on the genes to the identify novel candidate genes and genetic variants associated with KDs<br />
+</li>
+<li>Group and sort the genes into different categories, for example into phenotypic groups, the onset, syndromic, etc.<br />
+</li>
+<li>Establish genotype-phenotype correlations that can be used to assign multiple clinical entities to a single gene in order to improve understanding and treatment choices<br />
+</li>
+<li>The information can be used to develop personalized treatment strategies and interventions, leading to more effective and targeted therapies for individuals with KD<br />
+</li>
+<li>Researchers can freely access “Kidney-Genetics” ensuring consistency and comparability across different research projects, which can accelerate scientific progress, foster collaborations, and facilitate the development of new insights and approaches</li>
+</ul>
+<p>The scientific literature highlights the need for such a database and emphasizes the importance of genetic research in kidney disease. For example, a study published xxx. Another article published in xxx.<br />
+<!-- TODO: Scan literature that notices a scientific need for a standardized kidney gene database (see some interesting paper in the references section) --></p>
+<blockquote>
+<p>In summary, our research question and its approach have the potential to provide a deeper scientific understanding of KD genetics, improve diagnostic accuracy, guide treatment selection, advance precision medicine, and facilitate research collaboration. The establishment of the <strong>“Kidney-Genetics”</strong> database addresses an important gap in the field and provides a valuable resource for researchers, clinicians, and patients involved in the discovery and treatment of KD.</p>
+</blockquote>
 </div>
 <div id="methods" class="section level2 unnumbered hasAnchor">
 <h2>Methods<a href="index.html#methods" class="anchor-section" aria-label="Anchor link to header"></a></h2>
-<p>To create a comprehensive and standardized database of kidney-related genes, we employed the following methods:</p>
+<blockquote>
+<p>To create a thorough and standardized database of kidney-related genes, we employed the following methods and compiled kidney disease-associated gene information from various sources:</p>
+</blockquote>
 <ol style="list-style-type: decimal">
-<li>Utilized data from Genomics England and Australia PanelApp.</li>
-<li>Conducted a comprehensive literature review of published gene lists.</li>
-<li>Collected information from clinical diagnostic panels for kidney disease.</li>
-<li>Performed a Human Phenotype Ontology (HPO)-based search in rare disease databases (OMIM, Orphanet).</li>
-<li>Employed a PubTator API-based automated literature extraction from PubMed.</li>
+<li>Utilized data from Genomics England and Australia PanelApp<br />
+</li>
+<li>Conducted a comprehensive literature review of published gene lists<br />
+</li>
+<li>Collected information from clinical diagnostic panels for kidney disease<br />
+</li>
+<li>Performed a Human Phenotype Ontology (HPO)-based search in rare disease databases (OMIM, Orphanet)<br />
+</li>
+<li>Employed a PubTator API-based automated literature extraction from PubMed</li>
 </ol>
-<p>We also developed an evidence-scoring system to differentiate highly confirmed disease genes from candidate genes.</p>
-In order to make our approach more transparent and thus more comprehensible, we have attached our current workflow as a chart.
+<p>We also developed an evidence-scoring system to differentiate highly confirmed disease genes from candidate genes. We defined the presence of a certain gene in 3 or more of the 5 resources as highly evident genes.
+These genes were then manually curated according to predetermined criteria or, in the case of existing ClinGen curation, their data and scores were used. Genes with a score of 2 or less were accordingly more likely to be classified as candidate genes.<br />
+Furthermore, we grouped all genes into different categories to later match them in a genotype-phenotype correlation.<br />
+<!-- TODO: Provide detailed information about the different groups and categories and explain our decision for them --></p>
+<p>To get a more transparent and thus more comprehensive understanding of our several evidence source “pillars”, we listed our different steps below and attached a flowchart for better visualization.</p>
+<ol style="list-style-type: decimal">
+<li>We retrieved all kidney disease related panels from both PanelApp UK and PanelApp Australia, meaning all panels that include “renal” or “kidney” in its name. That included xxx different lists. The access date was the xxx.<br />
+</li>
+<li>We identified Genes associated with kidney disease in a systematic Literature search using the following search query:<br />
+<em>(1) “Kidney”[Mesh] OR “Kidney Diseases”[Mesh] OR kidney OR renal</em> AND<br />
+<em>(2) “Genetic Structures”[Mesh] OR “Genes”[Mesh] OR genetic test OR gene panel OR gene panels OR multigene panel</em> OR targeted panel*<br />
+we then screened for published lists and got xxx lists from date to date xxx.<br />
+</li>
+<li>We used ten common diagnostic panels that can be purchased for genome analysis and extracted the screened genes from them. Those included following panels:
+<ul>
+<li>Centogene nephrology<br />
+</li>
+<li>Cegat kidney diseases<br />
+</li>
+<li>Preventiongenetics</li>
+<li>etc.<br />
+<!-- TODO: complete the list and provide the links with RMD --></li>
+</ul></li>
+<li>We used eight common databases for rare diseases and screened them for kidney disease associated Genes from a Human Phenotype Ontology (HPO) based search query.
+The most comprehensive HPO term used was “Abnormality of the upper urinary tract” (HP:0010935) and included all subgroup terms. We deliberately chose these to be somewhat broader in order to fully include all relevant kidney diseases such as CAKUT, among others.<br />
+</li>
+<li>We retrieved all kidney disease associated Genes from a PubTator API-based automated literature extraction of publications available on PubMed.</li>
+</ol>
+<blockquote>
+<p><strong>Kidney-Genetics Flowchart</strong></p>
+</blockquote>
 <div class="figure">
 <img src="KidneyGenetics_documentation_files/figure-html/curation_flow_diagram.svg" alt="Curation process flow diagram"  />
 <p class="caption">
@@ -180,17 +243,30 @@ In order to make our approach more transparent and thus more comprehensible, we 
 </div>
 <div id="results" class="section level2 unnumbered hasAnchor">
 <h2>Results<a href="index.html#results" class="anchor-section" aria-label="Anchor link to header"></a></h2>
-<p>The “Kidney-Genetics” database currently includes detailed information on 2,906 kidney-associated genes. Notably, 439 genes (15.1%) are present in three or more of the analyzed information sources, indicating high confidence and their potential for diagnostic use.</p>
-<p>To ensure currency, Kidney-Genetics will be regularly and automatically updated. We will also provide phenotypic and functional clustering results to facilitate gene grouping.</p>
+<blockquote>
+<p>The “Kidney-Genetics” database currently contains detailed information on 2.906 kidney-associated genes with detailed annotations on gene function, kidney phenotype, incidence, possible syndromic disease expression and genetic variation.
+To automatically group the genes, we will present the results of phenotypic and functional clustering.<br />
+<!-- TODO: Provide clustering and grouping results with numbers and proportions --></p>
+</blockquote>
+<p>The number of genes extracted from the five analyzed sources of information is as follows: (1) 546, (2) 822, (3) 911, (4) 779, and (5) 2.032<br />
+Notably, 439 genes (15.1%) of the total 2.906 genes are present in three or more of the analyzed information sources, thus meeting our evidence criteria, indicating high confidence and their potential for diagnostic use.
+Of these genes, 424 (96.6%) are present in at least one, and 56 (12.8%) are present in all comprehensive diagnostic laboratory panels.<br />
+<!-- TODO: compute the gene numbers with placeholders --></p>
+<p>To ensure currency, Kidney-Genetics will be updated regularly and automatically at xxx week intervals. We will also provide phenotypic and functional clustering results to facilitate gene grouping.<br />
+<!-- TODO: Provide information about the planned update framework --></p>
 </div>
 <div id="conclusion" class="section level2 unnumbered hasAnchor">
 <h2>Conclusion<a href="index.html#conclusion" class="anchor-section" aria-label="Anchor link to header"></a></h2>
-<p>Kidney-Genetics is a comprehensive and freely accessible database that researchers can use to analyze genomic data related to kidney diseases. The database is regularly updated through a standardized pipeline and an automated system, ensuring it remains up-to-date with the latest advancements in kidney research and diagnostics.</p>
-<p>By utilizing Kidney-Genetics, clinicians and researchers can enhance their understanding of the genetic aspects of kidney disorders.</p>
+<blockquote>
+<p>Kidney-Genetics is a comprehensive, free and publicly accessible database that can be used by researchers to analyze genomic data related to KDs. The database will be routinely updated using an automated system and standardized pipeline to ensure that it is always up-to-date with the latest kidney research and diagnostics.</p>
+</blockquote>
+<p>By utilizing Kidney-Genetics, clinicians, geneticists, and researchers can examine genomic data and improve their understanding of the genetic components of diverse KDs. The code and results are completely available on GitHub. A standardized pipeline and automated system keep our database on the cutting edge of kidney research and diagnostics.
+Screening efforts toward manual curation (such as through the ClinGen initiative) and assignment of diagnostic genes to nephrologic disease groups (e.g., syndromic vs. isolated; adult vs. pediatric; cystic, nephrotic, etc.) are currently in the development process and our goals for the near future.</p>
 </div>
 <div id="outlook" class="section level2 unnumbered hasAnchor">
 <h2>Outlook<a href="index.html#outlook" class="anchor-section" aria-label="Anchor link to header"></a></h2>
-<p>Future goals include manual curation and the assignment of diagnostic genes to specific nephrology disease groups, such as syndromic vs. isolated, adult- vs. pediatric-onset, and cystic vs. nephrotic, among others.</p>
+<p>Future goals include the further manual curation of the high evident genes to acquire a more accurate individual assessment of each gene. For this purpose, we have developed a standardized curation process based on the ClinGen criteria, as previously discussed in the methods section.
+Furthermore, diagnostic genes will be assigned to certain defined nephrological disease groups, in order to obtain a phenotype-genotype correlation and gain a better clinical understanding.</p>
 
 </div>
 </div>
