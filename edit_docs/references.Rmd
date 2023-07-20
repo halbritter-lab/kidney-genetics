@@ -1,8 +1,3 @@
 `r if (knitr:::is_html_output()) '
 # References {-}
 '`
-
-- KidneyNetwork: using kidney-derived gene expression data to predict and prioritize novel genes involved in kidney disease / Albertien M. van Eerde / PMID: 36807342  
-- Genetic kidney diseases / Friedhelm Hildebrandt / PMID: 20382325  
-- Renal Gene Expression Database (RGED): a relational database of gene expression profiles in kidney disease / Zhiguo Mao / PMID: 25252782  
-- Review of genetic testing in kidney disease patients: Diagnostic yield of single nucleotide variants and copy number variations evaluated across and within kidney phenotype groups / Albertien M. van Eerde / PMID: 36161467  

@@ -103,7 +103,7 @@ To address this gap, we created the **“Kidney-Genetics”** a regularly update
 - The information can be used to develop personalized treatment strategies and interventions, leading to more effective and targeted therapies for individuals with KD  
 - Researchers can freely access "Kidney-Genetics" ensuring consistency and comparability across different research projects, which can accelerate scientific progress, foster collaborations, and facilitate the development of new insights and approaches  
 
-The scientific literature highlights the need for such a database and emphasizes the importance of genetic research in kidney disease. For example, a study published xxx. Another article published in xxx.  
+The scientific literature highlights the need for such a database and emphasizes the importance of genetic research in kidney disease. For example, a study published [@boulogne_kidneynetwork_2023]. Another article published in xxx.  
 <!-- TODO: Scan literature that notices a scientific need for a standardized kidney gene database (see some interesting paper in the references section) -->
 
 > In summary, our research question and its approach have the potential to provide a deeper scientific understanding of KD genetics, improve diagnostic accuracy, guide treatment selection, advance precision medicine, and facilitate research collaboration. The establishment of the **"Kidney-Genetics"** database addresses an important gap in the field and provides a valuable resource for researchers, clinicians, and patients involved in the discovery and treatment of KD.  
