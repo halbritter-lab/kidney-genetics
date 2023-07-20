@@ -43,6 +43,7 @@ config_vars_proj <- config::get(file = Sys.getenv("CONFIG_FILE"),
 # load global functions
 # file functions
 source("../analyses/functions/file-functions.R", local = TRUE)
+source("../analyses/functions/string-functions.R", local = TRUE)
 ```
 
 <!-- TODO: load and filter (newest) the files automatically  -->
@@ -155,8 +156,9 @@ To get a more transparent and thus more comprehensive understanding of our sever
 To automatically group the genes, we will present the results of phenotypic and functional clustering.  
 <!-- TODO: Provide clustering and grouping results with numbers and proportions -->
 
+<!-- TODO: write a function to format numbers as strings using the formula below -->
 The number of genes extracted from the five analyzed sources of information is as follows: (1) 546, (2) 822, (3) 911, (4) 779, and (5) 2.032  
-Notably, 439 genes (15.1%) of the total 2.906 genes are present in three or more of the analyzed information sources, thus meeting our evidence criteria, indicating high confidence and their potential for diagnostic use. 
+Notably, **`r toString(format(round(as.numeric(high_evidence_genes), 0), nsmall = 0, big.mark = ","))`** genes (`r percent(high_evidence_genes / all_genes, digits = 1)`) of the total `r toString(format(round(as.numeric(all_genes), 0), nsmall = 0, big.mark = ","))` genes are present in three or more of the analyzed information sources, thus meeting our evidence criteria, indicating high confidence and their potential for diagnostic use.
 Of these genes, 424 (96.6%) are present in at least one, and 56 (12.8%) are present in all comprehensive diagnostic laboratory panels.  
 <!-- TODO: compute the gene numbers with placeholders -->
 
