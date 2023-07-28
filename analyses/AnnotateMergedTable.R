@@ -155,7 +155,7 @@ if (check_file_age("hpo_list_adult", "shared/", 1)) {
       overwrite = TRUE)
 }
 
-# 3) syndromic vs non-syndromic (categories in OMIM: GROWTH, SKELETAL, NEUROLOGIC, HEAD & NECK; exclude: CARDIOVASCULAR, ABDOMEN, GENITOURINARY)# we load and use the results of previous walks through the ontology tree if not older then 1 month
+# 3) syndromic vs non-syndromic (categories in OMIM: GROWTH, SKELETAL, NEUROLOGIC, HEAD & NECK; exclude: CARDIOVASCULAR, ABDOMEN, GENITOURINARY)
 # we load and use the results of previous walks through the ontology tree if not older then 1 month
 # TODO: differentiate into the 3 organ systems
 
@@ -227,6 +227,9 @@ if (check_file_age("phenotype", "shared/data/downloads/", 1)) {
 if (check_file_age("omim_genemap2", "shared/data/downloads/", 1)) {
   omim_genemap2_filename <- get_newest_file("omim_genemap2", "shared/data/downloads/")
 } else {
+  # TODO: compute date only once or somehow in config
+  file_date <- strftime(as.POSIXlt(Sys.time(), "UTC", "%Y-%m-%dT%H:%M:%S"), "%Y-%m-%d")
+
   # OMIM links to genemap2 file needs to be set in config and applied for at
   # https://www.omim.org/downloads
   omim_genemap2_url <- config_vars_proj$omim_genemap2_url
@@ -256,7 +259,7 @@ omim_genemap2 <- read_delim(omim_genemap2_filename, "\t",
     col_names = FALSE,
     comment = "#",
     trim_ws = TRUE) %>%
-  select(Chromosome = X1,
+  dplyr::select(Chromosome = X1,
     Genomic_Position_Start = X2,
     Genomic_Position_End = X3,
     Cyto_Location = X4,
@@ -270,7 +273,7 @@ omim_genemap2 <- read_delim(omim_genemap2_filename, "\t",
     Comments = X12,
     Phenotypes = X13,
     Mouse_Gene_Symbol_ID = X14) %>%
-  select(approved_symbol, Phenotypes) %>%
+  dplyr::select(approved_symbol, Phenotypes) %>%
   separate_rows(Phenotypes, sep = "; ") %>%
   separate(Phenotypes, c("disease_ontology_name", "hpo_mode_of_inheritance_term_name"), "\\), (?!.+\\))") %>%
   separate(disease_ontology_name, c("disease_ontology_name", "Mapping_key"), "\\((?!.+\\()") %>%
@@ -283,7 +286,7 @@ omim_genemap2 <- read_delim(omim_genemap2_filename, "\t",
   mutate(disease_ontology_id = paste0("OMIM:", MIM_Number)) %>%
   separate_rows(hpo_mode_of_inheritance_term_name, sep = ", ") %>%
   mutate(hpo_mode_of_inheritance_term_name = str_replace_all(hpo_mode_of_inheritance_term_name, "\\?", "")) %>%
-  select(-MIM_Number) %>%
+  dplyr::select(-MIM_Number) %>%
   unique() %>%
   mutate(hpo_mode_of_inheritance_term_name = case_when(hpo_mode_of_inheritance_term_name == "Autosomal dominant" ~ "Autosomal dominant inheritance",
     hpo_mode_of_inheritance_term_name == "Autosomal recessive" ~ "Autosomal recessive inheritance",
@@ -549,7 +552,7 @@ hpo_gene_list_kidney_all_kidney_groups_summarized_for_join <- hpo_gene_list_kidn
 
 
 ############################################
-# annotate pediatric vs adult onset (OMIM: HPO terms Adult onset HP:0003581, Pediatric onset HP:0410280, mandchildren of terms)
+# annotate pediatric vs adult onset (OMIM: HPO terms Adult onset HP:0003581, Pediatric onset HP:0410280, mndchildren of terms)
 phenotype_hpoa_filter_adult <- phenotype_hpoa %>%
    filter(hpo_id %in% hpo_list_adult$term) %>%
    select(database_id, hpo_id) %>%

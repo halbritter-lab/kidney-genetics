@@ -30,35 +30,115 @@ options(scipen = 999)
 # load global functions
 # hgnc functions
 source("../functions/ensembl-functions.R", local = TRUE)
+source("../functions/gnomad-functions.R", local = TRUE)
+source("../functions/file-functions.R", local = TRUE)
 ############################################
 
 
 ############################################
-## download HGNC file
-file_date <- strftime(as.POSIXlt(Sys.time(),
+## download all required database sources from HGNC and OMIM
+# we load and use the results of previous walks through the ontology tree if not older then 1 month
+
+current_date <- strftime(as.POSIXlt(Sys.time(),
     "UTC", "%Y-%m-%dT%H:%M:%S"),
   "%Y-%m-%d")
 
-# define link and file name
-# TODO: this should be a config variable
-hgnc_link <-
-  "http://ftp.ebi.ac.uk/pub/databases/genenames/hgnc/tsv/non_alt_loci_set.txt"
+if (check_file_age("non_alt_loci_set", "../shared/data/downloads/", 1)) {
+  non_alt_loci_set_filename <- get_newest_file("non_alt_loci_set", "../shared/data/downloads/")
+} else {
+  # HGNC links to non_alt_loci_set file needs to be set in config
+  non_alt_loci_set_url <- config_vars_proj$non_alt_loci_set_url
 
-hgnc_file <- "data/non_alt_loci_set.txt"
+  non_alt_loci_set_filename <- paste0("../shared/data/downloads/non_alt_loci_set.",
+    current_date,
+    ".txt")
 
-# download and gzip file to save space
-download.file(hgnc_link, hgnc_file, mode = "wb")
-gzip(hgnc_file, overwrite = TRUE)
+  download.file(non_alt_loci_set_url, non_alt_loci_set_filename, mode = "wb")
+
+  gzip(non_alt_loci_set_filename,
+    overwrite = TRUE)
+}
+
+if (check_file_age("omim_genemap2", "../shared/data/downloads/", 1)) {
+  omim_genemap2_filename <- get_newest_file("omim_genemap2", "../shared/data/downloads/")
+} else {
+  # OMIM links to genemap2 file needs to be set in config and applied for at
+  # https://www.omim.org/downloads
+  omim_genemap2_url <- config_vars_proj$omim_genemap2_url
+
+  omim_genemap2_filename <- paste0("../shared/data/downloads/omim_genemap2.",
+    current_date,
+    ".txt")
+
+  download.file(omim_genemap2_url, omim_genemap2_filename, mode = "wb")
+
+  gzip(omim_genemap2_filename,
+    overwrite = TRUE)
+}
 ############################################
 
 
 ############################################
 ## load the downloaded HGNC file
 # TODO: specify column specifications to suppress warnings
-non_alt_loci_set <- read_delim(paste0(hgnc_file, ".gz"),
+non_alt_loci_set <- read_delim(paste0(non_alt_loci_set_filename, ".gz"),
     "\t",
     col_names = TRUE) %>%
-  mutate(update_date = file_date)
+  mutate(update_date = current_date)
+############################################
+
+
+############################################
+## load OMIM file and reformat them
+omim_genemap2 <- read_delim(omim_genemap2_filename, "\t",
+    escape_double = FALSE,
+    col_names = FALSE,
+    comment = "#",
+    trim_ws = TRUE) %>%
+  dplyr::select(Chromosome = X1,
+    Genomic_Position_Start = X2,
+    Genomic_Position_End = X3,
+    Cyto_Location = X4,
+    Computed_Cyto_Location = X5,
+    MIM_Number = X6,
+    Gene_Symbols = X7,
+    Gene_Name = X8,
+    approved_symbol = X9,
+    Entrez_Gene_ID = X10,
+    Ensembl_Gene_ID = X11,
+    Comments = X12,
+    Phenotypes = X13,
+    Mouse_Gene_Symbol_ID = X14) %>%
+  dplyr::select(approved_symbol, Phenotypes) %>%
+  separate_rows(Phenotypes, sep = "; ") %>%
+  separate(Phenotypes, c("disease_ontology_name", "hpo_mode_of_inheritance_term_name"), "\\), (?!.+\\))") %>%
+  separate(disease_ontology_name, c("disease_ontology_name", "Mapping_key"), "\\((?!.+\\()") %>%
+  mutate(Mapping_key = str_replace_all(Mapping_key, "\\)", "")) %>%
+  separate(disease_ontology_name, c("disease_ontology_name", "MIM_Number"), ", (?=[0-9][0-9][0-9][0-9][0-9][0-9])") %>%
+  mutate(Mapping_key = str_replace_all(Mapping_key, " ", "")) %>%
+  mutate(MIM_Number = str_replace_all(MIM_Number, " ", "")) %>%
+  filter(!is.na(MIM_Number))  %>%
+  filter(!is.na(approved_symbol)) %>%
+  mutate(disease_ontology_id = paste0("OMIM:", MIM_Number)) %>%
+  separate_rows(hpo_mode_of_inheritance_term_name, sep = ", ") %>%
+  mutate(hpo_mode_of_inheritance_term_name = str_replace_all(hpo_mode_of_inheritance_term_name, "\\?", "")) %>%
+  dplyr::select(-MIM_Number) %>%
+  unique() %>%
+  mutate(hpo_mode_of_inheritance_term_name = case_when(hpo_mode_of_inheritance_term_name == "Autosomal dominant" ~ "Autosomal dominant inheritance",
+    hpo_mode_of_inheritance_term_name == "Autosomal recessive" ~ "Autosomal recessive inheritance",
+    hpo_mode_of_inheritance_term_name == "Digenic dominant" ~ "Digenic inheritance",
+    hpo_mode_of_inheritance_term_name == "Digenic recessive" ~ "Digenic inheritance",
+    hpo_mode_of_inheritance_term_name == "Isolated cases" ~ "Sporadic",
+    hpo_mode_of_inheritance_term_name == "Mitochondrial" ~ "Mitochondrial inheritance",
+    hpo_mode_of_inheritance_term_name == "Multifactorial" ~ "Multifactorial inheritance",
+    hpo_mode_of_inheritance_term_name == "Pseudoautosomal dominant" ~ "X-linked dominant inheritance",
+    hpo_mode_of_inheritance_term_name == "Pseudoautosomal recessive" ~ "X-linked recessive inheritance",
+    hpo_mode_of_inheritance_term_name == "Somatic mosaicism" ~ "Somatic mosaicism",
+    hpo_mode_of_inheritance_term_name == "Somatic mutation" ~ "Somatic mutation",
+    hpo_mode_of_inheritance_term_name == "X-linked" ~ "X-linked inheritance",
+    hpo_mode_of_inheritance_term_name == "X-linked dominant" ~ "X-linked dominant inheritance",
+    hpo_mode_of_inheritance_term_name == "X-linked recessive" ~ "X-linked recessive inheritance",
+    hpo_mode_of_inheritance_term_name == "Y-linked" ~ "Y-linked inheritance"))
 ############################################
 
 
@@ -96,6 +176,7 @@ non_alt_loci_set_string <- non_alt_loci_set %>%
 
 ############################################
 ## add gene coordinates from ensembl
+# TODO: fix warning "! Ensembl will soon enforce the use of https. Ensure the 'host' argument includes https://""
 non_alt_loci_set_coordinates <- non_alt_loci_set_string %>%
   mutate(hg19_coordinates_from_ensembl =
     gene_coordinates_from_ensembl(ensembl_gene_id)) %>%
@@ -128,11 +209,35 @@ non_alt_loci_set_coordinates <- non_alt_loci_set_string %>%
 ############################################
 
 
+
+############################################
+# TODO: annotate with OMIM P numbers
+# use omim tables
+
+############################################
+
+
+
 ############################################
 # TODO: annotate gnomAD pLI and missense Z-scores
+# use gnomAD download table from https://storage.googleapis.com/gcp-public-data--gnomad/release/2.1.1/constraint/gnomad.v2.1.1.lof_metrics.by_transcript.txt.bgz
+# TODO: future adaption use https://gnomad.broadinstitute.org/api/
+ensembl_gene_id_gnomad <- non_alt_loci_set_coordinates %>%
+    filter(!is.na(ensembl_gene_id)) %>%
+    dplyr::select(ensembl_gene_id) %>%
+    head(30) %>%
+    mutate(gene_data = get_multiple_gene_data_from_gnomad(ensembl_gene_id))
+############################################
+
+
+
+############################################
+# TODO: annotate ClinVar variant counts
+# use the clinvar API
 # use https://gnomad.broadinstitute.org/api/
 
 ############################################
+
 
 
 ############################################
