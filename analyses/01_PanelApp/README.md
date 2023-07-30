@@ -7,6 +7,21 @@ This repository contains an R script that retrieves and processes genetic panel 
 - R (version 3.6.0 or above)
 - R libraries: readr, tidyverse, rvest, jsonlite, config
 
+## Script structure
+
+```mermaid
+   graph TB
+    A[Load Libraries] --> B[Define Variables]
+    B --> C[Read Configuration and Set Working Directory]
+    C --> D[Set Global Options]
+    D --> E[Load Functions]
+    E --> F[Get PanelApp Panels]
+    F --> G[Define Base URL]
+    G --> H[Store Pages in List]
+    H --> I[Loop through Pages]
+    I --> J[Combine All into One]
+```
+
 ## Usage
 
 Clone the repository and run the R script located in `analyses/01_PanelApp/`. 
