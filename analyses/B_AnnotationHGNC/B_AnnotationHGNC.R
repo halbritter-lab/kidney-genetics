@@ -43,6 +43,7 @@ current_date <- strftime(as.POSIXlt(Sys.time(),
     "UTC", "%Y-%m-%dT%H:%M:%S"),
   "%Y-%m-%d")
 
+# HGNC file download
 if (check_file_age("non_alt_loci_set", "../shared/data/downloads/", 1)) {
   non_alt_loci_set_filename <- get_newest_file("non_alt_loci_set", "../shared/data/downloads/")
 } else {
@@ -59,6 +60,7 @@ if (check_file_age("non_alt_loci_set", "../shared/data/downloads/", 1)) {
     overwrite = TRUE)
 }
 
+# OMIM file download
 if (check_file_age("omim_genemap2", "../shared/data/downloads/", 1)) {
   omim_genemap2_filename <- get_newest_file("omim_genemap2", "../shared/data/downloads/")
 } else {
@@ -76,6 +78,7 @@ if (check_file_age("omim_genemap2", "../shared/data/downloads/", 1)) {
     overwrite = TRUE)
 }
 
+# gnomAD lof metrics download
 if (check_file_age("gnomad.v2.1.1.lof_metrics.by_gene", "../shared/data/downloads/", 1)) {
   gnomad_v211_lof_met_gene_filename <- get_newest_file("gnomad.v2.1.1.lof_metrics.by_gene", "../shared/data/downloads/")
 } else {
@@ -87,6 +90,34 @@ if (check_file_age("gnomad.v2.1.1.lof_metrics.by_gene", "../shared/data/download
     ".txt.gz")
 
   download.file(gnomad_v211_lof_met_gene_url, gnomad_v211_lof_met_gene_filename, mode = "wb")
+}
+
+# clinvar VCF file download
+if (check_file_age("clinvar", "../shared/data/downloads/", 1)) {
+  clinvar_vcf_hg19_filename <- get_newest_file("clinvar", "../shared/data/downloads/")
+} else {
+  # clinvar VCF file links to genemap2 file needs to be set in config
+  clinvar_vcf_hg19_url <- config_vars_proj$clinvar_vcf_url
+
+  clinvar_vcf_hg19_filename <- paste0("../shared/data/downloads/clinvar.",
+    current_date,
+    ".vcf.gz")
+
+  download.file(clinvar_vcf_hg19_url, clinvar_vcf_hg19_filename, mode = "wb")
+}
+
+# genCC file download
+if (check_file_age("gencc_submissions", "../shared/data/downloads/", 1)) {
+  gencc_filename <- get_newest_file("gencc_submissions", "../shared/data/downloads/")
+} else {
+  # genCC file links to genemap2 file needs to be set in config
+  gencc_submissions_url <- config_vars_proj$gencc_submissions_url
+
+  gencc_submissions_filename <- paste0("../shared/data/downloads/gencc_submissions.",
+    current_date,
+    ".xlsx")
+
+  download.file(gencc_submissions_url, gencc_submissions_filename, mode = "wb")
 }
 ############################################
 
@@ -156,10 +187,43 @@ omim_genemap2 <- read_delim(omim_genemap2_filename, "\t",
 
 
 ############################################
+## load gnomAD lof metrics file
 gnomad_v211_lof_met_gene <- read_delim(gnomad_v211_lof_met_gene_filename,
     delim = "\t",
     escape_double = FALSE,
     trim_ws = TRUE)
+############################################
+
+
+############################################
+# load or process clinvar VCF file into table
+# and then safe/load the result as a table for future use
+if (check_file_age("clinvar_table", "results/", 1)) {
+  clinvar_table_filename <- get_newest_file("clinvar_table", "results/")
+
+  clinvar_table <- read_csv(clinvar_table_filename)
+} else {
+  ## load the downloaded clinvar VCF file
+  clinvar_vcf <- read_delim(clinvar_vcf_hg19_filename,
+      delim = "\t", escape_double = FALSE,
+      trim_ws = TRUE,
+      comment = "##")
+
+  # reformat the vcf into a table
+  clinvar_table <- clinvar_vcf %>% 
+    separate_rows(INFO, sep = ";") %>%
+    separate(INFO, into = c("key", "value"), sep = "=") %>%
+    spread(key, value) %>%
+    separate_rows(GENEINFO, sep = "\\|") %>%
+    separate_rows(CLNSIG, sep = "/")
+
+  # write the table to a csv file
+  write_csv(clinvar_table,
+    file = paste0("results/clinvar_table.", current_date, ".csv"))
+
+  gzip(paste0("results/clinvar_table.", current_date, ".csv"),
+    overwrite = TRUE)
+}
 ############################################
 
 
@@ -230,7 +294,6 @@ non_alt_loci_set_coordinates <- non_alt_loci_set_string %>%
 ############################################
 
 
-
 ############################################
 # annotate with OMIM P numbers
 # use omim tables
@@ -252,27 +315,63 @@ non_alt_loci_set_coordinates_omim <- non_alt_loci_set_coordinates %>%
 
 ############################################
 # annotate gnomAD pLI and missense Z-scores
-# curently using: use gnomAD download table
+# currently using: use gnomAD download table
 # TODO: future adaption use https://gnomad.broadinstitute.org/api/
 
-# join with non_alt_loci_set_coordinates_omim
+# split the mane_select column into mane_enst and mane_nm to find the corresponding transcript for the join
+non_alt_loci_set_coordinates_reformat <- non_alt_loci_set_coordinates %>%
+  separate(mane_select, into = c("mane_enst", "mane_nm"), sep = "\\|") %>%
+  separate(mane_enst, into = c("mane_enst", "mane_enst_version"), sep = "\\.") %>%
+  dplyr::select(symbol, mane_enst) %>%
+  filter(!is.na(mane_enst))
+
+# first joinwith the above helper table
+gnomad_v211_lof_met_gene_mane_enst <- non_alt_loci_set_coordinates_reformat %>%
+  left_join(gnomad_v211_lof_met_gene, by = c("mane_enst" = "transcript")) %>%
+  dplyr::select(-gene)
+
+# then join with non_alt_loci_set_coordinates_omim
 non_alt_loci_set_coordinates_gnomad <- non_alt_loci_set_coordinates_omim %>%
-  left_join(gnomad_v211_lof_met_gene, by = c("symbol" = "gene"))
+  left_join(gnomad_v211_lof_met_gene_mane_enst, by = c("symbol"))
 ############################################
 
 
 
 ############################################
-# TODO: annotate ClinVar variant counts
-# use the clinvar API
-# use https://gnomad.broadinstitute.org/api/
+# annotate ClinVar variant counts
+# use the clinvar VCF file
 
+# summarize the clinvar table first
+# TODO: implement computing HGNC and symbol using hgnc functions
+# TODO: join on something safe then like the HGNC ID
+clinvar_table_counts <- clinvar_table %>%
+  group_by(GENEINFO, CLNSIG) %>%
+  summarise(count = n(), .groups = 'drop') %>%
+  filter(CLNSIG %in% c("Pathogenic", "Likely_pathogenic", "Uncertain_significance")) %>%
+  pivot_wider(names_from = CLNSIG, values_from = count, values_fill = 0) %>%
+  mutate(Pathogenic = paste0("P:", Pathogenic),
+         Likely_pathogenic = paste0("LP:", Likely_pathogenic),
+         Uncertain_significance = paste0("VUS:", Uncertain_significance)) %>%
+  unite("ClinVar", Pathogenic:Uncertain_significance, sep = "; ", remove = FALSE, na.rm = TRUE) %>%
+  separate(GENEINFO, into = c("symbol", "Gene_ID"), sep = ":") %>%
+  group_by(symbol) %>%
+  summarise(Gene_ID = paste(Gene_ID, collapse = "|"),
+    ClinVar = paste(ClinVar, collapse = "|"),
+    .groups = 'drop') %>%
+  dplyr::select(symbol, ClinVar)
+
+# join with non_alt_loci_set_coordinates_gnomad
+non_alt_loci_set_coordinates_gnomad_clinvar <- non_alt_loci_set_coordinates_gnomad %>%
+  left_join(clinvar_table_counts, by = c("symbol" = "symbol"))
 ############################################
 
 
 
 ############################################
 # TODO: annotate with GeneCC classification
+# download link for GenCC data
+# https://search.thegencc.org/download/action/submissions-export-xlsx
+
 
 ############################################
 

@@ -70,7 +70,7 @@ hgnc_id_from_aliassymbol <- function(symbol_input) {
 #'
 #' @export
 hgnc_id_from_symbol <- function(symbol_tibble) {
-  symbol_list_tibble <- as_tibble(symbol_tibble) %>% select(symbol = value) %>% mutate(symbol = toupper(symbol))
+  symbol_list_tibble <- as_tibble(symbol_tibble) %>% dplyr::select(symbol = value) %>% mutate(symbol = toupper(symbol))
 
   symbol_request <- fromJSON(paste0("http://rest.genenames.org/search/symbol/", str_c(symbol_list_tibble$symbol, collapse = "+OR+")))
 
@@ -83,7 +83,7 @@ hgnc_id_from_symbol <- function(symbol_tibble) {
 
   return_tibble <- symbol_list_tibble %>% 
   left_join(hgnc_id_from_symbol, by = "symbol") %>%
-  select(hgnc_id)
+  dplyr::select(hgnc_id)
 
   return(return_tibble)
 }
@@ -119,7 +119,7 @@ hgnc_id_from_symbol_grouped <- function(input_tibble, request_max = 150) {
 
   input_tibble_request_repair <- input_tibble_request %>%
   filter(is.na(response)) %>%
-  select(value) %>%
+  dplyr::select(value) %>%
   unique() %>%
   rowwise() %>%
   mutate(response = hgnc_id_from_prevsymbol(value)) %>%
@@ -148,7 +148,7 @@ hgnc_id_from_symbol_grouped <- function(input_tibble, request_max = 150) {
 #' @export
 symbol_from_hgnc_id <- function(hgnc_id_tibble) {
   hgnc_id_list_tibble <- as_tibble(hgnc_id_tibble) %>%
-    select(hgnc_id = value) %>%
+    dplyr::select(hgnc_id = value) %>%
     mutate(hgnc_id = as.integer(hgnc_id))
 
   hgnc_id_request <- fromJSON(paste0("http://rest.genenames.org/search/hgnc_id/", str_c(hgnc_id_list_tibble$hgnc_id, collapse = "+OR+")))
@@ -162,7 +162,7 @@ symbol_from_hgnc_id <- function(hgnc_id_tibble) {
 
   return_tibble <- hgnc_id_list_tibble %>% 
   left_join(hgnc_id_from_hgnc_id, by = "hgnc_id") %>%
-  select(symbol)
+  dplyr::select(symbol)
 
   return(return_tibble)
 }
