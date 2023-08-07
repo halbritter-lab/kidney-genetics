@@ -242,4 +242,3 @@ get_multiple_clinvar_variants <- function(ensemble_ids) {
   # Return the list of tibbles
   return(list_of_tibbles)
 }
-

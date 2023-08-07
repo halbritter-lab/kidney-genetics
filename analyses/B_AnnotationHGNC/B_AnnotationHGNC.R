@@ -75,13 +75,26 @@ if (check_file_age("omim_genemap2", "../shared/data/downloads/", 1)) {
   gzip(omim_genemap2_filename,
     overwrite = TRUE)
 }
+
+if (check_file_age("gnomad.v2.1.1.lof_metrics.by_gene", "../shared/data/downloads/", 1)) {
+  gnomad_v211_lof_met_gene_filename <- get_newest_file("gnomad.v2.1.1.lof_metrics.by_gene", "../shared/data/downloads/")
+} else {
+  # gnomAD lof metrics links to genemap2 file needs to be set in config
+  gnomad_v211_lof_met_gene_url <- config_vars_proj$gnomad_v211_lof_met_gene_url
+
+  gnomad_v211_lof_met_gene_filename <- paste0("../shared/data/downloads/gnomad.v2.1.1.lof_metrics.by_gene.",
+    current_date,
+    ".txt.gz")
+
+  download.file(gnomad_v211_lof_met_gene_url, gnomad_v211_lof_met_gene_filename, mode = "wb")
+}
 ############################################
 
 
 ############################################
 ## load the downloaded HGNC file
 # TODO: specify column specifications to suppress warnings
-non_alt_loci_set <- read_delim(paste0(non_alt_loci_set_filename, ".gz"),
+non_alt_loci_set <- read_delim(paste0(non_alt_loci_set_filename),
     "\t",
     col_names = TRUE) %>%
   mutate(update_date = current_date)
@@ -139,6 +152,14 @@ omim_genemap2 <- read_delim(omim_genemap2_filename, "\t",
     hpo_mode_of_inheritance_term_name == "X-linked dominant" ~ "X-linked dominant inheritance",
     hpo_mode_of_inheritance_term_name == "X-linked recessive" ~ "X-linked recessive inheritance",
     hpo_mode_of_inheritance_term_name == "Y-linked" ~ "Y-linked inheritance"))
+############################################
+
+
+############################################
+gnomad_v211_lof_met_gene <- read_delim(gnomad_v211_lof_met_gene_filename,
+    delim = "\t",
+    escape_double = FALSE,
+    trim_ws = TRUE)
 ############################################
 
 
@@ -211,22 +232,32 @@ non_alt_loci_set_coordinates <- non_alt_loci_set_string %>%
 
 
 ############################################
-# TODO: annotate with OMIM P numbers
+# annotate with OMIM P numbers
 # use omim tables
 
+# group the omim table by gene symbol
+omim_genemap2_grouped <- omim_genemap2 %>%
+  group_by(approved_symbol) %>%
+  summarise(disease_ontology_id = str_c(disease_ontology_id, collapse = ";"),
+    disease_ontology_name = str_c(disease_ontology_name, collapse = ";"),
+    hpo_mode_of_inheritance_term_name = str_c(hpo_mode_of_inheritance_term_name, collapse = ";")) %>%
+  ungroup()
+
+# joing with non_alt_loci_set_coordinates
+non_alt_loci_set_coordinates_omim <- non_alt_loci_set_coordinates %>%
+  left_join(omim_genemap2_grouped, by = c("symbol" = "approved_symbol"))
 ############################################
 
 
 
 ############################################
-# TODO: annotate gnomAD pLI and missense Z-scores
-# use gnomAD download table from https://storage.googleapis.com/gcp-public-data--gnomad/release/2.1.1/constraint/gnomad.v2.1.1.lof_metrics.by_transcript.txt.bgz
+# annotate gnomAD pLI and missense Z-scores
+# curently using: use gnomAD download table
 # TODO: future adaption use https://gnomad.broadinstitute.org/api/
-ensembl_gene_id_gnomad <- non_alt_loci_set_coordinates %>%
-    filter(!is.na(ensembl_gene_id)) %>%
-    dplyr::select(ensembl_gene_id) %>%
-    head(30) %>%
-    mutate(gene_data = get_multiple_gene_data_from_gnomad(ensembl_gene_id))
+
+# join with non_alt_loci_set_coordinates_omim
+non_alt_loci_set_coordinates_gnomad <- non_alt_loci_set_coordinates_omim %>%
+  left_join(gnomad_v211_lof_met_gene, by = c("symbol" = "gene"))
 ############################################
 
 
