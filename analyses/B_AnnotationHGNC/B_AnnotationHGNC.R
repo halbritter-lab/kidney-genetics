@@ -4,6 +4,7 @@ library(tidyverse)  ## needed for general table operations
 library(biomaRt)    ## needed to get gene coordinates
 library(STRINGdb)  ## needed to compute StringDB identifiers
 library("R.utils")  ## gzip downloaded and result files
+library(readxl)     ## needed to read xlsx file
 library(config)     ## needed for config loading
 ############################################
 
@@ -108,7 +109,7 @@ if (check_file_age("clinvar", "../shared/data/downloads/", 1)) {
 
 # genCC file download
 if (check_file_age("gencc_submissions", "../shared/data/downloads/", 1)) {
-  gencc_filename <- get_newest_file("gencc_submissions", "../shared/data/downloads/")
+  gencc_submissions_filename <- get_newest_file("gencc_submissions", "../shared/data/downloads/")
 } else {
   # genCC file links to genemap2 file needs to be set in config
   gencc_submissions_url <- config_vars_proj$gencc_submissions_url
@@ -228,6 +229,25 @@ if (check_file_age("clinvar_table", "results/", 1)) {
 
 
 ############################################
+# load and process genCC file
+
+# load the Excel file
+gencc_submissions_table <-  read_excel(gencc_submissions_filename)
+
+# summarize the table by gene symbol
+gencc_submissions_table_grouped <- gencc_submissions_table %>%
+  arrange(gene_symbol, classification_title) %>%
+  group_by(gene_symbol, gene_curie) %>%
+  summarise(disease_curie = str_c(disease_curie, collapse = ";"),
+    disease_title = str_c(disease_title, collapse = ";"),
+    classification_title = str_c(classification_title, collapse = ";"),
+    moi_title = str_c(moi_title, collapse = ";"),
+    .groups = 'drop') %>%
+  ungroup()
+############################################
+
+
+############################################
 ## load STRINGdb database
 string_db <- STRINGdb$new(version = "11.5",
   species = 9606,
@@ -310,7 +330,6 @@ omim_genemap2_grouped <- omim_genemap2 %>%
 non_alt_loci_set_coordinates_omim <- non_alt_loci_set_coordinates %>%
   left_join(omim_genemap2_grouped, by = c("symbol" = "approved_symbol"))
 ############################################
-
 
 
 ############################################
