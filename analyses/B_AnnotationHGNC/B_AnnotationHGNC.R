@@ -2,7 +2,7 @@
 ## load libraries
 library(tidyverse)  ## needed for general table operations
 library(biomaRt)    ## needed to get gene coordinates
-library(STRINGdb)  ## needed to compute StringDB identifiers
+library(STRINGdb)   ## needed to compute StringDB identifiers
 library("R.utils")  ## gzip downloaded and result files
 library(readxl)     ## needed to read xlsx file
 library(config)     ## needed for config loading
@@ -231,19 +231,21 @@ if (check_file_age("clinvar_table", "results/", 1)) {
 ############################################
 # load and process genCC file
 
-# load the Excel file
-gencc_submissions_table <-  read_excel(gencc_submissions_filename)
+# Define the order of classification_title
+classification_order <- c(
+  "Definitive",
+  "Strong",
+  "Moderate",
+  "Limited",
+  "Supportive",
+  "Disputed Evidence",
+  "Refuted Evidence",
+  "No Known Disease Relationship"
+)
 
-# summarize the table by gene symbol
-gencc_submissions_table_grouped <- gencc_submissions_table %>%
-  arrange(gene_symbol, classification_title) %>%
-  group_by(gene_symbol, gene_curie) %>%
-  summarise(disease_curie = str_c(disease_curie, collapse = ";"),
-    disease_title = str_c(disease_title, collapse = ";"),
-    classification_title = str_c(classification_title, collapse = ";"),
-    moi_title = str_c(moi_title, collapse = ";"),
-    .groups = 'drop') %>%
-  ungroup()
+# load the Excel file
+gencc_submissions_table <-  read_excel(gencc_submissions_filename) %>%
+  mutate(classification_title = factor(classification_title, levels = classification_order))
 ############################################
 
 
@@ -315,24 +317,6 @@ non_alt_loci_set_coordinates <- non_alt_loci_set_string %>%
 
 
 ############################################
-# annotate with OMIM P numbers
-# use omim tables
-
-# group the omim table by gene symbol
-omim_genemap2_grouped <- omim_genemap2 %>%
-  group_by(approved_symbol) %>%
-  summarise(disease_ontology_id = str_c(disease_ontology_id, collapse = ";"),
-    disease_ontology_name = str_c(disease_ontology_name, collapse = ";"),
-    hpo_mode_of_inheritance_term_name = str_c(hpo_mode_of_inheritance_term_name, collapse = ";")) %>%
-  ungroup()
-
-# joing with non_alt_loci_set_coordinates
-non_alt_loci_set_coordinates_omim <- non_alt_loci_set_coordinates %>%
-  left_join(omim_genemap2_grouped, by = c("symbol" = "approved_symbol"))
-############################################
-
-
-############################################
 # annotate gnomAD pLI and missense Z-scores
 # currently using: use gnomAD download table
 # TODO: future adaption use https://gnomad.broadinstitute.org/api/
@@ -344,16 +328,74 @@ non_alt_loci_set_coordinates_reformat <- non_alt_loci_set_coordinates %>%
   dplyr::select(symbol, mane_enst) %>%
   filter(!is.na(mane_enst))
 
-# first joinwith the above helper table
+# first join with the above helper table
 gnomad_v211_lof_met_gene_mane_enst <- non_alt_loci_set_coordinates_reformat %>%
   left_join(gnomad_v211_lof_met_gene, by = c("mane_enst" = "transcript")) %>%
-  dplyr::select(-gene)
+  dplyr::select(symbol, mane_enst, pLI, pNull, pRec, oe_lof, oe_lof_lower, oe_lof_upper, oe_mis, oe_syn, lof_z, mis_z, syn_z, constraint_flag) %>%
+  mutate_at(vars(-symbol, -mane_enst, -constraint_flag), ~ if_else(is.na(.), NA_real_, round(as.numeric(.), 6)))
 
 # then join with non_alt_loci_set_coordinates_omim
-non_alt_loci_set_coordinates_gnomad <- non_alt_loci_set_coordinates_omim %>%
+non_alt_loci_set_coordinates_gnomad <- non_alt_loci_set_coordinates %>%
   left_join(gnomad_v211_lof_met_gene_mane_enst, by = c("symbol"))
 ############################################
 
+
+############################################
+# annotate with OMIM P numbers
+# use omim tables
+
+# group the omim table by gene symbol
+omim_genemap2_grouped <- omim_genemap2 %>%
+  group_by(approved_symbol) %>%
+  summarise(
+    omim_summary = paste(paste0(disease_ontology_name,
+      "[",
+      disease_ontology_id,
+      "]-",
+      hpo_mode_of_inheritance_term_name), collapse = " | "),
+    omim_count = n(),
+    .groups = 'drop') %>%
+  ungroup()
+
+# joining with non_alt_loci_set_coordinates_gnomad
+non_alt_loci_set_coordinates_gnomad_omim <- non_alt_loci_set_coordinates_gnomad %>%
+  left_join(omim_genemap2_grouped, by = c("symbol" = "approved_symbol"))
+############################################
+
+
+############################################
+# annotate with GenCC classification
+
+# first summarize the table by gene symbol
+gencc_submissions_table_grouped <- gencc_submissions_table %>%
+  arrange(gene_symbol, classification_title) %>%
+  group_by(gene_symbol, gene_curie, disease_curie, disease_title, moi_title) %>%
+  summarise(
+    classification_title = paste0(classification_title, collapse = ", "),
+    gencc_classification_count = n(),
+    .groups = 'drop') %>%
+  ungroup() %>%
+  group_by(gene_symbol, gene_curie) %>%
+  summarise(
+    gencc_summary = paste(paste0(classification_title,
+      " (",
+      disease_title,
+      "[",
+      disease_curie,
+      "]-",
+      moi_title,
+      ")"), collapse = " | "),
+    gencc_count = paste(gencc_classification_count,
+      collapse = ", "),
+    .groups = 'drop') %>%
+  ungroup() %>%
+  dplyr::select(-gene_symbol)
+
+# join with non_alt_loci_set_coordinates_gnomad_omim
+non_alt_loci_set_coordinates_gnomad_omim_gencc <- non_alt_loci_set_coordinates_gnomad_omim %>%
+  left_join(gencc_submissions_table_grouped, by = c("hgnc_id" = "gene_curie"))
+
+############################################
 
 
 ############################################
@@ -380,18 +422,8 @@ clinvar_table_counts <- clinvar_table %>%
   dplyr::select(symbol, ClinVar)
 
 # join with non_alt_loci_set_coordinates_gnomad
-non_alt_loci_set_coordinates_gnomad_clinvar <- non_alt_loci_set_coordinates_gnomad %>%
+non_alt_loci_set_coordinates_gnomad_omim_gencc_clinvar <- non_alt_loci_set_coordinates_gnomad_omim_gencc %>%
   left_join(clinvar_table_counts, by = c("symbol" = "symbol"))
-############################################
-
-
-
-############################################
-# TODO: annotate with GeneCC classification
-# download link for GenCC data
-# https://search.thegencc.org/download/action/submissions-export-xlsx
-
-
 ############################################
 
 
@@ -401,7 +433,7 @@ creation_date <- strftime(as.POSIXlt(Sys.time(),
     "UTC", "%Y-%m-%dT%H:%M:%S"),
   "%Y-%m-%d")
 
-write_csv(non_alt_loci_set_coordinates,
+write_csv(non_alt_loci_set_coordinates_gnomad_omim_gencc_clinvar,
   file = paste0("results/non_alt_loci_set_coordinates.", creation_date, ".csv"))
 
 gzip(paste0("results/non_alt_loci_set_coordinates.", creation_date, ".csv"),
