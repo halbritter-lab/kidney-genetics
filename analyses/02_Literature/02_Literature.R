@@ -292,8 +292,6 @@ literature_genes <- kidney_genes_publication_list %>%
     source_count = publication_count,
     source_evidence = at_least_two_publications)
 
-# TODO: normalize PMID representation
-
 # TODO: normalize source_evidence to 0/1 as percentiles
 # TODO: write a function for this normalization step
 
