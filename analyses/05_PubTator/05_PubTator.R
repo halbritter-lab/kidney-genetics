@@ -77,7 +77,7 @@ pubtator_genes <- page_tibble_genes %>%
   select(pmid, symbol, text_part) %>%
   group_by(symbol) %>%
   summarise(symbol = paste(unique(symbol), collapse = "; "),
-    pmid = paste(unique(pmid), collapse = "; "),
+    pmid = paste(unique(paste0("PMID_", pmid)), collapse = " | "),
     text_part = paste(text_part, collapse = "; "),
     source_count = n(),
     .groups = "keep") %>%
@@ -95,8 +95,6 @@ pubtator_genes_normalize <- pubtator_genes %>%
     source = pmid,
     source_count,
     source_evidence = at_least_three_pub)
-
-# TODO: normalize PMID representation
 
 # TODO: normalize source_evidence to 0/1 as percentiles
 # TODO: write a function for this normalization step
