@@ -124,10 +124,27 @@ panelapp_genes <- panelapp_panels_kidney %>%
     phenotypes, publications) %>%
   ungroup()
 
+# sapply used to collapse all list entries into one string
 all_panelapp_genes <- panelapp_genes %>%
+  arrange(panel_id, entity_name) %>%
   mutate(evidence = sapply(evidence, paste, collapse = "; "),
     phenotypes = sapply(phenotypes, paste, collapse = "; "),
     publications = sapply(publications, paste, collapse = "; ")) %>%
+  mutate(evidence_category =
+    case_when(
+      confidence_level == 3 ~ "Green",
+      confidence_level == 2 ~ "Amber",
+      confidence_level == 1 | confidence_level == 0 ~ "Red",
+    )
+  ) %>%
+  mutate(panel = paste0(panel_name,
+      " (id=",
+      panel_id,
+      ", version=",
+      panel_version,
+      ", confidence=",
+      evidence_category,
+      ")")) %>%
   group_by(entity_name) %>%
   summarise(entity_name = paste(unique(entity_name), collapse = " | "),
     entity_type = paste(unique(entity_type), collapse = " | "),
@@ -135,25 +152,19 @@ all_panelapp_genes <- panelapp_genes %>%
     hgnc_id = paste(unique(hgnc_id), collapse = " | "),
     omim_gene = paste(unique(omim_gene), collapse = " | "),
     evidence = paste(unique(evidence), collapse = " | "),
+    evidence_category = paste(unique(evidence_category), collapse = " | "),
     confidence_level = paste(unique(confidence_level), collapse = " | "),
     mode_of_inheritance = paste(unique(mode_of_inheritance), collapse = " | "),
     phenotypes = paste(unique(phenotypes), collapse = " | "),
     publications = paste(unique(publications), collapse = " | "),
-    panel = paste(paste0(panel_name,
-      " (id=",
-      panel_id,
-      ", version=",
-      panel_version,
-      ", confidence=",
-      confidence_level,
-      ")"), collapse = " | "),
+    panel = paste(unique(panel), collapse = " | "),
     panel_id = paste(unique(panel_id), collapse = " | "),
     panel_name = paste(unique(panel_name), collapse = " | "),
     panel_version = paste(unique(panel_version), collapse = " | "),
     panel_version_created = paste(unique(panel_version_created),
       collapse = " | "),
     panel_source = paste(unique(panel_source), collapse = " | "),
-    PanelApp_Green_or_amber = grepl("Green|Amber", evidence),
+    PanelApp_Green_or_amber = grepl("Green|Amber", evidence_category),
     source_count = n(),
     .groups = "keep") %>%
   ungroup() %>%
@@ -167,7 +178,6 @@ all_panelapp_genes_format <- all_panelapp_genes %>%
     source = panel,
     source_count,
     source_evidence = PanelApp_Green_or_amber)
-
 
 # TODO: normalize source_evidence to 0/1 as percentiles
 # TODO: write a function for this normalization step
