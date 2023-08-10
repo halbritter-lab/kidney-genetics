@@ -234,13 +234,4 @@ write_csv(hpo_gene_list,
 
 gzip(paste0("results/04_HPO_genes.", creation_date, ".csv"),
   overwrite = TRUE)
-
-write_csv(hpo_list_kidney,
-  file = paste0("results/04_children-from-terms.",
-    creation_date,
-    ".csv"),
-  na = "NULL")
-
-gzip(paste0("results/04_children-from-terms.", creation_date, ".csv"),
-  overwrite = TRUE)
 ############################################
