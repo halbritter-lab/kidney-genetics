@@ -16,13 +16,36 @@
 #' genes <- pubtator_genes_in_request(query = "BRCA1", page = 1)
 #'
 #' @export
-pubtator_genes_in_request <- function(query, page, filter_type = "Gene") {
-  url <- paste0("https://www.ncbi.nlm.nih.gov/research/pubtator-api/publications/search?q=", query, "&page=", page)
-  search_request <- fromJSON(URLencode(url), flatten = TRUE)
-
-  # TODO: implement retry if error
+pubtator_genes_in_request <- function(query, page, filter_type = "Gene", max_retries = 3) {
   # TODO: also return NCBI gene ID
 
+  # define URL
+  url <- paste0("https://www.ncbi.nlm.nih.gov/research/pubtator-api/publications/search?q=", query, "&page=", page)
+  retries <- 0
+
+  while(retries <= max_retries) {
+    # Attempt to get data
+    tryCatch({
+      search_request <- fromJSON(URLencode(url), flatten = TRUE)
+
+      # If successful, exit loop
+      break
+
+    }, error = function(e) {
+      # If there's an error, increment the retry count and print a warning
+      retries <- retries + 1
+      if(retries <= max_retries) {
+        warning(paste("Attempt", retries, "failed. Retrying..."))
+      }
+    })
+  }
+
+  # If max retries exhausted and still failed, throw an error
+  if(retries > max_retries) {
+    stop("Failed to fetch data after", max_retries, "attempts.")
+  }
+
+  # Continue processing the data as before
   search_results_tibble <- search_request$results %>%
     as_tibble()
 
@@ -30,8 +53,7 @@ pubtator_genes_in_request <- function(query, page, filter_type = "Gene") {
     {if (!("accessions" %in% colnames(.))) add_column(., accessions = "NULL") else .} %>%
     filter(accessions != "NULL")
 
-  if (nrow(search_results_filtered) > 0)
-  {
+  if (nrow(search_results_filtered) > 0) {
     search_results <- search_results_filtered %>%
       select(pmid, passages) %>%
       unnest(passages) %>%
