@@ -49,6 +49,7 @@ kidney_genes_publication_list <- read_excel(pub_file, skip = 4, na = "NA") %>%
 ## download all files
 # TODO: replace wininet method
 # TODO: make download of supplements more stable (2,7,15,16), maybe get links from website
+# TODO: implement using already download files if they are not to old
 kidney_genes_publication_list_download <- kidney_genes_publication_list %>%
   rowwise() %>%
   mutate(downloaded = download.file(Download_link,
@@ -64,7 +65,7 @@ kidney_genes_publication_list_download <- kidney_genes_publication_list %>%
 
 ###############
 # Publication number 1: for PMID 35325889
-number1_pmid_35325889_genes <- read_docx("data/PMID_35325889.docx") %>%
+number1_pmid_35325889_genes <- read_docx("data/downloads/PMID_35325889.docx") %>%
   docx_summary() %>%
   filter(content_type == "paragraph") %>%
   filter(str_detect(text, "ABCC6")) %>%
@@ -80,9 +81,9 @@ number1_pmid_35325889_genes <- read_docx("data/PMID_35325889.docx") %>%
 
 ###############
 # Publication number 2: for PMID 34264297
-number2_pmid_34264297_genes <- unzip("data/PMID_34264297.zip", list = TRUE, exdir = "data", overwrite = TRUE) %>%
+number2_pmid_34264297_genes <- unzip("data/downloads/PMID_34264297.zip", list = TRUE, exdir = "data", overwrite = TRUE) %>%
   rowwise() %>%
-  mutate(genes = list(read_excel(unzip("data/PMID_34264297.zip", files = Name, exdir = "data"), skip = 2) %>%
+  mutate(genes = list(read_excel(unzip("data/downloads/PMID_34264297.zip", files = Name, exdir = "data"), skip = 2) %>%
   select(Gene))) %>%
   ungroup() %>%
   unnest(genes) %>%
@@ -105,7 +106,7 @@ number2_pmid_34264297_genes <- unzip("data/PMID_34264297.zip", list = TRUE, exdi
 
 ###############
 # Publication number 3: for PMID 36035137
-number3_pmid_36035137_genes <- read_excel("data/PMID_36035137.xlsx", skip = 1) %>%
+number3_pmid_36035137_genes <- read_excel("data/downloads/PMID_36035137.xlsx", skip = 1) %>%
   select(gene = Gene) %>%
   unique() %>%
   arrange(gene) %>%
@@ -117,7 +118,7 @@ number3_pmid_36035137_genes <- read_excel("data/PMID_36035137.xlsx", skip = 1) %
 
 ###############
 # Publication number 5:
-number5_pmid_33664247_genes <- pdf_text("data/PMID_33664247.pdf") %>%
+number5_pmid_33664247_genes <- pdf_text("data/downloads/PMID_33664247.pdf") %>%
   read_lines(skip = 15) %>%
   str_squish() %>%
   as_tibble() %>%
@@ -137,7 +138,7 @@ number5_pmid_33664247_genes <- pdf_text("data/PMID_33664247.pdf") %>%
 
 ###############
 # Publication number 7: for PMID 30476936
-number7_pmid_30476936_genes <- read_excel("data/PMID_30476936.xlsx") %>%
+number7_pmid_30476936_genes <- read_excel("data/downloads/PMID_30476936.xlsx") %>%
   select(gene = `Gene Name`) %>%
   unique() %>%
   arrange(gene) %>%
@@ -149,7 +150,7 @@ number7_pmid_30476936_genes <- read_excel("data/PMID_30476936.xlsx") %>%
 
 ###############
 # Publication number 9: for PMID 31509055
-number9_pmid_31509055_genes <- pdf_text("data/PMID_31509055.pdf") %>%
+number9_pmid_31509055_genes <- pdf_text("data/downloads/PMID_31509055.pdf") %>%
   read_lines() %>%
   str_squish() %>%
   as_tibble() %>%
@@ -168,7 +169,7 @@ number9_pmid_31509055_genes <- pdf_text("data/PMID_31509055.pdf") %>%
 
 ###############
 # Publication number 10: for PMID 31822006
-number10_pmid_31822006_genes <- pdf_text("data/PMID_31822006.pdf")[1:9] %>%
+number10_pmid_31822006_genes <- pdf_text("data/downloads/PMID_31822006.pdf")[1:9] %>%
   read_lines(skip = 31) %>%
   str_squish() %>%
   as_tibble() %>%
@@ -187,7 +188,7 @@ number10_pmid_31822006_genes <- pdf_text("data/PMID_31822006.pdf")[1:9] %>%
 
 ###############
 # Publication number 12: for PMID 29801666
-number12_pmid_29801666_genes <- read_docx("data/PMID_29801666.docx") %>%
+number12_pmid_29801666_genes <- read_docx("data/downloads/PMID_29801666.docx") %>%
   docx_summary() %>%
   filter(cell_id == 1) %>%
   filter(text != "Gene") %>%
@@ -202,7 +203,7 @@ number12_pmid_29801666_genes <- read_docx("data/PMID_29801666.docx") %>%
 
 ###############
 # Publication number 13: for PMID 31027891
-number13_pmid_31027891_genes <- read_docx("data/PMID_31027891.docx") %>%
+number13_pmid_31027891_genes <- read_docx("data/downloads/PMID_31027891.docx") %>%
   docx_summary() %>%
   filter(cell_id == 8) %>%
   filter(text != "GENE SYMBOL") %>%
@@ -218,7 +219,7 @@ number13_pmid_31027891_genes <- read_docx("data/PMID_31027891.docx") %>%
 
 ###############
 # Publication number 14: for PMID 26862157
-number14_pmid_26862157_genes <- pdf_text("data/PMID_26862157.pdf")[1:4] %>%
+number14_pmid_26862157_genes <- pdf_text("data/downloads/PMID_26862157.pdf")[1:4] %>%
   read_lines(skip = 9) %>%
   str_squish() %>%
   as_tibble() %>%
@@ -238,7 +239,7 @@ number14_pmid_26862157_genes <- pdf_text("data/PMID_26862157.pdf")[1:4] %>%
 
 ###############
 # Publication number 15: for PMID 33532864
-number15_pmid_33532864_genes <- read_docx("data/PMID_33532864.docx") %>%
+number15_pmid_33532864_genes <- read_docx("data/downloads/PMID_33532864.docx") %>%
   docx_summary() %>%
   filter(cell_id == 1) %>%
   filter(text != "Gene") %>%
@@ -255,7 +256,7 @@ number15_pmid_33532864_genes <- read_docx("data/PMID_33532864.docx") %>%
 
 ###############
 # Publication number 16: for PMID 35005812
-number16_pmid_35005812_genes <- read_excel("data/PMID_35005812.xlsx", skip = 1, na = "NA") %>%
+number16_pmid_35005812_genes <- read_excel("data/downloads/PMID_35005812.xlsx", skip = 1, na = "NA") %>%
   select(gene = `...2`) %>%
   mutate(gene = str_remove_all(gene, "[\\( ].+")) %>%
   filter(!is.na(gene)) %>%
