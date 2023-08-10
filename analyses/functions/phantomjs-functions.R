@@ -20,24 +20,24 @@
 #'
 #' @export
 download_url_by_phantomjs <- function(input_url,
-		output_basename,
-		output_extension = "html",
-		save_path = "data/downloads") {
-	# based on: https://ladal.edu.au/webcrawling.html
+    output_basename,
+    output_extension = "html",
+    save_path = "data/downloads") {
+  # based on: https://ladal.edu.au/webcrawling.html
 
-	pjs_instance <- run_phantomjs(timeout = 5000)
-	pjs_session <- Session$new(port = pjs_instance$port)
+  pjs_instance <- run_phantomjs(timeout = 50000)
+  pjs_session <- Session$new(port = pjs_instance$port)
 
-	# go to input URL
-	pjs_session$go(input_url)
-	# render page
-	rendered_source <- pjs_session$getSource()
+  # go to input URL
+  pjs_session$go(input_url)
+  # render page
+  rendered_source <- pjs_session$getSource()
 
-	# generate file name
-	creation_date <- strftime(as.POSIXlt(Sys.time(), "UTC", "%Y-%m-%dT%H:%M:%S"), "%Y-%m-%d")
-	output_filename <- paste0(save_path, "/", output_basename, ".", creation_date, ".", output_extension)
-	
-	cat(rendered_source, file = output_filename)
-	
-	return(output_filename)
+  # generate file name
+  creation_date <- strftime(as.POSIXlt(Sys.time(), "UTC", "%Y-%m-%dT%H:%M:%S"), "%Y-%m-%d")
+  output_filename <- paste0(save_path, "/", output_basename, ".", creation_date, ".", output_extension)
+
+  cat(rendered_source, file = output_filename)
+
+  return(output_filename)
 }
