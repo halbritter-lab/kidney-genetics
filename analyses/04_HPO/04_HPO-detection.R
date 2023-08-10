@@ -33,42 +33,92 @@ options(scipen = 999)
 # hgnc functions
 source("../functions/hgnc-functions.R", local = TRUE)
 source("../functions/hpo-functions.R", local = TRUE)
+source("../functions/file-functions.R", local = TRUE)
 ############################################
 
 
 ############################################
-## get all children of term Abnormality of the kidney HP:0000077 and annotating them with name and definition.
+## get relevant HPO terms for kidney disease classification
+# get the current date
 
-# TODO: implement the query date as a column in the table
-query_date <- strftime(as.POSIXlt(Sys.time(), "UTC", "%Y-%m-%dT%H:%M:%S"), "%Y-%m-%d")
+# TODO: compute date only once or somehow in config
+current_date <- strftime(as.POSIXlt(Sys.time(), "UTC", "%Y-%m-%dT%H:%M:%S"), "%Y-%m-%d")
 
+# get all children of term upper urinary tract (HP:0010935) for classification into kidney disease groups
 # walk through the ontology tree and add all unique terms descending from
 # Abnormality of the upper urinary tract (HP:0010935)
-# TODO: implement a logic to save the results of the walk through the ontology tree and load it if not older then 1 month
-all_hpo_children_list_kidney <- HPO_all_children_from_term("HP:0010935")
+# we load and use the results of previous walks through the ontology tree if not older then 1 month
 
-# transform hte list into a tibble
-hpo_list_kidney <- all_hpo_children_list_kidney %>%
-  unlist() %>%
-  tibble(`term` = .) %>%
-  unique()
+if (check_file_age("hpo_list_kidney", "../shared/", 1)) {
+  hpo_list_kidney <- read_csv(get_newest_file("hpo_list_kidney", "../shared"))
+} else {
+  all_hpo_children_list_kidney <- HPO_all_children_from_term("HP:0010935")
+
+  # transform the list into a tibble
+  hpo_list_kidney <- all_hpo_children_list_kidney %>%
+    unlist() %>%
+    tibble(`term` = .) %>%
+    unique() %>%
+    mutate(query_date = current_date)
+
+  write_csv(hpo_list_kidney,
+    file = paste0("../shared/hpo_list_kidney.",
+      current_date,
+      ".csv"),
+    na = "NULL")
+
+  gzip(paste0("../shared/hpo_list_kidney.", current_date, ".csv"),
+    overwrite = TRUE)
+}
 ############################################
 
 
 ############################################
 ## download all required database sources from HPO and OMIM
-file_date <- strftime(as.POSIXlt(Sys.time(), "UTC", "%Y-%m-%dT%H:%M:%S"), "%Y-%m-%d")
+# we load and use the results of previous walks through the ontology tree if not older then 1 month
 
 # disease ontology annotations from HPO
-phenotype_hpoa_url <- "http://purl.obolibrary.org/obo/hp/hpoa/phenotype.hpoa"
-phenotype_hpoa_filename <- paste0("data/downloads/phenotype.", file_date, ".hpoa")
-download.file(phenotype_hpoa_url, phenotype_hpoa_filename, mode = "wb")
+if (check_file_age("phenotype", "../shared/data/downloads/", 1)) {
+  phenotype_hpoa_filename <- get_newest_file("phenotype", "../shared/data/downloads/")
+} else {
+  # TODO: compute date only once or somehow in config
+  file_date <- strftime(as.POSIXlt(Sys.time(), "UTC", "%Y-%m-%dT%H:%M:%S"), "%Y-%m-%d")
+
+  # disease ontology annotations from HPO
+  # TODO: this should be a config variable
+  phenotype_hpoa_url <- "http://purl.obolibrary.org/obo/hp/hpoa/phenotype.hpoa"
+
+  phenotype_hpoa_filename <- paste0("../shared/data/downloads/phenotype.",
+    file_date,
+    ".hpoa")
+
+  download.file(phenotype_hpoa_url, phenotype_hpoa_filename, mode = "wb")
+
+  gzip(phenotype_hpoa_filename,
+    overwrite = TRUE)
+}
 
 # OMIM links to genemap2 file needs to be set in config and applied for at
 # https://www.omim.org/downloads
-omim_genemap2_url <- config_vars_proj$omim_genemap2_url
-omim_genemap2_filename <- paste0("data/downloads/omim_genemap2.", file_date, ".txt")
-download.file(omim_genemap2_url, omim_genemap2_filename, mode = "wb")
+if (check_file_age("omim_genemap2", "../shared/data/downloads/", 1)) {
+  omim_genemap2_filename <- get_newest_file("omim_genemap2", "../shared/data/downloads/")
+} else {
+  # TODO: compute date only once or somehow in config
+  file_date <- strftime(as.POSIXlt(Sys.time(), "UTC", "%Y-%m-%dT%H:%M:%S"), "%Y-%m-%d")
+
+  # OMIM links to genemap2 file needs to be set in config and applied for at
+  # https://www.omim.org/downloads
+  omim_genemap2_url <- config_vars_proj$omim_genemap2_url
+
+  omim_genemap2_filename <- paste0("../shared/data/downloads/omim_genemap2.",
+    file_date,
+    ".txt")
+
+  download.file(omim_genemap2_url, omim_genemap2_filename, mode = "wb")
+
+  gzip(omim_genemap2_filename,
+    overwrite = TRUE)
+}
 ############################################
 
 

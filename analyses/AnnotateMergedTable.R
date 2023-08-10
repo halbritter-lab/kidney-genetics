@@ -75,6 +75,7 @@ merged_genes <- merged_csv_table %>%
 ############################################
 ## get relevant HPO terms for kidney disease classification
 # get the current date
+# TODO: compute date only once or somehow in config
 current_date <- strftime(as.POSIXlt(Sys.time(), "UTC", "%Y-%m-%dT%H:%M:%S"), "%Y-%m-%d")
 
 # 1) get all children of term upper urinary tract (HP:0010935) for classification into kidney disease groups
@@ -204,6 +205,7 @@ if (check_file_age("hpo_list_syndromic", "shared/", 1)) {
 ## download all required database sources from HPO and OMIM
 # we load and use the results of previous walks through the ontology tree if not older then 1 month
 
+# disease ontology annotations from HPO
 if (check_file_age("phenotype", "shared/data/downloads/", 1)) {
   phenotype_hpoa_filename <- get_newest_file("phenotype", "shared/data/downloads/")
 } else {
@@ -224,6 +226,8 @@ if (check_file_age("phenotype", "shared/data/downloads/", 1)) {
     overwrite = TRUE)
 }
 
+# OMIM links to genemap2 file needs to be set in config and applied for at
+# https://www.omim.org/downloads
 if (check_file_age("omim_genemap2", "shared/data/downloads/", 1)) {
   omim_genemap2_filename <- get_newest_file("omim_genemap2", "shared/data/downloads/")
 } else {
