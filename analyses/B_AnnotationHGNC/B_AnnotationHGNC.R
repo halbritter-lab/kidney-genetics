@@ -6,6 +6,7 @@ library(STRINGdb)   ## needed to compute StringDB identifiers
 library("R.utils")  ## gzip downloaded and result files
 library(readxl)     ## needed to read xlsx file
 library(config)     ## needed for config loading
+library(janitor)    ## needed for cleaning column names
 ############################################
 
 
@@ -37,7 +38,7 @@ source("../functions/file-functions.R", local = TRUE)
 
 
 ############################################
-## download all required database sources from HGNC and OMIM
+## download all required database sources from HGNC, OMIM, gnomAD, ClinVar and genCC
 # we load and use the results of previous walks through the ontology tree if not older then 1 month
 
 current_date <- strftime(as.POSIXlt(Sys.time(),
@@ -59,6 +60,9 @@ if (check_file_age("non_alt_loci_set", "../shared/data/downloads/", 1)) {
 
   gzip(non_alt_loci_set_filename,
     overwrite = TRUE)
+
+  non_alt_loci_set_filename <- paste0(non_alt_loci_set_filename,
+    ".gz")
 }
 
 # OMIM file download
@@ -77,6 +81,9 @@ if (check_file_age("omim_genemap2", "../shared/data/downloads/", 1)) {
 
   gzip(omim_genemap2_filename,
     overwrite = TRUE)
+
+  omim_genemap2_filename <- paste0(omim_genemap2_filename,
+    ".gz")
 }
 
 # gnomAD lof metrics download
@@ -119,6 +126,26 @@ if (check_file_age("gencc_submissions", "../shared/data/downloads/", 1)) {
     ".xlsx")
 
   download.file(gencc_submissions_url, gencc_submissions_filename, mode = "wb")
+}
+
+# ClinGen file download
+if (check_file_age("clingen_gene_disease_summary", "../shared/data/downloads/", 1)) {
+  clingen_gene_disease_summary_filename <- get_newest_file("clingen_gene_disease_summary", "../shared/data/downloads/")
+} else {
+  # ClinGen file links to genemap2 file needs to be set in config
+  clingen_gene_disease_summary_url <- config_vars_proj$clingen_gene_disease_summary_url
+
+  clingen_gene_disease_summary_filename <- paste0("../shared/data/downloads/clingen_gene_sdisease_summary.",
+    current_date,
+    ".csv")
+
+  download.file(clingen_gene_disease_summary_url, clingen_gene_disease_summary_filename, mode = "wb")
+
+  gzip(clingen_gene_disease_summary_filename,
+    overwrite = TRUE)
+
+  clingen_gene_disease_summary_filename <- paste0(clingen_gene_disease_summary_filename,
+    ".gz")
 }
 ############################################
 
@@ -230,7 +257,6 @@ if (check_file_age("clinvar_table", "results/", 1)) {
 
 ############################################
 # load and process genCC file
-
 # Define the order of classification_title
 classification_order <- c(
   "Definitive",
@@ -246,6 +272,17 @@ classification_order <- c(
 # load the Excel file
 gencc_submissions_table <-  read_excel(gencc_submissions_filename) %>%
   mutate(classification_title = factor(classification_title, levels = classification_order))
+############################################
+
+
+############################################
+# load and process ClinGen CSV file
+# clean the column names
+# remove comments
+clingen_gene_disease_summary_table <- read_csv(clingen_gene_disease_summary_filename, 
+    skip = 4) %>%
+  janitor::clean_names() %>%
+  filter(!str_detect(gene_symbol, "\\+"))
 ############################################
 
 
@@ -365,7 +402,6 @@ non_alt_loci_set_coordinates_gnomad_omim <- non_alt_loci_set_coordinates_gnomad 
 
 ############################################
 # annotate with GenCC classification
-
 # first summarize the table by gene symbol
 gencc_submissions_table_grouped <- gencc_submissions_table %>%
   arrange(gene_symbol, classification_title) %>%
@@ -394,6 +430,40 @@ gencc_submissions_table_grouped <- gencc_submissions_table %>%
 # join with non_alt_loci_set_coordinates_gnomad_omim
 non_alt_loci_set_coordinates_gnomad_omim_gencc <- non_alt_loci_set_coordinates_gnomad_omim %>%
   left_join(gencc_submissions_table_grouped, by = c("hgnc_id" = "gene_curie"))
+############################################
+
+
+############################################
+# annotate ClinGen Gene-Disease Validity
+# TODO: add ClinGen Gene-Disease Validity
+# first summarize the table by gene symbol
+clingen_gene_disease_summary_table_grouped <- clingen_gene_disease_summary_table %>%
+  arrange(gene_symbol, classification) %>%
+  group_by(gene_symbol, gene_id_hgnc, disease_id_mondo, disease_label, moi) %>%
+  summarise(
+    classification = paste0(classification, collapse = ", "),
+    clingen_classification_count = n(),
+    .groups = 'drop') %>%
+  ungroup() %>%
+  group_by(gene_symbol, gene_id_hgnc) %>%
+  summarise(
+    clingen_summary = paste(paste0(classification,
+      " (",
+      disease_label,
+      "[",
+      disease_id_mondo,
+      "]-",
+      moi,
+      ")"), collapse = " | "),
+    clingen_count = paste(clingen_classification_count,
+      collapse = ", "),
+    .groups = 'drop') %>%
+  ungroup() %>%
+  dplyr::select(-gene_symbol)
+
+# join with non_alt_loci_set_coordinates_gnomad_omim_gencc
+non_alt_loci_set_coordinates_gnomad_omim_gencc_clingen <- non_alt_loci_set_coordinates_gnomad_omim_gencc %>%
+  left_join(clingen_gene_disease_summary_table_grouped, by = c("hgnc_id" = "gene_id_hgnc"))
 
 ############################################
 
@@ -422,7 +492,7 @@ clinvar_table_counts <- clinvar_table %>%
   dplyr::select(symbol, ClinVar)
 
 # join with non_alt_loci_set_coordinates_gnomad
-non_alt_loci_set_coordinates_gnomad_omim_gencc_clinvar <- non_alt_loci_set_coordinates_gnomad_omim_gencc %>%
+non_alt_loci_set_coordinates_gnomad_omim_gencc_clingen_clinvar <- non_alt_loci_set_coordinates_gnomad_omim_gencc_clingen %>%
   left_join(clinvar_table_counts, by = c("symbol" = "symbol"))
 ############################################
 
@@ -433,7 +503,7 @@ creation_date <- strftime(as.POSIXlt(Sys.time(),
     "UTC", "%Y-%m-%dT%H:%M:%S"),
   "%Y-%m-%d")
 
-write_csv(non_alt_loci_set_coordinates_gnomad_omim_gencc_clinvar,
+write_csv(non_alt_loci_set_coordinates_gnomad_omim_gencc_clingen_clinvar,
   file = paste0("results/non_alt_loci_set_coordinates.", creation_date, ".csv"))
 
 gzip(paste0("results/non_alt_loci_set_coordinates.", creation_date, ".csv"),
