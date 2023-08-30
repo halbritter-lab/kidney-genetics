@@ -45,6 +45,7 @@ merged_path <- "merged/"
 
 # find all CSV files in merged folders and filter
 # select newest file
+# TODO: replace with file function
 merged_csv_table <- list.files(path = merged_path,
     pattern = ".csv",
     full.names = TRUE) %>%
@@ -158,7 +159,7 @@ if (check_file_age("hpo_list_adult", "shared/", 1)) {
 
 # 3) syndromic vs non-syndromic (categories in OMIM: GROWTH, SKELETAL, NEUROLOGIC, HEAD & NECK; exclude: CARDIOVASCULAR, ABDOMEN, GENITOURINARY)
 # we load and use the results of previous walks through the ontology tree if not older then 1 month
-# TODO: differentiate into the 3 organ systems
+# TODO: differentiate into the 3 organ systems, plus summary of all 3 organ systems
 
 if (check_file_age("hpo_list_syndromic", "shared/", 1)) {
   hpo_list_syndromic <- read_csv(get_newest_file("hpo_list_syndromic", "shared"))
@@ -550,7 +551,7 @@ hpo_gene_list_kidney_all_kidney_groups_summarized_for_join <- hpo_gene_list_kidn
   ungroup()
 
 # TODO: check if we need to do this analysis per entity instead of per gene
-# TODO: workflow: if the respective gene/entity from our kidney list is in the geneCC curated list apply this group, if not apply the group with the highest score after reviewing the groups manually
+# TODO: workflow: if the respective gene/entity from our kidney list is in the ClinGen curated list apply this group, if not apply the group with the highest score after reviewing the groups manually
 ############################################
 
 

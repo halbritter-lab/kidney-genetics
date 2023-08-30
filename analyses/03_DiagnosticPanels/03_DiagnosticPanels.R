@@ -49,6 +49,7 @@ source("../functions/blueprintgenetics-functions.R", local = TRUE)
 diagnostic_panels_list <- read_excel("data/kidney_diagnostic_panels_list.xlsx") %>%
   filter(use == "yes")
 
+# TODO: implement using already download files if they are not too old
 # download using phantomJS
 diagnostic_panels <- diagnostic_panels_list %>%
   rowwise() %>%

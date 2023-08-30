@@ -3,6 +3,25 @@ require(jsonlite)
 require(tidyverse)
 require(purrr)
 
+
+#' Fetch Gene Data from gnomAD GraphQL API
+#'
+#' This function takes an Ensemble gene identifier as input, makes a POST request
+#' to the gnomAD GraphQL API, and returns the gene data as a tibble.
+#'
+#' @param ensemble_id A character string representing the Ensemble gene identifier.
+#'
+#' @return A tibble with columns for each field returned by the API. This includes
+#'         fields such as gene_id, gene_version, symbol, and others, as well as nested
+#'         fields under gnomad_constraint.
+#'
+#' @examples
+#' \dontrun{
+#'   gene_data <- get_gene_data_from_gnomad("ENSG00000008710")
+#'   print(gene_data)
+#' }
+#'
+#' @export
 get_gene_data_from_gnomad <- function(ensemble_id) {
 
   # Recursive function to replace NULL with NA
