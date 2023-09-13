@@ -226,6 +226,7 @@ gnomad_v211_lof_met_gene <- read_delim(gnomad_v211_lof_met_gene_filename,
 ############################################
 # load or process clinvar VCF file into table
 # and then safe/load the result as a table for future use
+# TODO: maybe safe the clinvar table in the (shared) or analysis data folder instead
 if (check_file_age("clinvar_table", "results/", 1)) {
   clinvar_table_filename <- get_newest_file("clinvar_table", "results/")
 
