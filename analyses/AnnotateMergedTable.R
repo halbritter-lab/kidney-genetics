@@ -34,6 +34,7 @@ options(scipen = 999)
 source("functions/hgnc-functions.R", local = TRUE)
 source("functions/hpo-functions.R", local = TRUE)
 source("functions/file-functions.R", local = TRUE)
+source("functions/gtex-functions.R", local = TRUE)
 ############################################
 
 
@@ -159,10 +160,15 @@ if (check_file_age("hpo_list_adult", "shared/", 1)) {
 
 # 3) syndromic vs non-syndromic (categories in OMIM: GROWTH, SKELETAL, NEUROLOGIC, HEAD & NECK; exclude: CARDIOVASCULAR, ABDOMEN, GENITOURINARY)
 # we load and use the results of previous walks through the ontology tree if not older then 1 month
-# TODO: differentiate into the 3 organ systems, plus summary of all 3 organ systems
 
 if (check_file_age("hpo_list_syndromic", "shared/", 1)) {
+  # load the list of syndromic terms
   hpo_list_syndromic <- read_csv(get_newest_file("hpo_list_syndromic", "shared"))
+  # also load the sublists if not older then 1 month
+  all_hpo_children_list_growth_term <- read_csv(get_newest_file("hpo_list_growth_term", "shared"))
+  all_hpo_children_list_skeletal_term <- read_csv(get_newest_file("hpo_list_skeletal_term", "shared"))
+  all_hpo_children_list_neurologic_term <- read_csv(get_newest_file("hpo_list_neurologic_term", "shared"))
+  all_hpo_children_list_head_and_neck_term <- read_csv(get_newest_file("hpo_list_head_and_neck_term", "shared"))
 } else {
   # walk through the ontology tree and add all unique terms descending from
   # Growth abnormality (HP:0001507)
@@ -180,24 +186,88 @@ if (check_file_age("hpo_list_syndromic", "shared/", 1)) {
   # Head and neck abnormality (HP:0000152)
   all_hpo_children_list_head_and_neck <- HPO_all_children_from_term("HP:0000152")
 
+  # add the base term name and term id to each list
+  # safe the lists as csv and gzip them
+  all_hpo_children_list_growth_term <- all_hpo_children_list_growth %>%
+    mutate(base_term = "Growth abnormality",
+      base_term_id = "HP:0001507") %>%
+    mutate(query_date = current_date) %>%
+    select(term = value, base_term, base_term_id)
+
+  all_hpo_children_list_skeletal_term <- all_hpo_children_list_skeletal %>%
+    mutate(base_term = "Skeletal system abnormality",
+      base_term_id = "HP:0000924") %>%
+    mutate(query_date = current_date) %>%
+    select(term = value, base_term, base_term_id)
+
+  all_hpo_children_list_neurologic_term <- all_hpo_children_list_neurologic %>%
+    mutate(base_term = "Neurologic abnormality",
+      base_term_id = "HP:0000707") %>%
+    mutate(query_date = current_date) %>%
+    select(term = value, base_term, base_term_id)
+
+  all_hpo_children_list_head_and_neck_term <- all_hpo_children_list_head_and_neck %>%
+    mutate(base_term = "Head and neck abnormality",
+      base_term_id = "HP:0000152") %>%
+    mutate(query_date = current_date) %>%
+    select(term = value, base_term, base_term_id)
+
+  write_csv(all_hpo_children_list_growth_term,
+    file = paste0("shared/hpo_list_growth_term.",
+      current_date,
+      ".csv"),
+    na = "NULL")
+
+  write_csv(all_hpo_children_list_skeletal_term,
+    file = paste0("shared/hpo_list_skeletal_term.",
+      current_date,
+      ".csv"),
+    na = "NULL")
+
+  write_csv(all_hpo_children_list_neurologic_term,
+    file = paste0("shared/hpo_list_neurologic_term.",
+      current_date,
+      ".csv"),
+    na = "NULL")
+
+  write_csv(all_hpo_children_list_head_and_neck_term,
+    file = paste0("shared/hpo_list_head_and_neck_term.",
+      current_date,
+      ".csv"),
+    na = "NULL")
+
+  gzip(paste0("shared/hpo_list_growth_term.", current_date, ".csv"),
+    overwrite = TRUE)
+
+  gzip(paste0("shared/hpo_list_skeletal_term.", current_date, ".csv"),
+    overwrite = TRUE)
+
+  gzip(paste0("shared/hpo_list_neurologic_term.", current_date, ".csv"),
+    overwrite = TRUE)
+
+  gzip(paste0("shared/hpo_list_head_and_neck_term.", current_date, ".csv"),
+    overwrite = TRUE)
+
   # merge all lists and transform the list into a tibble
-  hpo_list_syndromic <- bind_rows(all_hpo_children_list_growth,
-      all_hpo_children_list_skeletal,
-      all_hpo_children_list_neurologic,
-      all_hpo_children_list_head_and_neck) %>%
-    unlist() %>%
-    tibble(`term` = .) %>%
-    unique() %>%
-    mutate(query_date = current_date)
+  # summarize the list to unique terms
+  # safe the list as csv and gzip it
+  hpo_list_syndromic <- bind_rows(all_hpo_children_list_growth_term,
+      all_hpo_children_list_skeletal_term,
+      all_hpo_children_list_neurologic_term,
+      all_hpo_children_list_head_and_neck_term) %>%
+    group_by(term) %>%
+    summarise(base_term = paste0(base_term, collapse = "; "),
+      base_term_id = paste0(base_term_id, collapse = "; "),
+      query_date = current_date)
 
-    write_csv(hpo_list_syndromic,
-      file = paste0("shared/hpo_list_syndromic.",
-        current_date,
-        ".csv"),
-      na = "NULL")
+  write_csv(hpo_list_syndromic,
+    file = paste0("shared/hpo_list_syndromic.",
+      current_date,
+      ".csv"),
+    na = "NULL")
 
-    gzip(paste0("shared/hpo_list_syndromic.", current_date, ".csv"),
-      overwrite = TRUE)
+  gzip(paste0("shared/hpo_list_syndromic.", current_date, ".csv"),
+    overwrite = TRUE)
 }
 ############################################
 
@@ -214,8 +284,7 @@ if (check_file_age("phenotype", "shared/data/downloads/", 1)) {
   file_date <- strftime(as.POSIXlt(Sys.time(), "UTC", "%Y-%m-%dT%H:%M:%S"), "%Y-%m-%d")
 
   # disease ontology annotations from HPO
-  # TODO: this should be a config variable
-  phenotype_hpoa_url <- "http://purl.obolibrary.org/obo/hp/hpoa/phenotype.hpoa"
+  phenotype_hpoa_url <- config_vars_proj$phenotype_hpoa
 
   phenotype_hpoa_filename <- paste0("shared/data/downloads/phenotype.",
     file_date,
@@ -225,6 +294,9 @@ if (check_file_age("phenotype", "shared/data/downloads/", 1)) {
 
   gzip(phenotype_hpoa_filename,
     overwrite = TRUE)
+
+  phenotype_hpoa_filename <- paste0(phenotype_hpoa_filename,
+    ".gz")
 }
 
 # OMIM links to genemap2 file needs to be set in config and applied for at
@@ -247,6 +319,9 @@ if (check_file_age("omim_genemap2", "shared/data/downloads/", 1)) {
 
   gzip(omim_genemap2_filename,
     overwrite = TRUE)
+
+  omim_genemap2_filename <- paste0(omim_genemap2_filename,
+    ".txt")
 }
 ############################################
 
@@ -314,6 +389,8 @@ omim_genemap2 <- read_delim(omim_genemap2_filename, "\t",
 ############################################
 # annotate kidney groups from:
 # https://clinicalgenome.org/working-groups/clinical-domain/clingen-kidney-disease-clinical-domain-working-group/
+
+# TODO: safe the results of the API calls or websites for reproducibility
 
 ## general workflow:
 # A) get all genes from all kidney groups
@@ -501,6 +578,7 @@ all_kidney_groups <- bind_rows(complement_mediated_kidney_diseases_gene_list,
 # B) get phenotype annotation table from HPO, group by gene and filter for kidney phenotypes
 # C) compute for each list in A) the relative frequency of kidney phenotypes in 2), this will be the kidney group score
 # D) compute for each gene a list of all kidney group scores and sort by the highest score (the gene is in the kidney group with the highest score, but this needs to be checked manually)
+# TODO: describe the logic of the analysis in comments step by step
 omim_genemap2_disease_and_gene <- omim_genemap2 %>%
   select(disease_ontology_id, approved_symbol)
 
@@ -528,16 +606,16 @@ all_kidney_groups_hpo <- all_kidney_groups %>%
     .groups = "keep") %>%
   ungroup() %>%
   mutate(hpo_id_group_frac = hpo_id_group_count / hpo_id_count) %>%
-  select(-hpo_id_count, -hpo_id_group_count) %>%
-  group_by(kidney_disease_group_short)
+  select(-hpo_id_count, -hpo_id_group_count)
 
 hpo_gene_list_kidney_all_kidney_groups <- hpo_gene_list_kidney %>%
   left_join(all_kidney_groups_hpo, by = c("hpo_id"), relationship = "many-to-many") %>%
   filter(!is.na(kidney_disease_group_short)) %>%
-  select(approved_symbol, kidney_disease_group_short, hpo_id_group_frac) %>%
+  select(approved_symbol, database_id , kidney_disease_group_short, hpo_id_group_frac) %>%
   unique() %>%
-  group_by(approved_symbol, kidney_disease_group_short) %>%
+  group_by(approved_symbol, database_id, kidney_disease_group_short) %>%
   summarise(approved_symbol = unique(approved_symbol),
+    database_id = unique(database_id),
     kidney_disease_group_short = unique(kidney_disease_group_short),
     hpo_id_group_p = round(sum(hpo_id_group_frac), 3),
     .groups = "keep") %>%
@@ -545,41 +623,54 @@ hpo_gene_list_kidney_all_kidney_groups <- hpo_gene_list_kidney %>%
   arrange(approved_symbol, desc(hpo_id_group_p))
 
 hpo_gene_list_kidney_all_kidney_groups_summarized_for_join <- hpo_gene_list_kidney_all_kidney_groups %>%
+  group_by(approved_symbol, database_id) %>%
+  summarise(approved_symbol = unique(approved_symbol),
+    database_id = unique(database_id),
+    groups_p = paste0(kidney_disease_group_short, ": ", hpo_id_group_p, collapse = " | "),
+    .groups = "keep") %>%
+  ungroup() %>%
   group_by(approved_symbol) %>%
   summarise(approved_symbol = unique(approved_symbol),
-    groups_p = paste(kidney_disease_group_short, ": ", hpo_id_group_p, collapse = " | ")) %>%
+    groups_p = paste0(database_id, " (", groups_p, ")", collapse = "; "),
+    .groups = "keep") %>%
   ungroup()
 
-# TODO: check if we need to do this analysis per entity instead of per gene
+# TODO: check if it could be helpful to do this also per gene
 # TODO: workflow: if the respective gene/entity from our kidney list is in the ClinGen curated list apply this group, if not apply the group with the highest score after reviewing the groups manually
 ############################################
 
 
-
 ############################################
-# annotate pediatric vs adult onset (OMIM: HPO terms Adult onset HP:0003581, Pediatric onset HP:0410280, mndchildren of terms)
+# annotate pediatric vs adult onset (OMIM: HPO terms Adult onset HP:0003581, Pediatric onset HP:0410280, and children of terms)
+# TODO: describe the logic of the analysis in comments step by step
+
+# filter OMIM data for all the disease database ids with HPO terms for adult onset
 phenotype_hpoa_filter_adult <- phenotype_hpoa %>%
    filter(hpo_id %in% hpo_list_adult$term) %>%
    select(database_id, hpo_id) %>%
    unique()
 
+# annotate the OMIM data with the gene symbols
 hpo_gene_list_adult <- phenotype_hpoa_filter_adult %>%
   left_join(omim_genemap2_disease_and_gene, by = c("database_id" = "disease_ontology_id"), relationship = "many-to-many") %>%
   filter(!is.na(approved_symbol)) %>%
   unique() %>%
   mutate(onset_group = "adult")
 
+# filter OMIM data for all the disease database ids with HPO terms for non-adult onset
 phenotype_hpoa_filter_non_adult <- phenotype_hpoa %>%
    filter(hpo_id %in% hpo_list_non_adult$term) %>%
    select(database_id, hpo_id) %>%
    unique()
 
+# annotate the OMIM data with the gene symbols
 hpo_gene_list_non_adult <- phenotype_hpoa_filter_non_adult %>%
   left_join(omim_genemap2_disease_and_gene, by = c("database_id" = "disease_ontology_id"), relationship = "many-to-many") %>%
   filter(!is.na(approved_symbol)) %>%
   unique() %>%
   mutate(onset_group = "non_adult")
 
+# bind the two lists and compute the relative frequency of all onset related HPO terms in the OMIM entries associated with at least one of the terms per onset group
 onset_hpo <- bind_rows(hpo_gene_list_adult, hpo_gene_list_non_adult) %>%
   select(onset_group, hpo_id) %>%
   group_by(onset_group) %>%
@@ -592,33 +683,44 @@ onset_hpo <- bind_rows(hpo_gene_list_adult, hpo_gene_list_non_adult) %>%
     .groups = "keep") %>%
   ungroup() %>%
   mutate(hpo_id_group_frac = hpo_id_group_count / hpo_id_count) %>%
-  select(-hpo_id_count, -hpo_id_group_count) %>%
-  group_by(onset_group)
+  select(-hpo_id_count, -hpo_id_group_count)
 
+# now compute the sum of the relative frequency of the HPO terms in the two lists per gene and disease
+# this will be the hpo id group p-value
+# TODO: check if it could be helpful to do this also per gene
 hpo_gene_list_onset_groups <- bind_rows(hpo_gene_list_adult, hpo_gene_list_non_adult) %>%
    select(-onset_group) %>%
   left_join(onset_hpo, by = c("hpo_id"), relationship = "many-to-many") %>%
-  select(approved_symbol, onset_group, hpo_id_group_frac) %>%
-  group_by(approved_symbol, onset_group) %>%
+  select(approved_symbol, database_id, onset_group, hpo_id_group_frac) %>%
+  group_by(approved_symbol, database_id, onset_group) %>%
   summarise(approved_symbol = unique(approved_symbol),
+    database_id = unique(database_id),
     onset_group = unique(onset_group),
     hpo_id_group_p = round(sum(hpo_id_group_frac), 3),
     .groups = "keep") %>%
   ungroup() %>%
   arrange(approved_symbol, desc(hpo_id_group_p))
 
+# now summarize the results per gene
 hpo_gene_list_onset_groups_summarized_for_join <- hpo_gene_list_onset_groups %>%
+  group_by(approved_symbol, database_id) %>%
+  summarise(approved_symbol = unique(approved_symbol),
+    database_id = unique(database_id),
+    groups_p = paste0(onset_group, ": ", hpo_id_group_p, collapse = " | "),
+    .groups = "keep") %>%
+  ungroup() %>%
   group_by(approved_symbol) %>%
   summarise(approved_symbol = unique(approved_symbol),
-    groups_p = paste(onset_group, ": ", hpo_id_group_p, collapse = " | ")) %>%
+    groups_p = paste0(database_id, " (", groups_p, ")", collapse = "; "),
+    .groups = "keep") %>%
   ungroup()
 ############################################
 
 
-
 ############################################
-# TODO: differentiate into the 3 organ systems
 # syndromic vs non-syndromic (categories in OMIM: GROWTH, SKELETAL, NEUROLOGIC, HEAD & NECK; exclude: CARDIOVASCULAR, ABDOMEN, GENITOURINARY)
+# TODO: there could be an error in the logic how to compute the relative frequency of the HPO terms in the two lists, this needs to be fixed
+# TODO: Comment: I think it might still b e right, we just need to clearly explain what the value means and why the syndromic value differs from the sum of the other three values
 phenotype_hpoa_filter_syndromic <- phenotype_hpoa %>%
    filter(hpo_id %in% hpo_list_syndromic$term) %>%
    select(database_id, hpo_id) %>%
@@ -628,64 +730,119 @@ hpo_gene_list_syndromic <- phenotype_hpoa_filter_syndromic %>%
   left_join(omim_genemap2_disease_and_gene, by = c("database_id" = "disease_ontology_id"), relationship = "many-to-many") %>%
   filter(!is.na(approved_symbol)) %>%
   unique() %>%
-  mutate(symptom_group = "syndromic")
+  mutate(symptome_group = "syndromic")
 
-symptom_hpo <- hpo_gene_list_syndromic %>%
-  select(symptom_group, hpo_id) %>%
-  group_by(symptom_group) %>%
+# list to differentiate into the three organ systems
+phenotype_hpoa_filter_growth <- phenotype_hpoa %>%
+   filter(hpo_id %in% all_hpo_children_list_growth_term$term) %>%
+   select(database_id, hpo_id) %>%
+   unique()
+
+hpo_gene_list_growth <- phenotype_hpoa_filter_growth %>%
+  left_join(omim_genemap2_disease_and_gene, by = c("database_id" = "disease_ontology_id"), relationship = "many-to-many") %>%
+  filter(!is.na(approved_symbol)) %>%
+  unique() %>%
+  mutate(symptome_group = "growth")
+
+phenotype_hpoa_filter_skeletal <- phenotype_hpoa %>%
+   filter(hpo_id %in% all_hpo_children_list_skeletal_term$term) %>%
+   select(database_id, hpo_id) %>%
+   unique()
+
+hpo_gene_list_skeletal <- phenotype_hpoa_filter_skeletal %>%
+  left_join(omim_genemap2_disease_and_gene, by = c("database_id" = "disease_ontology_id"), relationship = "many-to-many") %>%
+  filter(!is.na(approved_symbol)) %>%
+  unique() %>%
+  mutate(symptome_group = "skeletal")
+
+phenotype_hpoa_filter_neurologic <- phenotype_hpoa %>%
+   filter(hpo_id %in% all_hpo_children_list_neurologic_term$term) %>%
+   select(database_id, hpo_id) %>%
+   unique()
+
+hpo_gene_list_neurologic <- phenotype_hpoa_filter_neurologic %>%
+  left_join(omim_genemap2_disease_and_gene, by = c("database_id" = "disease_ontology_id"), relationship = "many-to-many") %>%
+  filter(!is.na(approved_symbol)) %>%
+  unique() %>%
+  mutate(symptome_group = "neurologic")
+
+# bind the four lists and compute the relative frequency of the HPO terms in the three lists
+symptome_hpo <- bind_rows(hpo_gene_list_syndromic, hpo_gene_list_growth, hpo_gene_list_skeletal, hpo_gene_list_neurologic) %>%
+  select(symptome_group, hpo_id) %>%
+  group_by(symptome_group) %>%
   mutate(hpo_id_count = n()) %>%
   ungroup() %>%
-  group_by(symptom_group, hpo_id) %>%
+  group_by(symptome_group, hpo_id) %>%
   summarise(hpo_id = unique(hpo_id),
     hpo_id_count = unique(hpo_id_count),
     hpo_id_group_count = n(),
     .groups = "keep") %>%
   ungroup() %>%
   mutate(hpo_id_group_frac = hpo_id_group_count / hpo_id_count) %>%
-  select(-hpo_id_count, -hpo_id_group_count) %>%
-  group_by(symptom_group)
+  select(-hpo_id_count, -hpo_id_group_count)
 
-hpo_gene_list_symptom_groups <- hpo_gene_list_syndromic %>%
-   select(-symptom_group) %>%
-  left_join(symptom_hpo, by = c("hpo_id"), relationship = "many-to-many") %>%
-  select(approved_symbol, symptom_group, hpo_id_group_frac) %>%
-  group_by(approved_symbol, symptom_group) %>%
+hpo_gene_list_symptome_groups <- hpo_gene_list_syndromic %>%
+   select(-symptome_group) %>%
+  left_join(symptome_hpo, by = c("hpo_id"), relationship = "many-to-many") %>%
+  select(approved_symbol, database_id, symptome_group, hpo_id_group_frac) %>%
+  group_by(approved_symbol, database_id, symptome_group) %>%
   summarise(approved_symbol = unique(approved_symbol),
-    symptom_group = unique(symptom_group),
+    database_id = unique(database_id),
+    symptome_group = unique(symptome_group),
     hpo_id_group_p = round(sum(hpo_id_group_frac), 3),
     .groups = "keep") %>%
   ungroup() %>%
   arrange(approved_symbol, desc(hpo_id_group_p))
 
-hpo_gene_list_symptom_groups_summarized_for_join <- hpo_gene_list_symptom_groups %>%
+# summarize the results per gene
+# always put syndromic first, then growth, then skeletal, then neurologic
+hpo_gene_list_symptome_groups_summarized_for_join <- hpo_gene_list_symptome_groups %>%
+  group_by(approved_symbol, database_id) %>%
+  mutate(symptome_group = factor(symptome_group, levels = c("syndromic", "growth", "skeletal", "neurologic"))) %>%
+  arrange(symptome_group) %>%
+  summarise(approved_symbol = unique(approved_symbol),
+    database_id = unique(database_id),
+    groups_p = paste0(symptome_group, ": ", hpo_id_group_p, collapse = " | "),
+    .groups = "keep") %>%
+  ungroup() %>%
   group_by(approved_symbol) %>%
   summarise(approved_symbol = unique(approved_symbol),
-    groups_p = paste(symptom_group, ": ", hpo_id_group_p, collapse = " | ")) %>%
+    groups_p = paste0(database_id, " (", groups_p, ")", collapse = "; "),
+    .groups = "keep") %>%
   ungroup()
 
+# TODO: check if we need to do this analysis per entity instead per gene and then aggregate/ summarize per gene
 ############################################
-
 
 
 ############################################
 # TODO: annotate MGI mouse phenotypes kidney
 # use https://www.mousemine.org/mousemine/begin.do
-# https://www.mousemine.org/mousemine/results.do?trail=%257Cquery%257Cresults.0&queryBuilder=true
+# https://www.mousemine.org/mousemine/
 
+# use R package: https://www.bioconductor.org/packages/release/bioc/vignettes/InterMineR/inst/doc/InterMineR.html
+# TODO: need to find a table to show the genes names
+# TODO: need to find a table to map the mouse phenotypes to HPO terms
 ############################################
 
 
 ############################################
 # TODO: annotate StringDB interactions with strong evidence kidney genes
-
+# use download tables: https://string-db.org/cgi/download?sessionId=bVJC28yKCRz5&species_text=Homo+sapiens
+# eg physical: https://stringdb-downloads.org/download/protein.physical.links.v12.0/9606.protein.physical.links.v12.0.txt.gz
+# sum the interactions for each gene with the high evidence list, the percentile normalize, additionally show a sting with interacting genes and scores
 ############################################
 
 
 ############################################
+# TODO: move this to HGNC table
 # TODO: annotate GTEx kidney expression
 # use https://gtexportal.org/api/v2/redoc#tag/GTEx-Portal-API-Info
 # see GitHub issue for cutoffs
 # TODO: maybe add expression in embryonic kidney from somewhere (e.g. https://descartes.brotmanbaty.org/)
+# descartes: https://atlas.fredhutch.org/data/bbi/descartes/human_gtex/tables/tissue_tpm/kidney.csv (this one for TPM)
+# descartes: https://atlas.fredhutch.org/data/bbi/descartes/human_gtex/tables/tissue_percentage/kidney.csv
+# descartes: https://atlas.fredhutch.org/data/bbi/descartes/human_gtex/counts/gene2ens.csv (for identifier mapping)
 
 ############################################
 
