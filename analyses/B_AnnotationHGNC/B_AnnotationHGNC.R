@@ -33,6 +33,7 @@ options(scipen = 999)
 # hgnc functions
 source("../functions/ensembl-functions.R", local = TRUE)
 source("../functions/gnomad-functions.R", local = TRUE)
+source("../functions/gtex-functions.R", local = TRUE)
 source("../functions/file-functions.R", local = TRUE)
 ############################################
 
@@ -135,7 +136,7 @@ if (check_file_age("clingen_gene_disease_summary", "../shared/data/downloads/", 
   # ClinGen file links to genemap2 file needs to be set in config
   clingen_gene_disease_summary_url <- config_vars_proj$clingen_gene_disease_summary_url
 
-  clingen_gene_disease_summary_filename <- paste0("../shared/data/downloads/clingen_gene_sdisease_summary.",
+  clingen_gene_disease_summary_filename <- paste0("../shared/data/downloads/clingen_gene_disease_summary.",
     current_date,
     ".csv")
 
@@ -321,13 +322,15 @@ non_alt_loci_set_string <- non_alt_loci_set %>%
 
 ############################################
 ## add gene coordinates from ensembl
-# and compute ensembl_gene_id_version for hg19 and hg38
+# add ensembl_gene_id_version for hg19 and hg38 using the ensembl functions
+# add genocode id using the GTEx API and the get_multiple_gencode_ids function
 # TODO: fix warning "! Ensembl will soon enforce the use of https. Ensure the 'host' argument includes https://""
 non_alt_loci_set_coordinates <- non_alt_loci_set_string %>%
   mutate(ensembl_gene_id_version_hg19 =
     gene_id_version_from_ensembl(ensembl_gene_id, reference = "hg19")$ensembl_gene_id_version) %>%
   mutate(ensembl_gene_id_version_hg38 =
     gene_id_version_from_ensembl(ensembl_gene_id, reference = "hg38")$ensembl_gene_id_version) %>%
+  mutate(gencode_id = get_multiple_gencode_ids(symbol)$gencode_id) %>%
   mutate(hg19_coordinates_from_ensembl =
     gene_coordinates_from_ensembl(ensembl_gene_id)) %>%
   mutate(hg19_coordinates_from_symbol =
