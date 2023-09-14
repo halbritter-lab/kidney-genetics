@@ -11,7 +11,7 @@
 #' @return A tibble with the gene symbols and their corresponding coordinates in BED format.
 #'
 #' @examples
-#' gene_symbols <- c("ARID1B ", "GRIn2B", "NAA10")
+#' gene_symbols <- c("ARID1B ", "GRIN2B", "NAA10")
 #' gene_coordinates_from_symbol(gene_symbols, reference = "hg19")
 #'
 #' @export
@@ -99,6 +99,52 @@ gene_coordinates_from_ensembl <- function(ensembl_id, reference = "hg19") {
 
   ensembl_id_list_return <- ensembl_id_list %>%
   left_join(gene_coordinates_hg19, by = ("ensembl_gene_id"))
+
+  return(ensembl_id_list_return)
+}
+
+
+#' Retrieve Ensembl gene ID versions from Ensembl gene IDs
+#'
+#' This function retrieves the Ensembl gene ID versions for the given Ensembl
+#' gene IDs. The ID versions are obtained from the specified reference genome.
+#'
+#' @param ensembl_id A vector or tibble containing the Ensembl gene IDs.
+#' @param reference The reference genome to use (default: "hg19").
+#'
+#' @return A tibble with the Ensembl gene IDs and their corresponding Ensembl
+#'         gene ID versions.
+#'
+#' @examples
+#' ensembl_id <- c("ENSG00000203782", "ENSG00000008710")
+#' gene_id_version_from_ensembl(ensembl_id, reference = "hg19")
+#'
+#' @export
+gene_id_version_from_ensembl <- function(ensembl_id, reference = "hg19") {
+  ensembl_id_list <- enframe(ensembl_id,
+    name = NULL,
+    value = "ensembl_gene_id") 
+
+  # Define mart
+  if (reference == "hg19") {
+    mart <- useMart("ensembl",
+      dataset = "hsapiens_gene_ensembl", host = "grch37.ensembl.org")
+  } else {
+    mart <- useMart("ensembl",
+      dataset = "hsapiens_gene_ensembl", host = "ensembl.org")
+  }
+
+  # Define the attributes and filters
+  attributes <- c("ensembl_gene_id", "ensembl_gene_id_version")
+  filters <- "ensembl_gene_id"
+
+  # Retrieve the data
+  gene_id_version <- getBM(attributes = attributes, filters = filters,
+    values = ensembl_id_list$ensembl_gene_id, mart = mart)
+
+  # Join the data back to the input list to ensure all input IDs are in the output
+  ensembl_id_list_return <- ensembl_id_list %>%
+    left_join(gene_id_version, by = "ensembl_gene_id")
 
   return(ensembl_id_list_return)
 }

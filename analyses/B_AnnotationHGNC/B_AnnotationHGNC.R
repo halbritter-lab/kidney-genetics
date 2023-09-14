@@ -321,8 +321,13 @@ non_alt_loci_set_string <- non_alt_loci_set %>%
 
 ############################################
 ## add gene coordinates from ensembl
+# and compute ensembl_gene_id_version for hg19 and hg38
 # TODO: fix warning "! Ensembl will soon enforce the use of https. Ensure the 'host' argument includes https://""
 non_alt_loci_set_coordinates <- non_alt_loci_set_string %>%
+  mutate(ensembl_gene_id_version_hg19 =
+    gene_id_version_from_ensembl(ensembl_gene_id, reference = "hg19")$ensembl_gene_id_version) %>%
+  mutate(ensembl_gene_id_version_hg38 =
+    gene_id_version_from_ensembl(ensembl_gene_id, reference = "hg38")$ensembl_gene_id_version) %>%
   mutate(hg19_coordinates_from_ensembl =
     gene_coordinates_from_ensembl(ensembl_gene_id)) %>%
   mutate(hg19_coordinates_from_symbol =
