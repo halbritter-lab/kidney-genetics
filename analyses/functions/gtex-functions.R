@@ -2,27 +2,36 @@ require(httr)
 require(jsonlite)
 require(tidyverse)
 require(purrr)
-library(dplyr)
+require(dplyr)
+require(janitor)
+
 
 #' Get Median Tissue Expression Levels from GTEx API
 #'
-#' This function takes a list of GENCODE gene identifiers as input,
+#' This function takes a character vector of GENCODE gene identifiers as input,
 #' makes a GET request to the GTEx API, and returns the median tissue
 #' expression levels as a tibble.
 #'
 #' @param gencode_ids A character vector representing the GENCODE gene identifiers.
+#' @param tissue_site_detail_ids A character vector of tissue site detail IDs to filter the output. Default is NULL.
+#' @param wide_format A logical indicating whether to return the data in a wide format. Default is FALSE.
 #'
 #' @return A tibble with columns containing the median tissue expression data
-#'         returned by the GTEx API.
+#'         returned by the GTEx API. The format of the tibble (wide or long) 
+#'         can be controlled using the wide_format parameter.
 #'
 #' @examples
 #' \dontrun{
-#'   median_expression <- get_median_tissue_expression("ENSG00000008710.19", "ENSG00000118762.7"))
+#'   median_expression <- get_median_tissue_expression(c("ENSG00000008710.19", "ENSG00000118762.7"))
+#'   print(median_expression)
+#' }
+#' \dontrun{
+#'   median_expression <- get_median_tissue_expression(c("ENSG00000008710.19", "ENSG00000118762.7"), wide_format = TRUE)
 #'   print(median_expression)
 #' }
 #'
 #' @export
-get_median_tissue_expression <- function(gencode_ids) {
+get_median_tissue_expression <- function(gencode_ids, tissue_site_detail_ids = NULL, wide_format = FALSE) {
 
   # Prepare the API URL
   base_url <- "https://gtexportal.org/api/v2/expression/medianGeneExpression?"
@@ -43,7 +52,30 @@ get_median_tissue_expression <- function(gencode_ids) {
   # Convert the parsed JSON data to a tibble
   expression_tibble <- as_tibble(parsed_data$data)
 
-  return(expression_tibble)
+  # Create a template dataframe with all gencodeIds from the input
+  template_df <- tibble(gencodeId = gencode_ids)
+
+  # Filter the data based on tissue_site_detail_ids
+  if (!is.null(tissue_site_detail_ids)) {
+    expression_tibble <- expression_tibble %>%
+      filter(tissueSiteDetailId %in% tissue_site_detail_ids)
+  }
+
+  # Pivot to wide format if wide_format is TRUE
+  if (wide_format) {
+    expression_tibble <- expression_tibble %>%
+      dplyr::select(gencodeId, median, tissueSiteDetailId) %>%
+      pivot_wider(names_from = tissueSiteDetailId, values_from = median) 
+  }
+
+  # Left join with the template to include all gencodeIds in the output
+  output_tibble <- template_df %>%
+    left_join(expression_tibble, by = "gencodeId")
+
+  # Convert column names to snake case
+  output_tibble <- janitor::clean_names(output_tibble)
+
+  return(output_tibble)
 }
 
 
@@ -57,6 +89,8 @@ get_median_tissue_expression <- function(gencode_ids) {
 #' @param gencode_ids A character vector representing the GENCODE gene identifiers.
 #' @param max_ids_per_request An integer specifying the maximum number of identifiers
 #'        that can be queried in a single API request. Default is 50.
+#' @param tissue_site_detail_ids A character vector of tissue site detail IDs to filter the output. Default is NULL.
+#' @param wide_format A logical indicating whether to return the data in a wide format. Default is FALSE.
 #'
 #' @return A tibble with rows for each gene and columns containing the median tissue
 #'         expression data returned by the GTEx API.
@@ -72,13 +106,13 @@ get_median_tissue_expression <- function(gencode_ids) {
 #' }
 #'
 #' @export
-get_multiple_median_tissue_expression <- function(gencode_ids, max_ids_per_request = 50) {
+get_multiple_median_tissue_expression <- function(gencode_ids, max_ids_per_request = 50, tissue_site_detail_ids = NULL, wide_format = FALSE) {
 
   # Split the gencode_ids into chunks that fit within the API's limitations
   id_chunks <- split(gencode_ids, ceiling(seq_along(gencode_ids) / max_ids_per_request))
 
   # Use purrr::map to iterate over id_chunks and get a list of tibbles
-  list_of_tibbles <- purrr::map(id_chunks, get_median_tissue_expression)
+  list_of_tibbles <- purrr::map(id_chunks, ~get_median_tissue_expression(.x, tissue_site_detail_ids = tissue_site_detail_ids, wide_format = wide_format))
 
   # Use purrr::reduce to bind all tibbles into a single tibble
   aggregated_data <- purrr::reduce(list_of_tibbles, dplyr::bind_rows)
