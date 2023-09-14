@@ -830,7 +830,7 @@ hpo_gene_list_symptome_groups_summarized_for_join <- hpo_gene_list_symptome_grou
 # TODO: annotate StringDB interactions with strong evidence kidney genes
 # use download tables: https://string-db.org/cgi/download?sessionId=bVJC28yKCRz5&species_text=Homo+sapiens
 # eg physical: https://stringdb-downloads.org/download/protein.physical.links.v12.0/9606.protein.physical.links.v12.0.txt.gz
-# sum the interactions for each gene with the high evidence list, the percentile normalize, additionally show a sting with interacting genes and scores
+# sum the interactions for each gene with the high evidence list, the percentile normalize, additionally show a string with interacting genes and scores
 ############################################
 
 
@@ -838,6 +838,14 @@ hpo_gene_list_symptome_groups_summarized_for_join <- hpo_gene_list_symptome_grou
 # TODO: move this to HGNC table
 # TODO: annotate GTEx kidney expression
 # use https://gtexportal.org/api/v2/redoc#tag/GTEx-Portal-API-Info
+
+# Endpoint to use: 
+# https://gtexportal.org/api/v2/expression/medianGeneExpression?gencodeId=ENSG00000008710.19&gencodeId=ENSG00000203782.5
+# we need enseble gene ids with version
+
+
+
+
 # see GitHub issue for cutoffs
 # TODO: maybe add expression in embryonic kidney from somewhere (e.g. https://descartes.brotmanbaty.org/)
 # descartes: https://atlas.fredhutch.org/data/bbi/descartes/human_gtex/tables/tissue_tpm/kidney.csv (this one for TPM)

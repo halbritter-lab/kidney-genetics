@@ -2,7 +2,7 @@ require(httr)
 require(jsonlite)
 require(tidyverse)
 require(purrr)
-
+library(dplyr)
 
 #' Get Median Tissue Expression Levels from GTEx API
 #'
@@ -50,8 +50,8 @@ get_median_tissue_expression <- function(gencode_ids) {
 #' Fetch Median Tissue Expression Levels from GTEx API for Multiple Genes
 #'
 #' This function takes a character vector of GENCODE gene identifiers as input,
-#' splits it into appropriate chunks to fit the API input size limitations, 
-#' makes a GET request for each chunk of gene identifiers to the GTEx API, 
+#' splits it into appropriate chunks to fit the API input size limitations,
+#' makes a GET request for each chunk of gene identifiers to the GTEx API,
 #' and returns the median tissue expression levels as a tibble.
 #'
 #' @param gencode_ids A character vector representing the GENCODE gene identifiers.
@@ -106,7 +106,7 @@ get_multiple_median_tissue_expression <- function(gencode_ids, max_ids_per_reque
 #' }
 #' @export
 get_gencode_ids <- function(gene_symbols) {
-  
+
   # Prepare the API URL
   base_url <- "https://gtexportal.org/api/v2/reference/gene?"
   ids_query <- paste0("geneId=", gene_symbols, collapse = "&")
