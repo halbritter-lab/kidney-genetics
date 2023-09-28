@@ -80,6 +80,7 @@ panelapp_australia <- rbind_pages(panelapp_australia_pages) %>%
 
 # combine into one tibble
 # filter for kidney related panels
+# TODO: Issue #10 and move regex filter to config file
 filter_string <- "[Kk]idney|[Rr]enal|[Nn]ephro"
 
 panelapp_panels <- bind_rows(panelapp_uk, panelapp_australia) %>%
