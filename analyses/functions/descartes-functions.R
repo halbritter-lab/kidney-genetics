@@ -34,14 +34,20 @@ get_descartes_tpm_expression <- function(genes, tissue) {
   )
 
   # Read the CSV file from the URL
-  expression_data <- read_csv(url, col_names = c("Gene", "TPM"))
+  expression_data <- read_csv(url, col_names = c("gene", "tpm"))
 
   # Filter the expression data to include only the input genes
   filtered_expression_data <- expression_data %>% 
-    filter(Gene %in% genes)
+    filter(gene %in% genes)
 
-  # Return the filtered expression data
-  return(filtered_expression_data)
+  # Create a base tibble with all input gene names
+  base_tibble <- tibble(gene = genes)
+
+  # Join filtered_expression_data with base_tibble
+  result_tibble <- left_join(base_tibble, filtered_expression_data, by = "gene")
+
+  # Return the result tibble
+  return(result_tibble)
 }
 
 
@@ -85,12 +91,18 @@ get_descartes_cell_percentage_expression <- function(genes, tissue) {
   )
 
   # Read the CSV file from the URL
-  percentage_data <- read_csv(url, col_names = c("Gene", "Percentage"))
+  percentage_data <- read_csv(url, col_names = c("gene", "percentage"))
 
   # Filter the percentage data to include only the input genes
   filtered_percentage_data <- percentage_data %>% 
-    filter(Gene %in% genes)
+    filter(gene %in% genes)
 
-  # Return the filtered percentage data
-  return(filtered_percentage_data)
+  # Create a base tibble with all input gene names
+  base_tibble <- tibble(gene = genes)
+
+  # Join filtered_percentage_data with base_tibble
+  result_tibble <- left_join(base_tibble, filtered_percentage_data, by = "gene")
+
+  # Return the result tibble
+  return(result_tibble)
 }

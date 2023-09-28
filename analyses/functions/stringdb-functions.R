@@ -1,3 +1,6 @@
+require(tidyverse)
+
+
 #' Compute Protein Interactions Using STRINGdb Data
 #'
 #' This function takes a character vector of protein identifiers in the format
@@ -83,8 +86,13 @@ compute_protein_interactions <- function(protein_ids, refresh = FALSE,
                                           collapse = ", ")) %>%
     ungroup()
 
-  # Join interaction_strings with summed_scores
-  result_tibble <- left_join(summed_scores, interaction_strings, by = "protein1")
+  # Create a base tibble with all input protein IDs
+  base_tibble <- tibble(protein1 = protein_ids)
+
+  # Join interaction_strings and summed_scores with base_tibble
+  result_tibble <- base_tibble %>%
+    left_join(summed_scores, by = "protein1") %>%
+    left_join(interaction_strings, by = "protein1")
 
   # Return the results
   return(result_tibble)
