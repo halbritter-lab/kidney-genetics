@@ -17,7 +17,7 @@ require(janitor)
 #' @param wide_format A logical indicating whether to return the data in a wide format. Default is FALSE.
 #'
 #' @return A tibble with columns containing the median tissue expression data
-#'         returned by the GTEx API. The format of the tibble (wide or long) 
+#'         returned by the GTEx API. The format of the tibble (wide or long)
 #'         can be controlled using the wide_format parameter.
 #'
 #' @examples
@@ -65,7 +65,7 @@ get_median_tissue_expression <- function(gencode_ids, tissue_site_detail_ids = N
   if (wide_format) {
     expression_tibble <- expression_tibble %>%
       dplyr::select(gencodeId, median, tissueSiteDetailId) %>%
-      pivot_wider(names_from = tissueSiteDetailId, values_from = median) 
+      pivot_wider(names_from = tissueSiteDetailId, values_from = median)
   }
 
   # Left join with the template to include all gencodeIds in the output
@@ -126,7 +126,7 @@ get_multiple_median_tissue_expression <- function(gencode_ids, max_ids_per_reque
 #'
 #' This function takes a list of gene symbols as input, makes a GET request
 #' to the GTEx API, and returns the first GENCODE ID encountered for each
-#' gene symbol as a tibble. If the API returns an empty response, NA is returned 
+#' gene symbol as a tibble. If the API returns an empty response, NA is returned
 #' for the gencode_id.
 #'
 #' @param gene_symbols A character vector representing the gene symbols.
@@ -186,16 +186,16 @@ get_gencode_ids <- function(gene_symbols) {
 
 #' Fetch GENCODE IDs from GTEx API for Multiple Gene Symbols
 #'
-#' This function takes a character vector of gene symbols as input, splits it 
-#' into appropriate chunks to fit the API input size limitations, makes a GET 
-#' request for each chunk of gene symbols to the GTEx API, and returns the 
+#' This function takes a character vector of gene symbols as input, splits it
+#' into appropriate chunks to fit the API input size limitations, makes a GET
+#' request for each chunk of gene symbols to the GTEx API, and returns the
 #' GENCODE IDs as a tibble.
 #'
 #' @param gene_symbols A character vector representing the gene symbols.
-#' @param max_symbols_per_request An integer specifying the maximum number of 
+#' @param max_symbols_per_request An integer specifying the maximum number of
 #'        gene symbols that can be queried in a single API request. Default is 50.
 #'
-#' @return A tibble with rows for each gene and a column containing the 
+#' @return A tibble with rows for each gene and a column containing the
 #'         GENCODE ID returned by the GTEx API.
 #'
 #' @examples

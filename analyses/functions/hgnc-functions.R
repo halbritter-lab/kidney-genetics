@@ -81,7 +81,7 @@ hgnc_id_from_symbol <- function(symbol_tibble) {
   mutate(symbol = if (exists('symbol', where = hgnc_id_from_symbol)) toupper(symbol) else "") %>%
   mutate(hgnc_id = as.integer(str_split_fixed(hgnc_id, ":", 2)[, 2]))
 
-  return_tibble <- symbol_list_tibble %>% 
+  return_tibble <- symbol_list_tibble %>%
   left_join(hgnc_id_from_symbol, by = "symbol") %>%
   dplyr::select(hgnc_id)
 
@@ -112,7 +112,7 @@ hgnc_id_from_symbol_grouped <- function(input_tibble, request_max = 150) {
   groups_number <- ceiling(row_number/request_max)
 
   input_tibble_request <- input_tibble %>%
-  mutate(group = sample(1:groups_number, row_number, replace=T)) %>%
+  mutate(group = sample(1:groups_number, row_number, replace = TRUE)) %>%
   group_by(group) %>%
   mutate(response = hgnc_id_from_symbol(value)$hgnc_id) %>%
   ungroup()
@@ -160,7 +160,7 @@ symbol_from_hgnc_id <- function(hgnc_id_tibble) {
   mutate(hgnc_id = if (exists('hgnc_id', where = hgnc_id_from_hgnc_id)) toupper(hgnc_id) else "") %>%
   mutate(hgnc_id = as.integer(str_split_fixed(hgnc_id, ":", 2)[, 2]))
 
-  return_tibble <- hgnc_id_list_tibble %>% 
+  return_tibble <- hgnc_id_list_tibble %>%
   left_join(hgnc_id_from_hgnc_id, by = "hgnc_id") %>%
   dplyr::select(symbol)
 
@@ -191,7 +191,7 @@ symbol_from_hgnc_id_grouped <- function(input_tibble, request_max = 150) {
   groups_number <- ceiling(row_number/request_max)
 
   input_tibble_request <- input_tibble %>%
-    mutate(group = sample(1:groups_number, row_number, replace=T)) %>%
+    mutate(group = sample(1:groups_number, row_number, replace = TRUE)) %>%
     group_by(group) %>%
     mutate(response = symbol_from_hgnc_id(value)$symbol) %>%
     ungroup()

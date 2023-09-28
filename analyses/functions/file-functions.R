@@ -88,7 +88,7 @@ check_file_age <- function(file_basename, folder, months) {
   # Get the list of files
   files <- dir_ls(folder, regexp = pattern)
 
-  # If there are no files, we set the time to the start of Unix epoch 
+  # If there are no files, we set the time to the start of Unix epoch
   if (length(files) == 0) {
     newest_date <- as.Date("1970-01-01")
   } else {

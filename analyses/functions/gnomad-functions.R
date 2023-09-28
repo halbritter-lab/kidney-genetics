@@ -213,7 +213,7 @@ get_clinvar_variants <- function(ensemble_id) {
 #' @param ensemble_ids A character vector representing the Ensemble gene identifiers.
 #'
 #' @return A tibble with rows for each gene and columns for each field returned by the API.
-#'         This includes fields such as gene_id, gene_version, symbol, and others, 
+#'         This includes fields such as gene_id, gene_version, symbol, and others,
 #'         as well as nested fields under gnomad_constraint.
 #'
 #' @examples
@@ -243,8 +243,8 @@ get_multiple_gene_data_from_gnomad <- function(ensemble_ids) {
 #'
 #' @param ensemble_ids A character vector representing the Ensemble gene identifiers.
 #'
-#' @return A list with each element being a tibble with rows for each variant and columns for each field returned by the API. 
-#'         This includes fields such as clinical_significance, clinvar_variation_id, 
+#' @return A list with each element being a tibble with rows for each variant and columns for each field returned by the API.
+#'         This includes fields such as clinical_significance, clinvar_variation_id,
 #'         and others, as well as nested fields under gnomad and exome/genome.
 #'
 #' @examples

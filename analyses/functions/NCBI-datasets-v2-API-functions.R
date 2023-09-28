@@ -34,7 +34,7 @@ gene_info_from_gene_id <- function(input, api_key = NCBI_API_KEY, request_max = 
   groups_number <- ceiling(row_number/request_max)
 
   input_list_result <- input_list_unique %>%
-    mutate(group = sample(1:groups_number, row_number, replace=T)) %>%
+    mutate(group = sample(1:groups_number, row_number, replace = TRUE)) %>%
     group_by(group) %>%
     summarise(query = paste(unique(value), collapse = ",")) %>%
     ungroup() %>%
@@ -42,7 +42,7 @@ gene_info_from_gene_id <- function(input, api_key = NCBI_API_KEY, request_max = 
       query,
       ep_fields_args)) %>%
     rowwise() %>%
-    mutate(results = list(fromJSON(content(GET(url, add_headers("api-key" = api_key), accept_json()), "text", encoding = "UTF-8"))$reports$gene %>% 
+    mutate(results = list(fromJSON(content(GET(url, add_headers("api-key" = api_key), accept_json()), "text", encoding = "UTF-8"))$reports$gene %>%
       as_tibble() %>%
       unnest(annotations) %>%
       unnest(nomenclature_authority) %>%

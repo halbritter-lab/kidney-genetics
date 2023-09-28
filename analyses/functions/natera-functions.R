@@ -2,9 +2,9 @@
 
 #' Get Nonce from Renasight Genetic Testing Page
 #'
-#' This function opens a curl handle, fetches the content of the Renasight Genetic Testing 
+#' This function opens a curl handle, fetches the content of the Renasight Genetic Testing
 #' webpage, and extracts a nonce (a "number used once") using a specific xpath.
-#' 
+#'
 #' @param input_url A character string. The URL to fetch the nonce from.
 #' Default: "https://www.natera.com/organ-health/renasight-genetic-testing/gene-conditions-list/"
 #'
@@ -41,7 +41,7 @@ natera_renasight_get_nonce <- function(input_url = "https://www.natera.com/organ
 #' Default: "https://www.natera.com/wp-admin/admin-ajax.php"
 #'
 #' @return A character string. The extracted last page number from the webpage.
-#' 
+#'
 #' @examples
 #' natera_renasight_get_last_page_number()
 #'
@@ -78,9 +78,9 @@ natera_renasight_get_last_page_number <- function(input_url = "https://www.nater
 #' Get Genes from Specific Page on Renasight Genetic Testing Website
 #'
 #' This function opens a curl handle, sets a POST request with necessary form data,
-#' fetches the content of a specified webpage, and extracts a list of genes using a 
+#' fetches the content of a specified webpage, and extracts a list of genes using a
 #' specific xpath. The function can also save the fetched page if a valid path is provided.
-#' 
+#'
 #' @param page_requested A numeric value or a character string. The specific page number
 #' to fetch genes from.
 #' @param input_url A character string. The URL to fetch genes from. 
@@ -128,8 +128,8 @@ natera_renasight_get_genes_from_page <- function(page_requested,
 
     # assign content
     page_content <- r$content
-  } else {  
-    # make fetch memmory request
+  } else {
+    # make fetch memory request
     r <- curl_fetch_memory(input_url, h)
 
     # assign content

@@ -5,7 +5,7 @@
 #' This function uses PhantomJS to download files from a specified URL. The downloaded
 #' file is saved with a specified basename, creation date, and extension. The path to save
 #' the file can also be specified.
-#' 
+#'
 #' @param input_url A character string. The URL to download file from.
 #' @param output_basename A character string. The base name for the output file.
 #' @param output_extension A character string. The extension for the output file.
@@ -14,7 +14,7 @@
 #' Default: "data/downloads"
 #'
 #' @return A character string. The path of the downloaded file.
-#' 
+#'
 #' @examples
 #' download_url_by_phantomjs("https://www.example.com", "example_file")
 #'

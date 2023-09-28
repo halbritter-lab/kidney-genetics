@@ -123,7 +123,7 @@ gene_coordinates_from_ensembl <- function(ensembl_id, reference = "hg19") {
 gene_id_version_from_ensembl <- function(ensembl_id, reference = "hg19") {
   ensembl_id_list <- enframe(ensembl_id,
     name = NULL,
-    value = "ensembl_gene_id") 
+    value = "ensembl_gene_id")
 
   # Define mart
   if (reference == "hg19") {
