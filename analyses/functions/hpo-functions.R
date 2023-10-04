@@ -171,7 +171,6 @@ HPO_children_from_term <- function(term_input_id) {
 }
 
 
-
 #' Retrieve all HPO descendants and the term itself from term ID
 #'
 #' This function retrieves all the HPO children terms, including nested children,

@@ -96,6 +96,9 @@ if (check_file_age("phenotype", "../shared/data/downloads/", 1)) {
 
   gzip(phenotype_hpoa_filename,
     overwrite = TRUE)
+
+  phenotype_hpoa_filename <- paste0(phenotype_hpoa_filename,
+    ".gz")
 }
 
 # OMIM links to genemap2 file needs to be set in config and applied for at
