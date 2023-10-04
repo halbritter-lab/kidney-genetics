@@ -23,7 +23,7 @@
 <meta name="author" content="Bernt Popp, Nina Rank, Constantin Wolff, Jan Halbritter" />
 
 
-<meta name="date" content="2023-07-20" />
+<meta name="date" content="2023-10-04" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -82,6 +82,28 @@
 <style type="text/css">
   
   div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+</style>
+<style type="text/css">
+/* Used with Pandoc 2.11+ new --citeproc when CSL is used */
+div.csl-bib-body { }
+div.csl-entry {
+  clear: both;
+}
+.hanging div.csl-entry {
+  margin-left:2em;
+  text-indent:-2em;
+}
+div.csl-left-margin {
+  min-width:2em;
+  float:left;
+}
+div.csl-right-inline {
+  margin-left:2em;
+  padding-left:1em;
+}
+div.csl-indent {
+  margin-left: 2em;
+}
 </style>
 
 <link rel="stylesheet" href="style.css" type="text/css" />
@@ -147,7 +169,7 @@
 <div id="header">
 <h1 class="title">The Kidney-Genetics Documentation</h1>
 <p class="author"><em>Bernt Popp, Nina Rank, Constantin Wolff, Jan Halbritter</em></p>
-<p class="date"><em>2023-07-20</em></p>
+<p class="date"><em>2023-10-04</em></p>
 </div>
 <div id="preface" class="section level1 unnumbered hasAnchor">
 <h1>Preface<a href="index.html#preface" class="anchor-section" aria-label="Anchor link to header"></a></h1>
@@ -181,7 +203,7 @@ To address this gap, we created the <strong>“Kidney-Genetics”</strong> a reg
 </li>
 <li>Researchers can freely access “Kidney-Genetics” ensuring consistency and comparability across different research projects, which can accelerate scientific progress, foster collaborations, and facilitate the development of new insights and approaches</li>
 </ul>
-<p>The scientific literature highlights the need for such a database and emphasizes the importance of genetic research in kidney disease. For example, a study published xxx. Another article published in xxx.<br />
+<p>The scientific literature highlights the need for such a database and emphasizes the importance of genetic research in kidney disease (e.g. <span class="citation">(<a href="#ref-boulogne_kidneynetwork_2023" role="doc-biblioref">Boulogne et al., 2023</a>)</span>).
 <!-- TODO: Scan literature that notices a scientific need for a standardized kidney gene database (see some interesting paper in the references section) --></p>
 <blockquote>
 <p>In summary, our research question and its approach have the potential to provide a deeper scientific understanding of KD genetics, improve diagnostic accuracy, guide treatment selection, advance precision medicine, and facilitate research collaboration. The establishment of the <strong>“Kidney-Genetics”</strong> database addresses an important gap in the field and provides a valuable resource for researchers, clinicians, and patients involved in the discovery and treatment of KD.</p>
@@ -193,15 +215,14 @@ To address this gap, we created the <strong>“Kidney-Genetics”</strong> a reg
 <p>To create a thorough and standardized database of kidney-related genes, we employed the following methods and compiled kidney disease-associated gene information from various sources:</p>
 </blockquote>
 <ol style="list-style-type: decimal">
-<li>Utilized data from Genomics England and Australia PanelApp<br />
-</li>
+<li>Utilized data from Genomics England and Australia PanelApp <span class="citation">(<a href="#ref-martin_panelapp_2019" role="doc-biblioref">Martin et al., 2019</a>)</span></li>
 <li>Conducted a comprehensive literature review of published gene lists<br />
 </li>
 <li>Collected information from clinical diagnostic panels for kidney disease<br />
 </li>
-<li>Performed a Human Phenotype Ontology (HPO)-based search in rare disease databases (OMIM, Orphanet)<br />
+<li>Performed a Human Phenotype Ontology (HPO)-based <span class="citation">(<a href="#ref-kohler_human_2021" role="doc-biblioref">Köhler et al., 2021</a>)</span>) search in rare disease databases (OMIM)<br />
 </li>
-<li>Employed a PubTator API-based automated literature extraction from PubMed</li>
+<li>Employed a PubTator <span class="citation">(<a href="#ref-wei_pubtator_2013" role="doc-biblioref">Wei et al., 2013</a>)</span> API-based automated literature extraction from PubMed</li>
 </ol>
 <p>We also developed an evidence-scoring system to differentiate highly confirmed disease genes from candidate genes. We defined the presence of a certain gene in 3 or more of the 5 resources as highly evident genes.
 These genes were then manually curated according to predetermined criteria or, in the case of existing ClinGen curation, their data and scores were used. Genes with a score of 2 or less were accordingly more likely to be classified as candidate genes.<br />
@@ -218,18 +239,16 @@ we then screened for published lists and got xxx lists from date to date xxx.<br
 </li>
 <li>We used ten common diagnostic panels that can be purchased for genome analysis and extracted the screened genes from them. Those included following panels:
 <ul>
-<li>Centogene nephrology<br />
-</li>
-<li>Cegat kidney diseases<br />
-</li>
+<li>Centogene nephrology</li>
+<li>Cegat kidney diseases</li>
 <li>Preventiongenetics</li>
-<li>etc.<br />
+<li>etc.
 <!-- TODO: complete the list and provide the links with RMD --></li>
 </ul></li>
-<li>We used eight common databases for rare diseases and screened them for kidney disease associated Genes from a Human Phenotype Ontology (HPO) based search query.
+<li>We used common databases (e.g. OMIM) for rare diseases and screened them for kidney disease associated Genes from a Human Phenotype Ontology (HPO) based search query.
 The most comprehensive HPO term used was “Abnormality of the upper urinary tract” (HP:0010935) and included all subgroup terms. We deliberately chose these to be somewhat broader in order to fully include all relevant kidney diseases such as CAKUT, among others.<br />
 </li>
-<li>We retrieved all kidney disease associated Genes from a PubTator API-based automated literature extraction of publications available on PubMed.</li>
+<li>We retrieved all kidney disease associated genes from a PubTator API-based automated literature extraction of publications available on PubMed.</li>
 </ol>
 <blockquote>
 <p><strong>Kidney-Genetics Flowchart</strong></p>
@@ -248,11 +267,10 @@ The most comprehensive HPO term used was “Abnormality of the upper urinary tra
 To automatically group the genes, we will present the results of phenotypic and functional clustering.<br />
 <!-- TODO: Provide clustering and grouping results with numbers and proportions --></p>
 </blockquote>
-<p>The number of genes extracted from the five analyzed sources of information is as follows: (1) 546, (2) 822, (3) 911, (4) 779, and (5) 2.032<br />
-Notably, 439 genes (15.1%) of the total 2.906 genes are present in three or more of the analyzed information sources, thus meeting our evidence criteria, indicating high confidence and their potential for diagnostic use.
-Of these genes, 424 (96.6%) are present in at least one, and 56 (12.8%) are present in all comprehensive diagnostic laboratory panels.<br />
-<!-- TODO: compute the gene numbers with placeholders --></p>
-<p>To ensure currency, Kidney-Genetics will be updated regularly and automatically at xxx week intervals. We will also provide phenotypic and functional clustering results to facilitate gene grouping.<br />
+<p>The number of genes extracted from the five analyzed sources of information is as follows: (1) 550, (2) 822, (3) 936, (4) 791, and (5) 2133<br />
+Notably, <strong>437</strong> genes (14.6%) of the <strong>total 3001</strong> genes are present in three or more of the analyzed information sources, thus meeting our evidence criteria, indicating high confidence and their potential for diagnostic use.
+Of these high evidence genes, <strong>423</strong> (96.8%) are present in at least one, and <strong>56</strong> (12.8%) are present in all 10 comprehensive diagnostic laboratory panels.</p>
+<p>To ensure currency, Kidney-Genetics will be updated regularly and automatically at XXX week intervals. We will also provide phenotypic and functional clustering results to facilitate gene grouping.<br />
 <!-- TODO: Provide information about the planned update framework --></p>
 </div>
 <div id="conclusion" class="section level2 unnumbered hasAnchor">
@@ -268,6 +286,21 @@ Screening efforts toward manual curation (such as through the ClinGen initiative
 <p>Future goals include the further manual curation of the high evident genes to acquire a more accurate individual assessment of each gene. For this purpose, we have developed a standardized curation process based on the ClinGen criteria, as previously discussed in the methods section.
 Furthermore, diagnostic genes will be assigned to certain defined nephrological disease groups, in order to obtain a phenotype-genotype correlation and gain a better clinical understanding.</p>
 
+</div>
+</div>
+<h3>References<a href="references.html#references" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<div id="refs" class="references csl-bib-body hanging-indent" line-spacing="2">
+<div id="ref-boulogne_kidneynetwork_2023" class="csl-entry">
+Boulogne, F., Claus, L. R., Wiersma, H., Oelen, R., Schukking, F., Klein, N. de, Li, S., Westra, H.-J., Zwaag, B. van der, Reekum, F. van, Genomics England Research Consortium, Sierks, D., Schönauer, R., Li, Z., Bijlsma, E. K., Bos, W. J. W., Halbritter, J., Knoers, N. V. A. M., Besse, W., … Eerde, A. M. van. (2023). <span>KidneyNetwork</span>: Using kidney-derived gene expression data to predict and prioritize novel genes involved in kidney disease. <em>European Journal of Human Genetics: EJHG</em>. <a href="https://doi.org/10.1038/s41431-023-01296-x">https://doi.org/10.1038/s41431-023-01296-x</a>
+</div>
+<div id="ref-kohler_human_2021" class="csl-entry">
+Köhler, S., Gargano, M., Matentzoglu, N., Carmody, L. C., Lewis-Smith, D., Vasilevsky, N. A., Danis, D., Balagura, G., Baynam, G., Brower, A. M., Callahan, T. J., Chute, C. G., Est, J. L., Galer, P. D., Ganesan, S., Griese, M., Haimel, M., Pazmandi, J., Hanauer, M., … Robinson, P. N. (2021). The <span>Human</span> <span>Phenotype</span> <span>Ontology</span> in 2021. <em>Nucleic Acids Research</em>, <em>49</em>(D1), D1207–D1217. <a href="https://doi.org/10.1093/nar/gkaa1043">https://doi.org/10.1093/nar/gkaa1043</a>
+</div>
+<div id="ref-martin_panelapp_2019" class="csl-entry">
+Martin, A. R., Williams, E., Foulger, R. E., Leigh, S., Daugherty, L. C., Niblock, O., Leong, I. U. S., Smith, K. R., Gerasimenko, O., Haraldsdottir, E., Thomas, E., Scott, R. H., Baple, E., Tucci, A., Brittain, H., De Burca, A., Ibañez, K., Kasperaviciute, D., Smedley, D., … McDonagh, E. M. (2019). <span>PanelApp</span> crowdsources expert knowledge to establish consensus diagnostic gene panels. <em>Nature Genetics</em>, <em>51</em>(11), 1560–1565. <a href="https://doi.org/10.1038/s41588-019-0528-2">https://doi.org/10.1038/s41588-019-0528-2</a>
+</div>
+<div id="ref-wei_pubtator_2013" class="csl-entry">
+Wei, C.-H., Kao, H.-Y., &amp; Lu, Z. (2013). <span>PubTator</span>: A web-based text mining tool for assisting biocuration. <em>Nucleic Acids Research</em>, <em>41</em>(W1), W518–W522. <a href="https://doi.org/10.1093/nar/gkt441">https://doi.org/10.1093/nar/gkt441</a>
 </div>
 </div>
             </section>
