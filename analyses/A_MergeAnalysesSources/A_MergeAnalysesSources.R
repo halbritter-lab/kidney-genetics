@@ -89,30 +89,6 @@ results_genes_wider <- results_genes %>%
     values_from = source_evidence
   )
 
-#TODO: annotate with OMIM P numbers
-#TODO: annotate with GeneCC
-
-#TODO: annotate with HPO kidney groups (cystic, nephrotic, cancer,...)
-# annotate kidney groups
-# https://clinicalgenome.org/working-groups/clinical-domain/clingen-kidney-disease-clinical-domain-working-group/
-# 1) Complement-Mediated Kidney Diseases Gene Curation Expert Panel: https://www.clinicalgenome.org/affiliation/40069/ (no gene list, use https://panelapp.agha.umccr.org/panels/224/)
-# 2) Congenital Anomalies of the Kidney and Urinary Tract Gene Curation Expert Panel: https://www.clinicalgenome.org/affiliation/40070/ (no gene list, use https://panelapp.genomicsengland.co.uk/panels/234/)
-# 3) Glomerulopathy Gene Curation Expert Panel: https://www.clinicalgenome.org/affiliation/40068/
-# 4) Kidney Cystic and Ciliopathy Disorders Gene Curation Expert Panel: https://www.clinicalgenome.org/affiliation/40066/
-# 5) Tubulopathy Gene Curation Expert Panel: https://www.clinicalgenome.org/affiliation/40067/
-# 6) Hereditary Cancer Gene Curation Expert Panel: https://clingen.info/affiliation/40023/
-
-# general workflow:
-# 1) get all genes from all kidney groups
-# 2) get phenotype annotation table from HPO, group by gene and filter for kidney phenotypes
-# 3) compute for each list in 1) the relative frequency of kidney phenotypes in 2), this nwill be the kidney group score
-# 4) compute for each gene the a list of all kidney group scores and sort by the highest score (the gene is in the kidney group with the highest score, but this needs to be checked manually)
-# 5) genes with score 0 are not in any kidney group and are annotated as "none"
-# 6) genes with no annotated OMIM phenotypes are annotated as "NA"
-
-# syndromic vs non-syndromic (categories in OMIM: GROWTH, SKELETAL, NEUROLOGIC, HEAD & NECK; exclude: CARDIOVASCULAR, ABDOMEN, GENITOURINARY)
-# pediatric vs adult onset (OMIM: HPO terms Adult onset HP:0003581, Pediatric onset HP:0410280, maybe othe terms children of terms)
-
 ############################################
 
 
@@ -129,5 +105,14 @@ write_csv(results_genes_wider,
   na = "NULL")
 
 gzip(paste0("results/A_MergeAnalysesSources.", creation_date, ".csv"),
+  overwrite = TRUE)
+
+write_csv(results_csv_table,
+  file = paste0("results/A_results_csv_table.",
+    creation_date,
+    ".csv"),
+  na = "NULL")
+
+gzip(paste0("results/A_results_csv_table.", creation_date, ".csv"),
   overwrite = TRUE)
 ############################################
