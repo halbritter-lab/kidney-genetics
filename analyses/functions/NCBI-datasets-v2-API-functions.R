@@ -14,7 +14,7 @@
 #' @return A tibble with the input NCBI gene IDs and associated gene information.
 #'
 #' @examples
-#' gene_info <- gene_info_from_gene_id(input = c("GeneID1", "GeneID2"),
+#' gene_info <- gene_info_from_gene_id(input = c("5310", "5311"),
 #' api_key = "your_api_key")
 #'
 #' @export
@@ -51,6 +51,18 @@ gene_info_from_gene_id <- function(input, api_key = NCBI_API_KEY, request_max = 
       unique())) %>%
     select(-group, - query, -url) %>%
     unnest(results)
+
+  # Group by gene_id and concatenate unique values in other columns
+  input_list_result <- input_list_result %>%
+    group_by(gene_id) %>%
+    summarise(
+      symbol = paste(unique(symbol), collapse = ", "),
+      tax_id = paste(unique(tax_id), collapse = ", "),
+      taxname = paste(unique(taxname), collapse = ", "),
+      identifier = paste(unique(identifier), collapse = ", "),
+      ensembl_gene_ids = paste(unique(ensembl_gene_ids), collapse = ", ")
+    ) %>%
+    ungroup()
 
   input_list_return <- input_list %>%
     left_join(input_list_result, by = c("value" = "gene_id"))
