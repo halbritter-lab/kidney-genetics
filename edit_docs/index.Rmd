@@ -36,6 +36,9 @@ script_path <- "/edit_docs/"
 ## read configs
 config_vars_proj <- config::get(file = Sys.getenv("CONFIG_FILE"),
     config = project_topic)
+
+## set working directory
+setwd(paste0(config_vars_proj$projectsdir, project_name, script_path))
 ```
 
 <!-- here we load global functions libraries -->
@@ -46,7 +49,7 @@ source("../analyses/functions/file-functions.R", local = TRUE)
 source("../analyses/functions/string-functions.R", local = TRUE)
 ```
 
-<!-- TODO: load and filter (newest) the files automatically  -->
+
 <!-- TODO: also compute other numbers with placeholders -->
 <!-- TODO: version the image files with their computation date -->
 <!-- TODO: create output folder if not existent -->
@@ -54,7 +57,13 @@ source("../analyses/functions/string-functions.R", local = TRUE)
 <!-- here we load the result csv file and compute numbers to update the diagrams -->
 ```{r, echo=FALSE, message=FALSE, warning=FALSE}
 ## load the CSV data
-merge_analyses_sources <- read_csv("../analyses/A_MergeAnalysesSources/results/A_MergeAnalysesSources.2023-05-18.csv.gz")
+## load and filter (newest) the files automatically
+merge_analyses_sources <- read_csv(get_newest_file("A_MergeAnalysesSources", "../analyses/A_MergeAnalysesSources/results"))
+PanelApp_genes <- read_csv(get_newest_file("01_PanelApp_genes", "../analyses/01_PanelApp/results"))
+Literature_genes <- read_csv(get_newest_file("02_Literature_genes", "../analyses/02_Literature/results"))
+DiagnosticPanels_genes <- read_csv(get_newest_file("03_DiagnosticPanels_genes", "../analyses/03_DiagnosticPanels/results"))
+HPO_genes <- read_csv(get_newest_file("04_HPO_genes", "../analyses/04_HPO/results"))
+PubTator_genes <- read_csv(get_newest_file("05_PubTator_genes", "../analyses/05_PubTator/results"))
 
 # compute numbers for the diagrams
 all_genes <- merge_analyses_sources %>%
@@ -71,6 +80,26 @@ replace_strings("static/img/figures/raw/curation_flow_diagram_raw.drawio",
     "static/img/figures/updated/curation_flow_diagram_current.drawio",
     c("ALL_GENES", "HIGHEVIDENCE_GENES", "CLINGEN_GENES", "MANUALSCORING_GENES"),
     c(all_genes, high_evidence_genes, clingen_genes, manualscoring_genes))
+
+# compute per source numbers with placeholders
+summary_counts <- merge_analyses_sources %>%
+  summarize(across(starts_with("01_PanelApp"):(ncol(merge_analyses_sources)), 
+                   ~sum(!is.null(.x) & (.x == TRUE | .x == FALSE)), .names = "count_{.col}"))
+
+# join the merge_analyses_sources and DiagnosticPanels_genes tables and filter for evidence_count >= 3
+filtered_merge <- merge_analyses_sources %>%
+  left_join(DiagnosticPanels_genes, by = "hgnc_id") %>%
+  filter(evidence_count >= 3)
+
+# Compute the number of unique genes in all panels
+genes_all_diagnostic_panels <- filtered_merge %>%
+  filter(source_count == 10) %>%
+    nrow()
+
+# Compute the number of unique genes in at least one panel
+genes_at_least_one_diagnostic_panel <- filtered_merge %>%
+  filter(source_count >= 1) %>%
+    nrow()
 ```
 
 ---
@@ -104,7 +133,7 @@ To address this gap, we created the **“Kidney-Genetics”** a regularly update
 - The information can be used to develop personalized treatment strategies and interventions, leading to more effective and targeted therapies for individuals with KD  
 - Researchers can freely access "Kidney-Genetics" ensuring consistency and comparability across different research projects, which can accelerate scientific progress, foster collaborations, and facilitate the development of new insights and approaches  
 
-The scientific literature highlights the need for such a database and emphasizes the importance of genetic research in kidney disease. For example, a study published [@boulogne_kidneynetwork_2023]. Another article published in xxx.  
+The scientific literature highlights the need for such a database and emphasizes the importance of genetic research in kidney disease (e.g. [@boulogne_kidneynetwork_2023]).
 <!-- TODO: Scan literature that notices a scientific need for a standardized kidney gene database (see some interesting paper in the references section) -->
 
 > In summary, our research question and its approach have the potential to provide a deeper scientific understanding of KD genetics, improve diagnostic accuracy, guide treatment selection, advance precision medicine, and facilitate research collaboration. The establishment of the **"Kidney-Genetics"** database addresses an important gap in the field and provides a valuable resource for researchers, clinicians, and patients involved in the discovery and treatment of KD.  
@@ -114,11 +143,11 @@ The scientific literature highlights the need for such a database and emphasizes
 
 > To create a thorough and standardized database of kidney-related genes, we employed the following methods and compiled kidney disease-associated gene information from various sources:  
 
-1. Utilized data from Genomics England and Australia PanelApp  
+1. Utilized data from Genomics England and Australia PanelApp [@martin_panelapp_2019]
 2. Conducted a comprehensive literature review of published gene lists  
 3. Collected information from clinical diagnostic panels for kidney disease  
-4. Performed a Human Phenotype Ontology (HPO)-based search in rare disease databases (OMIM, Orphanet)  
-5. Employed a PubTator API-based automated literature extraction from PubMed  
+4. Performed a Human Phenotype Ontology (HPO)-based [@kohler_human_2021]) search in rare disease databases (OMIM)  
+5. Employed a PubTator [@wei_pubtator_2013] API-based automated literature extraction from PubMed  
 
 We also developed an evidence-scoring system to differentiate highly confirmed disease genes from candidate genes. We defined the presence of a certain gene in 3 or more of the 5 resources as highly evident genes. 
 These genes were then manually curated according to predetermined criteria or, in the case of existing ClinGen curation, their data and scores were used. Genes with a score of 2 or less were accordingly more likely to be classified as candidate genes.  
@@ -133,18 +162,17 @@ To get a more transparent and thus more comprehensive understanding of our sever
       *(2)	"Genetic Structures"[Mesh] OR "Genes"[Mesh] OR genetic test OR gene panel OR gene panels OR multigene panel* OR targeted panel*  
     we then screened for published lists and got xxx lists from date to date xxx.  
 3. We used ten common diagnostic panels that can be purchased for genome analysis and extracted the screened genes from them. Those included following panels:  
-    - Centogene nephrology  
-    - Cegat kidney diseases  
-    - Preventiongenetics 
-    - etc.   
+    - Centogene nephrology
+    - Cegat kidney diseases
+    - Preventiongenetics
+    - etc.
   <!-- TODO: complete the list and provide the links with RMD -->
-4. We used eight common databases for rare diseases and screened them for kidney disease associated Genes from a Human Phenotype Ontology (HPO) based search query. 
+4. We used common databases (e.g. OMIM) for rare diseases and screened them for kidney disease associated Genes from a Human Phenotype Ontology (HPO) based search query. 
    The most comprehensive HPO term used was “Abnormality of the upper urinary tract” (HP:0010935) and included all subgroup terms. We deliberately chose these to be somewhat broader in order to fully include all relevant kidney diseases such as CAKUT, among others.  
-5. We retrieved all kidney disease associated Genes from a PubTator API-based automated literature extraction of publications available on PubMed.  
+5. We retrieved all kidney disease associated genes from a PubTator API-based automated literature extraction of publications available on PubMed.  
 
 
 > **Kidney-Genetics Flowchart**
-
 
 ```{drawio curation_flow_diagram, src="static/img/figures/updated/curation_flow_diagram_current.drawio", fig.cap = "Curation process flow diagram", engine.path = config_vars_proj$drawio_path}
 ```
@@ -156,13 +184,11 @@ To get a more transparent and thus more comprehensive understanding of our sever
 To automatically group the genes, we will present the results of phenotypic and functional clustering.  
 <!-- TODO: Provide clustering and grouping results with numbers and proportions -->
 
-<!-- TODO: write a function to format numbers as strings using the formula below -->
-The number of genes extracted from the five analyzed sources of information is as follows: (1) 546, (2) 822, (3) 911, (4) 779, and (5) 2.032  
-Notably, **`r toString(format(round(as.numeric(high_evidence_genes), 0), nsmall = 0, big.mark = ","))`** genes (`r percent(high_evidence_genes / all_genes, digits = 1)`) of the total `r toString(format(round(as.numeric(all_genes), 0), nsmall = 0, big.mark = ","))` genes are present in three or more of the analyzed information sources, thus meeting our evidence criteria, indicating high confidence and their potential for diagnostic use.
-Of these genes, 424 (96.6%) are present in at least one, and 56 (12.8%) are present in all comprehensive diagnostic laboratory panels.  
-<!-- TODO: compute the gene numbers with placeholders -->
+The number of genes extracted from the five analyzed sources of information is as follows: (1) `r format_number(summary_counts$count_01_PanelApp)`, (2) `r format_number(summary_counts$count_02_Literature)`, (3) `r format_number(summary_counts$count_03_DiagnosticPanels)`, (4) `r format_number(summary_counts$count_04_HPO)`, and (5) `r format_number(summary_counts$count_05_PubTator)`  
+Notably, **`r format_number(high_evidence_genes)`** genes (`r percent(high_evidence_genes / all_genes, digits = 1)`) of the **total `r format_number(all_genes)`** genes are present in three or more of the analyzed information sources, thus meeting our evidence criteria, indicating high confidence and their potential for diagnostic use.
+Of these high evidence genes, **`r format_number(genes_at_least_one_diagnostic_panel)`** (`r percent(genes_at_least_one_diagnostic_panel / high_evidence_genes, digits = 1)`) are present in at least one, and **`r format_number(genes_all_diagnostic_panels)`** (`r percent(genes_all_diagnostic_panels / high_evidence_genes, digits = 1)`) are present in all 10 comprehensive diagnostic laboratory panels.
 
-To ensure currency, Kidney-Genetics will be updated regularly and automatically at xxx week intervals. We will also provide phenotypic and functional clustering results to facilitate gene grouping.  
+To ensure currency, Kidney-Genetics will be updated regularly and automatically at XXX week intervals. We will also provide phenotypic and functional clustering results to facilitate gene grouping.  
 <!-- TODO: Provide information about the planned update framework -->
 
 
