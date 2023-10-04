@@ -52,7 +52,7 @@ current_date <- strftime(as.POSIXlt(Sys.time(), "UTC", "%Y-%m-%dT%H:%M:%S"), "%Y
 if (check_file_age("hpo_list_kidney", "../shared/", 1)) {
   hpo_list_kidney <- read_csv(get_newest_file("hpo_list_kidney", "../shared"))
 } else {
-  all_hpo_children_list_kidney <- HPO_all_children_from_term("HP:0010935")
+  all_hpo_children_list_kidney <- hpo_all_children_from_term("HP:0010935")
 
   # transform the list into a tibble
   hpo_list_kidney <- all_hpo_children_list_kidney %>%

@@ -39,7 +39,7 @@ source("../functions/file-functions.R", local = TRUE)
 
 
 ############################################
-## download all required database sources from HGNC, OMIM, gnomAD, ClinVar and genCC
+## download all required database sources from HGNC, OMIM, gnomAD, clinvar and genCC
 # we load and use the results of previous walks through the ontology tree if not older then 1 month
 
 current_date <- strftime(as.POSIXlt(Sys.time(),
@@ -444,7 +444,6 @@ non_alt_loci_set_coordinates_gnomad_omim_gencc <- non_alt_loci_set_coordinates_g
 
 ############################################
 # annotate ClinGen Gene-Disease Validity
-# TODO: add ClinGen Gene-Disease Validity
 # first summarize the table by gene symbol
 clingen_gene_disease_summary_table_grouped <- clingen_gene_disease_summary_table %>%
   arrange(gene_symbol, classification) %>%
@@ -478,7 +477,7 @@ non_alt_loci_set_coordinates_gnomad_omim_gencc_clingen <- non_alt_loci_set_coord
 
 
 ############################################
-# annotate ClinVar variant counts
+# annotate clinvar variant counts
 # use the clinvar VCF file
 
 # summarize the clinvar table first
@@ -492,13 +491,13 @@ clinvar_table_counts <- clinvar_table %>%
   mutate(Pathogenic = paste0("P:", Pathogenic),
          Likely_pathogenic = paste0("LP:", Likely_pathogenic),
          Uncertain_significance = paste0("VUS:", Uncertain_significance)) %>%
-  unite("ClinVar", Pathogenic:Uncertain_significance, sep = "; ", remove = FALSE, na.rm = TRUE) %>%
+  unite("clinvar", Pathogenic:Uncertain_significance, sep = "; ", remove = FALSE, na.rm = TRUE) %>%
   separate(GENEINFO, into = c("symbol", "Gene_ID"), sep = ":") %>%
   group_by(symbol) %>%
   summarise(Gene_ID = paste(Gene_ID, collapse = "|"),
-    ClinVar = paste(ClinVar, collapse = "|"),
+    clinvar = paste(clinvar, collapse = "|"),
     .groups = 'drop') %>%
-  dplyr::select(symbol, ClinVar)
+  dplyr::select(symbol, clinvar)
 
 # join with non_alt_loci_set_coordinates_gnomad
 non_alt_loci_set_coordinates_gnomad_omim_gencc_clingen_clinvar <- non_alt_loci_set_coordinates_gnomad_omim_gencc_clingen %>%

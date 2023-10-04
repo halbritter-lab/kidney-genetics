@@ -17,10 +17,10 @@ require(tidyverse)
 #' @return A tibble with the HPO name corresponding to the input HPO term ID.
 #'
 #' @examples
-#' HPO_name_from_term("HP:1234567")
+#' hpo_name_from_term("HP:1234567")
 #'
 #' @export
-HPO_name_from_term <- function(term_input_id) {
+hpo_name_from_term <- function(term_input_id) {
   retries <- 3  # Number of retries before giving up
   retry_delay <- 5  # Delay in seconds between retries
 
@@ -60,10 +60,10 @@ HPO_name_from_term <- function(term_input_id) {
 #' @return A tibble with the HPO definition corresponding to the input HPO term ID.
 #'
 #' @examples
-#' HPO_definition_from_term("HP:1234567")
+#' hpo_definition_from_term("HP:1234567")
 #'
 #' @export
-HPO_definition_from_term <- function(term_input_id) {
+hpo_definition_from_term <- function(term_input_id) {
   retries <- 3  # Number of retries before giving up
   retry_delay <- 5  # Delay in seconds between retries
 
@@ -103,10 +103,10 @@ HPO_definition_from_term <- function(term_input_id) {
 #' @return An integer representing the count of HPO children terms.
 #'
 #' @examples
-#' HPO_children_count_from_term("HP:1234567")
+#' hpo_children_count_from_term("HP:1234567")
 #'
 #' @export
-HPO_children_count_from_term <- function(term_input_id) {
+hpo_children_count_from_term <- function(term_input_id) {
   retries <- 3  # Number of retries before giving up
   retry_delay <- 5  # Delay in seconds between retries
 
@@ -143,10 +143,10 @@ HPO_children_count_from_term <- function(term_input_id) {
 #' @return A tibble with the HPO children terms corresponding to the input HPO term ID.
 #'
 #' @examples
-#' HPO_children_from_term("HP:1234567")
+#' hpo_children_from_term("HP:1234567")
 #'
 #' @export
-HPO_children_from_term <- function(term_input_id) {
+hpo_children_from_term <- function(term_input_id) {
   retries <- 3  # Number of retries before giving up
   retry_delay <- 5  # Delay in seconds between retries
 
@@ -183,12 +183,12 @@ HPO_children_from_term <- function(term_input_id) {
 #'   corresponding to the input HPO term ID.
 #'
 #' @examples
-#' HPO_all_children_from_term("HP:1234567", list())
+#' hpo_all_children_from_term("HP:1234567", list())
 #'
 #' @export
-HPO_all_children_from_term <- function(term_input, all_children_list = list()) {
+hpo_all_children_from_term <- function(term_input, all_children_list = list()) {
 
-  children_list <- HPO_children_from_term(term_input)
+  children_list <- hpo_children_from_term(term_input)
 
   # Combine all_children_list and term_input
   all_children_list <- c(all_children_list, term_input)
@@ -196,7 +196,7 @@ HPO_all_children_from_term <- function(term_input, all_children_list = list()) {
   if (length(children_list) != 0) {
     for (p in children_list$ontologyId) {
         # Update all_children_list with each recursive call
-        all_children_list <- HPO_all_children_from_term(p, all_children_list)
+        all_children_list <- hpo_all_children_from_term(p, all_children_list)
     }
   }
 
