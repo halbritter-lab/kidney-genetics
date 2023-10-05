@@ -180,7 +180,7 @@ To get a more transparent and thus more comprehensive understanding of our sever
 
 ## Results {-}
 
-> The "Kidney-Genetics" database currently contains detailed information on 2.906 kidney-associated genes with detailed annotations on gene function, kidney phenotype, incidence, possible syndromic disease expression and genetic variation. 
+> The "Kidney-Genetics" database currently contains detailed information on `r format_number(all_genes)` kidney-associated genes with detailed annotations on gene function, kidney phenotype, incidence, possible syndromic disease expression and genetic variation. 
 To automatically group the genes, we will present the results of phenotypic and functional clustering.  
 <!-- TODO: Provide clustering and grouping results with numbers and proportions -->
 
