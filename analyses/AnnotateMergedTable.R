@@ -35,6 +35,8 @@ source("functions/hgnc-functions.R", local = TRUE)
 source("functions/hpo-functions.R", local = TRUE)
 source("functions/file-functions.R", local = TRUE)
 source("functions/gtex-functions.R", local = TRUE)
+source("functions/descartes-functions.R", local = TRUE)
+source("functions/stringdb-functions.R", local = TRUE)
 ############################################
 
 
@@ -75,6 +77,58 @@ merged_genes <- merged_csv_table %>%
 
 
 ############################################
+## download all required database sources from HPO and MPO
+# we load and use the results of previous walks through the ontology tree if not older then 1 month
+
+current_date <- strftime(as.POSIXlt(Sys.time(),
+    "UTC", "%Y-%m-%dT%H:%M:%S"),
+  "%Y-%m-%d")
+
+# HPO obo file download
+if (check_file_age("hpo_obo", "shared/data/downloads/", 1)) {
+  hpo_obo_filename <- get_newest_file("hpo_obo", "shared/data/downloads/")
+} else {
+  # HPO links to hpo_obo file needs to be set in config
+  hpo_obo_url <- config_vars_proj$hpo_obo_url
+
+  hpo_obo_filename <- paste0("shared/data/downloads/hpo_obo.",
+    current_date,
+    ".obo")
+
+  download.file(hpo_obo_url, hpo_obo_filename, mode = "wb")
+}
+
+hpo <- get_ontology(
+    hpo_obo_filename,
+    propagate_relationships = "is_a",
+    extract_tags = "minimal",
+    merge_equivalent_terms = TRUE
+)
+
+# MPO obo file download
+if (check_file_age("mpo_obo", "shared/data/downloads/", 1)) {
+  mpo_obo_filename <- get_newest_file("mpo_obo", "shared/data/downloads/")
+} else {
+  # MPO links to mpo_obo file needs to be set in config
+  mpo_obo_url <- config_vars_proj$mpo_obo_url
+
+  mpo_obo_filename <- paste0("shared/data/downloads/mpo_obo.",
+    current_date,
+    ".obo")
+
+  download.file(mpo_obo_url, mpo_obo_filename, mode = "wb")
+}
+
+mpo <- get_ontology(
+    mpo_obo_filename,
+    propagate_relationships = "is_a",
+    extract_tags = "minimal",
+    merge_equivalent_terms = TRUE
+)
+############################################
+
+
+############################################
 ## get relevant HPO terms for kidney disease classification
 # get the current date
 # TODO: compute date only once or somehow in config
@@ -88,14 +142,7 @@ current_date <- strftime(as.POSIXlt(Sys.time(), "UTC", "%Y-%m-%dT%H:%M:%S"), "%Y
 if (check_file_age("hpo_list_kidney", "shared/", 1)) {
   hpo_list_kidney <- read_csv(get_newest_file("hpo_list_kidney", "shared"))
 } else {
-  all_hpo_children_list_kidney <- HPO_all_children_from_term("HP:0010935")
-
-  # transform the list into a tibble
-  hpo_list_kidney <- all_hpo_children_list_kidney %>%
-    unlist() %>%
-    tibble(`term` = .) %>%
-    unique() %>%
-    mutate(query_date = current_date)
+  hpo_list_kidney <- hpo_all_children_from_term("HP:0010935")
 
   write_csv(hpo_list_kidney,
     file = paste0("shared/hpo_list_kidney.",
@@ -116,37 +163,26 @@ if (check_file_age("hpo_list_adult", "shared/", 1)) {
 } else {
   # walk through the ontology tree and add all unique terms descending from
   # Adult onset (HP:0003581)
-  all_hpo_children_list_adult <- HPO_all_children_from_term("HP:0003581")
+  hpo_list_adult <- hpo_all_children_from_term("HP:0003581")
 
-  # transform the list into a tibble
-  hpo_list_adult <- all_hpo_children_list_adult %>%
-    unlist() %>%
-    tibble(`term` = .) %>%
-    unique() %>%
-    mutate(query_date = current_date)
+  write_csv(hpo_list_adult,
+    file = paste0("shared/hpo_list_adult.",
+      current_date,
+      ".csv"),
+    na = "NULL")
 
-    write_csv(hpo_list_adult,
-      file = paste0("shared/hpo_list_adult.",
-        current_date,
-        ".csv"),
-      na = "NULL")
-
-    gzip(paste0("shared/hpo_list_adult.", current_date, ".csv"),
-      overwrite = TRUE)
+  gzip(paste0("shared/hpo_list_adult.", current_date, ".csv"),
+    overwrite = TRUE)
 
   # walk through the ontology tree and add all unique terms descending from
   # Onset HP:0003674
-  all_hpo_children_list_onset <- HPO_all_children_from_term("HP:0003674")
+  all_hpo_children_list_onset <- hpo_all_children_from_term("HP:0003674")
 
   # then remove all terms that are children of Adult onset (HP:0003581) to get
   # all terms that are children of Pediatric onset (HP:0410280), etc.
   # and transform the list into a tibble
   hpo_list_non_adult <- setdiff(all_hpo_children_list_onset,
-      all_hpo_children_list_adult) %>%
-    unlist() %>%
-    tibble(`term` = .) %>%
-    unique() %>%
-    mutate(query_date = current_date)
+      hpo_list_adult)
 
     write_csv(hpo_list_non_adult,
       file = paste0("shared/hpo_list_non_adult.",
@@ -172,45 +208,41 @@ if (check_file_age("hpo_list_syndromic", "shared/", 1)) {
 } else {
   # walk through the ontology tree and add all unique terms descending from
   # Growth abnormality (HP:0001507)
-  all_hpo_children_list_growth <- HPO_all_children_from_term("HP:0001507")
+  all_hpo_children_list_growth <- hpo_all_children_from_term("HP:0001507")
 
   # walk through the ontology tree and add all unique terms descending from
   # Skeletal system abnormality (HP:0000924)
-  all_hpo_children_list_skeletal <- HPO_all_children_from_term("HP:0000924")
+  all_hpo_children_list_skeletal <- hpo_all_children_from_term("HP:0000924")
 
   # walk through the ontology tree and add all unique terms descending from
   # Neurologic abnormality (HP:0000707)
-  all_hpo_children_list_neurologic <- HPO_all_children_from_term("HP:0000707")
+  all_hpo_children_list_neurologic <- hpo_all_children_from_term("HP:0000707")
 
   # walk through the ontology tree and add all unique terms descending from
   # Head and neck abnormality (HP:0000152)
-  all_hpo_children_list_head_and_neck <- HPO_all_children_from_term("HP:0000152")
+  all_hpo_children_list_head_and_neck <- hpo_all_children_from_term("HP:0000152")
 
   # add the base term name and term id to each list
   # safe the lists as csv and gzip them
   all_hpo_children_list_growth_term <- all_hpo_children_list_growth %>%
     mutate(base_term = "Growth abnormality",
       base_term_id = "HP:0001507") %>%
-    mutate(query_date = current_date) %>%
-    select(term = value, base_term, base_term_id)
+    select(term, base_term, base_term_id)
 
   all_hpo_children_list_skeletal_term <- all_hpo_children_list_skeletal %>%
     mutate(base_term = "Skeletal system abnormality",
       base_term_id = "HP:0000924") %>%
-    mutate(query_date = current_date) %>%
-    select(term = value, base_term, base_term_id)
+    select(term, base_term, base_term_id)
 
   all_hpo_children_list_neurologic_term <- all_hpo_children_list_neurologic %>%
     mutate(base_term = "Neurologic abnormality",
       base_term_id = "HP:0000707") %>%
-    mutate(query_date = current_date) %>%
-    select(term = value, base_term, base_term_id)
+    select(term, base_term, base_term_id)
 
   all_hpo_children_list_head_and_neck_term <- all_hpo_children_list_head_and_neck %>%
     mutate(base_term = "Head and neck abnormality",
       base_term_id = "HP:0000152") %>%
-    mutate(query_date = current_date) %>%
-    select(term = value, base_term, base_term_id)
+    select(term, base_term, base_term_id)
 
   write_csv(all_hpo_children_list_growth_term,
     file = paste0("shared/hpo_list_growth_term.",
@@ -391,6 +423,7 @@ omim_genemap2 <- read_delim(omim_genemap2_filename, "\t",
 # https://clinicalgenome.org/working-groups/clinical-domain/clingen-kidney-disease-clinical-domain-working-group/
 
 # TODO: safe the results of the API calls or websites for reproducibility
+# TODO: add stones? and maybe other kidney diseases like in Becherucci et al. 2023
 
 ## general workflow:
 # A) get all genes from all kidney groups
@@ -643,6 +676,7 @@ hpo_gene_list_kidney_all_kidney_groups_summarized_for_join <- hpo_gene_list_kidn
 ############################################
 # annotate pediatric vs adult onset (OMIM: HPO terms Adult onset HP:0003581, Pediatric onset HP:0410280, and children of terms)
 # TODO: describe the logic of the analysis in comments step by step
+# TODO: make prenatal and congenital a separate group
 
 # filter OMIM data for all the disease database ids with HPO terms for adult onset
 phenotype_hpoa_filter_adult <- phenotype_hpoa %>%
@@ -720,7 +754,7 @@ hpo_gene_list_onset_groups_summarized_for_join <- hpo_gene_list_onset_groups %>%
 ############################################
 # syndromic vs non-syndromic (categories in OMIM: GROWTH, SKELETAL, NEUROLOGIC, HEAD & NECK; exclude: CARDIOVASCULAR, ABDOMEN, GENITOURINARY)
 # TODO: there could be an error in the logic how to compute the relative frequency of the HPO terms in the two lists, this needs to be fixed
-# TODO: Comment: I think it might still b e right, we just need to clearly explain what the value means and why the syndromic value differs from the sum of the other three values
+# TODO: Comment: I think it might still be right, we just need to clearly explain what the value means and why the syndromic value differs from the sum of the other three values
 phenotype_hpoa_filter_syndromic <- phenotype_hpoa %>%
    filter(hpo_id %in% hpo_list_syndromic$term) %>%
    select(database_id, hpo_id) %>%
@@ -823,6 +857,9 @@ hpo_gene_list_symptome_groups_summarized_for_join <- hpo_gene_list_symptome_grou
 # use R package: https://www.bioconductor.org/packages/release/bioc/vignettes/InterMineR/inst/doc/InterMineR.html
 # TODO: need to find a table to show the genes names
 # TODO: need to find a table to map the mouse phenotypes to HPO terms
+# TODO: alternatively use the equivalent MPO kidney parent term
+# TODO: differentiate between gene and inheritance mode (biallelic vs monoallelic)
+# TODO: check Ninas solution for this
 ############################################
 
 
@@ -830,27 +867,24 @@ hpo_gene_list_symptome_groups_summarized_for_join <- hpo_gene_list_symptome_grou
 # TODO: annotate StringDB interactions with strong evidence kidney genes
 # use download tables: https://string-db.org/cgi/download?sessionId=bVJC28yKCRz5&species_text=Homo+sapiens
 # eg physical: https://stringdb-downloads.org/download/protein.physical.links.v12.0/9606.protein.physical.links.v12.0.txt.gz
-# sum the interactions for each gene with the high evidence list, the percentile normalize, additionally show a string with interacting genes and scores
+# sum the interactions for each gene with the high evidence list, then percentile normalize, additionally show a string with interacting genes and scores
 ############################################
 
 
 ############################################
-# TODO: move this to HGNC table
-# TODO: annotate GTEx kidney expression
-# use https://gtexportal.org/api/v2/redoc#tag/GTEx-Portal-API-Info
-
-# Endpoint to use: 
-# https://gtexportal.org/api/v2/expression/medianGeneExpression?gencodeId=ENSG00000008710.19&gencodeId=ENSG00000203782.5
-# we need enseble gene ids with version
-
-
-
-
+# TODO: annotate kidney expression
 # see GitHub issue for cutoffs
+
+# TODO: use gtex functions to compute TPM GTEx kidney expression
+# we need the gencode_ids from the HGNC table for this
+
+
 # TODO: maybe add expression in embryonic kidney from somewhere (e.g. https://descartes.brotmanbaty.org/)
 # descartes: https://atlas.fredhutch.org/data/bbi/descartes/human_gtex/tables/tissue_tpm/kidney.csv (this one for TPM)
 # descartes: https://atlas.fredhutch.org/data/bbi/descartes/human_gtex/tables/tissue_percentage/kidney.csv
 # descartes: https://atlas.fredhutch.org/data/bbi/descartes/human_gtex/counts/gene2ens.csv (for identifier mapping)
+# TODO: use descartes functions to compute TPM GTEx kidney expression
+# TODO: annotate descartes kidney expression
 
 ############################################
 
@@ -860,6 +894,8 @@ hpo_gene_list_symptome_groups_summarized_for_join <- hpo_gene_list_symptome_grou
 # TODO: scoring logic: if only screening publication then the category cant be more then Limited, if there is a clinical description then the category can be Moderate, if there is a clinical replication then the category can be Definitive
 # TODO: scoring logic: we further use the category "no known relation" for genes that are not trustworthy associated with kidney disease
 # TODO: maybe annotate with publications (from OMIM) and GeneReviews
+
+#TODO: annotate phenotypes as phenopackets for each entity?
 
 ############################################
 
