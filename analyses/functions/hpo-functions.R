@@ -2,6 +2,80 @@ require(jsonlite)
 require(tidyverse)
 
 #### This file holds analyses functions for HPO request
+#' Retrieve the HPO children terms for a given HPO term ID.
+#'
+#' This function retrieves the immediate children terms of a specified term 
+#' from the Human Phenotype Ontology (HPO). It uses the `ontologyIndex` package 
+#' to interact with the ontology and the `tidyr` package to format the results.
+#'
+#' @param term_input_id The HPO term ID for which to retrieve the children terms. 
+#'   This should be a valid HPO term ID string.
+#'
+#' @details The function starts by querying the ontology for the children of the 
+#'   given term using `get_term_property()`. The result is then transformed into 
+#'   a tibble. Additionally, the current system date is added as an attribute 
+#'   to each term, representing the date of the query.
+#'
+#' @importFrom ontologyIndex get_term_property
+#' @importFrom tidyr as_tibble
+#'
+#' @return A tibble with two columns: 
+#'   - `term`: Contains the HPO children terms corresponding to the input HPO term ID.
+#'   - `query_date`: Contains the date when the query was made.
+#'
+#' @examples
+#' \dontrun{
+#'   # Load the Human Phenotype Ontology (HPO) before using the function
+#'   # Example usage of the function:
+#'   hpo_children_from_term("HP:0000001")
+#' }
+#'
+#' @export
+hpo_children_from_term <- function(term_input_id) {
+  # Query the ontology for children of the given term
+  children_terms <- get_term_property(ontology = hpo, property = "children", term = term_input_id)
+
+  # Convert the result into a tibble and add the current query date
+  children_tibble <- children_terms %>%
+    tidyr::as_tibble() %>%
+    mutate(query_date = Sys.Date()) %>%
+    select(term = value, query_date)
+
+  return(children_tibble)
+}
+
+
+#' Retrieve all HPO descendants and the term itself from term ID.
+#'
+#' @param term_input_id The HPO term ID for which to retrieve all children terms.
+#' @param all_children_list A list to accumulate all children terms. Initial call should be empty.
+#' @return A tibble with unique HPO children terms and the query date, including nested children,
+#'   corresponding to the input HPO term ID.
+#' @examples
+#' \dontrun{
+#' # Load the Human Phenotype Ontology (HPO) before using the function
+#' # Example usage of the function with an empty list as the initial call:
+#' hpo_all_children_from_term("HP:0000001")
+#' }
+#' @export
+hpo_all_children_from_term <- function(term_input_id, all_children_list = tibble()) {
+
+  # Retrieve the immediate children of the current term
+  children_tibble <- hpo_children_from_term(term_input_id)
+
+  # Add the current term to the results
+  all_children_list <- bind_rows(all_children_list, tibble(term = term_input_id, query_date = Sys.Date()))
+
+  # If there are children, recursively get their children
+  if (nrow(children_tibble) > 0) {
+    for (child_id in children_tibble$term) {
+      all_children_list <- hpo_all_children_from_term(child_id, all_children_list)
+    }
+  }
+
+  # Return only unique rows
+  return(distinct(all_children_list))
+}
 
 #' Retrieve HPO name from term ID
 #'
@@ -143,10 +217,10 @@ hpo_children_count_from_term <- function(term_input_id) {
 #' @return A tibble with the HPO children terms corresponding to the input HPO term ID.
 #'
 #' @examples
-#' hpo_children_from_term("HP:1234567")
+#' hpo_children_from_term_api("HP:1234567")
 #'
 #' @export
-hpo_children_from_term <- function(term_input_id) {
+hpo_children_from_term_api <- function(term_input_id) {
   retries <- 3  # Number of retries before giving up
   retry_delay <- 5  # Delay in seconds between retries
 
@@ -183,12 +257,12 @@ hpo_children_from_term <- function(term_input_id) {
 #'   corresponding to the input HPO term ID.
 #'
 #' @examples
-#' hpo_all_children_from_term("HP:1234567", list())
+#' hpo_all_children_from_term_api("HP:1234567", list())
 #'
 #' @export
-hpo_all_children_from_term <- function(term_input, all_children_list = list()) {
+hpo_all_children_from_term_api <- function(term_input, all_children_list = list()) {
 
-  children_list <- hpo_children_from_term(term_input)
+  children_list <- hpo_children_from_term_api(term_input)
 
   # Combine all_children_list and term_input
   all_children_list <- c(all_children_list, term_input)
@@ -196,7 +270,7 @@ hpo_all_children_from_term <- function(term_input, all_children_list = list()) {
   if (length(children_list) != 0) {
     for (p in children_list$ontologyId) {
         # Update all_children_list with each recursive call
-        all_children_list <- hpo_all_children_from_term(p, all_children_list)
+        all_children_list <- hpo_all_children_from_term_api(p, all_children_list)
     }
   }
 
