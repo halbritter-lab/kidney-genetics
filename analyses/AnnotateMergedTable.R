@@ -130,12 +130,13 @@ if (check_file_age("hpo_list_kidney", "shared/", 1)) {
     overwrite = TRUE)
 }
 
-# 2) get all children of term Adult onset (HP:0003581) for classification into adult vs pediatric onset
+# 2) get all children of term Adult onset (HP:0003581) for classification into adult vs antenatal_or_congenital vs neonatal_or_pediatric onset
 # we load and use the results of previous walks through the ontology tree if not older then 1 month
 
-if (check_file_age("hpo_list_adult", "shared/", 1)) {
+if (check_file_age("hpo_list_adult", "shared/", 1) && check_file_age("hpo_list_antenatal_or_congenital", "shared/", 1) && check_file_age("hpo_list_neonatal_or_pediatric", "shared/", 1)) {
   hpo_list_adult <- read_csv(get_newest_file("hpo_list_adult", "shared"))
-  hpo_list_non_adult <- read_csv(get_newest_file("hpo_list_non_adult", "shared"))
+  hpo_list_antenatal_or_congenital <- read_csv(get_newest_file("hpo_list_antenatal_or_congenital", "shared"))
+  hpo_list_neonatal_or_pediatric <- read_csv(get_newest_file("hpo_list_neonatal_or_pediatric", "shared"))
 } else {
   # walk through the ontology tree and add all unique terms descending from
   # Adult onset (HP:0003581)
@@ -151,23 +152,32 @@ if (check_file_age("hpo_list_adult", "shared/", 1)) {
     overwrite = TRUE)
 
   # walk through the ontology tree and add all unique terms descending from
-  # Onset HP:0003674
-  all_hpo_children_list_onset <- hpo_all_children_from_term("HP:0003674")
+  # Antenatal onset HP:0030674 or Congenital onset HP:0003577
+  hpo_list_antenatal_or_congenital <- union(hpo_all_children_from_term("HP:0030674"),
+    hpo_all_children_from_term("HP:0003577"))
 
-  # then remove all terms that are children of Adult onset (HP:0003581) to get
-  # all terms that are children of Pediatric onset (HP:0410280), etc.
-  # and transform the list into a tibble
-  hpo_list_non_adult <- setdiff(all_hpo_children_list_onset,
-      hpo_list_adult)
+  write_csv(hpo_list_antenatal_or_congenital,
+    file = paste0("shared/hpo_list_antenatal_or_congenital.",
+      current_date,
+      ".csv"),
+    na = "NULL")
 
-    write_csv(hpo_list_non_adult,
-      file = paste0("shared/hpo_list_non_adult.",
-        current_date,
-        ".csv"),
-      na = "NULL")
+  gzip(paste0("shared/hpo_list_antenatal_or_congenital.", current_date, ".csv"),
+    overwrite = TRUE)
 
-    gzip(paste0("shared/hpo_list_non_adult.", current_date, ".csv"),
-      overwrite = TRUE)
+  # walk through the ontology tree and add all unique terms descending from
+  # Neonatal onset HP:0003623 or Pediatric onset HP:0410280
+  hpo_list_neonatal_or_pediatric <- union(hpo_all_children_from_term("HP:0003623"),
+    hpo_all_children_from_term("HP:0410280"))
+
+  write_csv(hpo_list_neonatal_or_pediatric,
+    file = paste0("shared/hpo_list_neonatal_or_pediatric.",
+      current_date,
+      ".csv"),
+    na = "NULL")
+
+  gzip(paste0("shared/hpo_list_neonatal_or_pediatric.", current_date, ".csv"),
+    overwrite = TRUE)
 }
 
 # 3) syndromic vs non-syndromic (categories in OMIM: GROWTH, SKELETAL, NEUROLOGIC, HEAD & NECK; exclude: CARDIOVASCULAR, ABDOMEN, GENITOURINARY)
@@ -705,21 +715,34 @@ hpo_gene_list_adult <- phenotype_hpoa_filter_adult %>%
   unique() %>%
   mutate(onset_group = "adult")
 
-# filter OMIM data for all the disease database ids with HPO terms for non-adult onset
-phenotype_hpoa_filter_non_adult <- phenotype_hpoa %>%
-   filter(hpo_id %in% hpo_list_non_adult$term) %>%
+# filter OMIM data for all the disease database ids with HPO terms for antenatal or congenital onset
+phenotype_hpoa_filter_antenatal_or_congenital <- phenotype_hpoa %>%
+   filter(hpo_id %in% hpo_list_antenatal_or_congenital$term) %>%
    select(database_id, hpo_id) %>%
    unique()
 
 # annotate the OMIM data with the gene symbols
-hpo_gene_list_non_adult <- phenotype_hpoa_filter_non_adult %>%
+hpo_gene_list_antenatal_or_congenital <- phenotype_hpoa_filter_antenatal_or_congenital %>%
   left_join(omim_genemap2_disease_and_gene, by = c("database_id" = "disease_ontology_id"), relationship = "many-to-many") %>%
   filter(!is.na(approved_symbol)) %>%
   unique() %>%
-  mutate(onset_group = "non_adult")
+  mutate(onset_group = "antenatal_or_congenital")
 
-# bind the two lists and compute the relative frequency of all onset related HPO terms in the OMIM entries associated with at least one of the terms per onset group
-onset_hpo <- bind_rows(hpo_gene_list_adult, hpo_gene_list_non_adult) %>%
+# filter OMIM data for all the disease database ids with HPO terms for neonatal or pediatric onset
+phenotype_hpoa_filter_neonatal_or_pediatric <- phenotype_hpoa %>%
+   filter(hpo_id %in% hpo_list_neonatal_or_pediatric$term) %>%
+   select(database_id, hpo_id) %>%
+   unique()
+
+# annotate the OMIM data with the gene symbols
+hpo_gene_list_neonatal_or_pediatric <- phenotype_hpoa_filter_neonatal_or_pediatric %>%
+  left_join(omim_genemap2_disease_and_gene, by = c("database_id" = "disease_ontology_id"), relationship = "many-to-many") %>%
+  filter(!is.na(approved_symbol)) %>%
+  unique() %>%
+  mutate(onset_group = "neonatal_or_pediatric")
+
+# bind the three lists and compute the relative frequency of all onset related HPO terms in the OMIM entries associated with at least one of the terms per onset group
+onset_hpo <- bind_rows(hpo_gene_list_adult, hpo_gene_list_antenatal_or_congenital, hpo_gene_list_neonatal_or_pediatric) %>%
   select(onset_group, hpo_id) %>%
   group_by(onset_group) %>%
   mutate(hpo_id_count = n()) %>%
