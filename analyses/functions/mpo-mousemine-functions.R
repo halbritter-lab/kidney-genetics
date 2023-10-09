@@ -122,7 +122,7 @@ compare_gene_phenotypes <- function(gene_name, phenotype_ids) {
   res <- runQuery(im, query)
 
   # Check if the result is empty
-  if (nrow(res) == 0) {
+  if (nrow(res) == 0 || is.null(res)) {
     return("hm (NA); ht (NA)")
   }
 
