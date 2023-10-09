@@ -6,7 +6,8 @@ library(rvest)  ## needed for scraping
 library(readr)  ## needed to read files
 library(tools)  ## needed for checksums
 library("R.utils")  ## gzip downloaded and result files
-library(config)
+library(config) ## needed to read config file
+library(ontologyIndex) ## needed to read ontology files
 ############################################
 
 
@@ -41,38 +42,13 @@ source("functions/stringdb-functions.R", local = TRUE)
 
 
 ############################################
-## load all analyses files and transform table
+## load the merged table for filtering and annotation
 
-# define analyses paths
-merged_path <- "merged/"
+# define merged analysis path
+merged_path <- "A_MergeAnalysesSources/results/"
 
-# find all CSV files in merged folders and filter
-# select newest file
-# TODO: replace with file function
-merged_csv_table <- list.files(path = merged_path,
-    pattern = ".csv",
-    full.names = TRUE) %>%
-  as_tibble() %>%
-  separate(value, c("path", "file"), sep = "\\/") %>%
-  mutate(file_path = paste0(path, "/", file)) %>%
-  separate(file, c(NA, "file_date", NA), sep = "\\.") %>%
-  mutate(results_file_id = row_number()) %>%
-  mutate(md5sum_file = md5sum(file_path)) %>%
-  dplyr::select(results_file_id,
-    file_path,
-    file_date,
-    md5sum_file) %>%
-  filter(file_date == max(file_date))
-
-# load the csv files
-merged_genes <- merged_csv_table %>%
-  rowwise() %>%
-  mutate(merged_list = list(read_csv(file_path,
-    na = "NULL"
-    ))) %>%
-  ungroup() %>%
-  select(merged_list) %>%
-  unnest(merged_list)
+# find newest file CSV files in merged folders and filter
+merged_csv_table <- read_csv(get_newest_file("A_MergeAnalysesSources", merged_path))
 ############################################
 
 
@@ -423,7 +399,7 @@ omim_genemap2 <- read_delim(omim_genemap2_filename, "\t",
 # https://clinicalgenome.org/working-groups/clinical-domain/clingen-kidney-disease-clinical-domain-working-group/
 
 # TODO: safe the results of the API calls or websites for reproducibility
-# TODO: add stones? and maybe other kidney diseases like in Becherucci et al. 2023
+# TODO: maybe other kidney diseases like in Becherucci et al. 2023
 
 ## general workflow:
 # A) get all genes from all kidney groups
@@ -432,7 +408,7 @@ omim_genemap2 <- read_delim(omim_genemap2_filename, "\t",
 # D) compute for each gene a list of all kidney group scores and sort by the highest score (the gene is in the kidney group with the highest score, but this needs to be checked manually)
 
 ## A get all genes from all kidney groups
-# 1) Complement-Mediated Kidney Diseases Gene Curation Expert Panel: https://www.clinicalgenome.org/affiliation/40069/ (no gene list, use https://panelapp.agha.umccr.org/panels/224/)
+# 1) Complement-Mediated Kidney Diseases Gene Curation Expert Panel: https://www.clinicalgenome.org/affiliation/40069/ (no clingen gene list, use https://panelapp.agha.umccr.org/panels/224/)
 
 api_call <- paste0(
     "https://panelapp.agha.umccr.org/api/v1/panels/",
@@ -600,13 +576,51 @@ hereditary_cancer_gene_list <- hereditary_cancer_response$rows %>%
     kidney_disease_group,
     kidney_disease_group_short)
 
+# 7) Nephrocalcinosis / Nephrolithiasis Diseases Gene Curation Expert Panel: https://www.clinicalgenome.org/affiliation/40069/ (no clingen gene list, use https://panelapp.agha.umccr.org/panels/149/)
+
+api_call <- paste0(
+    "https://panelapp.agha.umccr.org/api/v1/panels/",
+    "149",
+    "/?format=json")
+
+nephrocalcinosis_or_nephrolithiasis_response <- fromJSON(api_call)
+
+nephrocalcinosis_or_nephrolithiasis_gene_list <- nephrocalcinosis_or_nephrolithiasis_response$gene %>%
+  tibble() %>%
+  unnest_wider(gene_data, names_repair = "unique") %>%
+  select(entity_name,
+    entity_type,
+    gene_symbol,
+    hgnc_id,
+    omim_gene,
+    evidence,
+    confidence_level,
+    mode_of_inheritance,
+    phenotypes, publications) %>%
+  mutate(evidence = sapply(evidence, paste, collapse = "; "),
+    phenotypes = sapply(phenotypes, paste, collapse = "; "),
+    publications = sapply(publications, paste, collapse = "; ")) %>%
+  filter(confidence_level == 3) %>%
+  select(gene_symbol) %>%
+  distinct() %>%
+  mutate(hgnc_id = hgnc_id_from_symbol_grouped(gene_symbol)) %>%
+  mutate(approved_symbol = symbol_from_hgnc_id_grouped(hgnc_id)) %>%
+  mutate(kidney_disease_group = "nephrocalcinosis_or_nephrolithiasis") %>%
+  mutate(kidney_disease_group_short = "nephrocalcinosis") %>%
+  select(approved_symbol,
+    hgnc_id,
+    gene_name_reported = gene_symbol,
+    kidney_disease_group,
+    kidney_disease_group_short)
+
 ## bind all tables
 all_kidney_groups <- bind_rows(complement_mediated_kidney_diseases_gene_list,
     congenital_anomalies_of_the_kidney_and_urinary_tract_gene_list,
     glomerulopathy_gene_list,
     kidney_cystic_and_ciliopathy_disorders_gene_list,
     tubulopathy_gene_list,
-    hereditary_cancer_gene_list)
+    hereditary_cancer_gene_list,
+    nephrocalcinosis_or_nephrolithiasis_gene_list)
 
 # B) get phenotype annotation table from HPO, group by gene and filter for kidney phenotypes
 # C) compute for each list in A) the relative frequency of kidney phenotypes in 2), this will be the kidney group score
