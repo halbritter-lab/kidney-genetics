@@ -87,7 +87,7 @@ mpo_all_children_from_term <- function(term_input_id, all_children_list = tibble
 #' comparison results grouped by zygosity.
 #'
 #' @param gene_name A character string specifying the name of the gene.
-#' @param phenotype_ids A tibble containing a column named 'ontology_id' with
+#' @param phenotype_ids A tibble containing a column named 'term' with
 #'   the phenotype identifiers to compare against.
 #'
 #' @return A character string representing the comparison results, grouped by
@@ -98,15 +98,15 @@ mpo_all_children_from_term <- function(term_input_id, all_children_list = tibble
 #'   result will be "NA" for that zygosity.
 #'
 #' @examples
-#' phenotype_ids <- tibble::tibble(ontology_id = c("MP:0005502", "MP:0001756"))
+#' phenotype_ids <- tibble::tibble(term = c("MP:0005502", "MP:0001756"))
 #' compare_gene_phenotypes("PKD1", phenotype_ids)
 #'
 #' @export
 compare_gene_phenotypes <- function(gene_name, phenotype_ids) {
 
   # Check if the required column is present in the phenotype_ids tibble
-  if (!"ontology_id" %in% names(phenotype_ids)) {
-    stop("The phenotype_ids tibble must contain a column named 'ontology_id'")
+  if (!"term" %in% names(phenotype_ids)) {
+    stop("The phenotype_ids tibble must contain a column named 'term'")
   }
 
   # Initialise the connection to the MouseMine database
@@ -133,13 +133,13 @@ compare_gene_phenotypes <- function(gene_name, phenotype_ids) {
     select(
       primary_identifier = OntologyAnnotation.subject.primaryIdentifier,
       zygosity = OntologyAnnotation.subject.zygosity,
-      ontology_id = OntologyAnnotation.ontologyTerm.identifier,
+      term = OntologyAnnotation.ontologyTerm.identifier,
       ontology_name = OntologyAnnotation.ontologyTerm.name
     )
 
   # Compare the phenotypes and construct the result string
-  hm_result <- ifelse(any(res_tibble$zygosity == "hm" & res_tibble$ontology_id %in% phenotype_ids$ontology_id), "true", "false")
-  ht_result <- ifelse(any(res_tibble$zygosity == "ht" & res_tibble$ontology_id %in% phenotype_ids$ontology_id), "true", "false")
+  hm_result <- ifelse(any(res_tibble$zygosity == "hm" & res_tibble$term %in% phenotype_ids$term), "true", "false")
+  ht_result <- ifelse(any(res_tibble$zygosity == "ht" & res_tibble$term %in% phenotype_ids$term), "true", "false")
 
   result_string <- paste0("hm (", hm_result, "); ht (", ht_result, ")")
 
