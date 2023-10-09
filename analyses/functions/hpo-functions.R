@@ -1,5 +1,6 @@
-require(jsonlite)
-require(tidyverse)
+require(jsonlite) # Load the jsonlite package before using the functions
+require(tidyverse) # Load the tidyverse package before using the functions
+require(ontologyIndex) # Load the ontologyIndex package before using the functions
 
 #### This file holds analyses functions for HPO request
 #' Retrieve the HPO children terms for a given HPO term ID.

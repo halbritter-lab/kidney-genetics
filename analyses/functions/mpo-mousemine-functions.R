@@ -1,4 +1,5 @@
-require(ontologyIndex) #
+require(tidyverse) # Load the tidyverse package before using the functions
+require(ontologyIndex) # Load the ontologyIndex package before using the functions
 require(InterMineR) # Load the InterMineR package before using the functions
 
 #### This file holds analyses functions for MPO request
