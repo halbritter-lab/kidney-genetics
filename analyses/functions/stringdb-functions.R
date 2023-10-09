@@ -72,11 +72,11 @@ compute_protein_interactions <- function(protein_ids, refresh = FALSE,
   # Sum the scores for each protein
   summed_scores <- filtered_data %>% 
     group_by(protein1) %>% 
-    summarise(sum_score = sum(combined_score)) %>% 
+    summarise(interaction_sum_score = sum(combined_score)) %>% 
     ungroup()
 
   # Percentile normalize the summed scores
-  summed_scores$normalized_score <- percent_rank(summed_scores$sum_score)
+  summed_scores$interaction_normalized_score <- percent_rank(summed_scores$interaction_sum_score)
 
   # Create a string of interacting proteins and scores for each protein1
   interaction_strings <- filtered_data %>% 
