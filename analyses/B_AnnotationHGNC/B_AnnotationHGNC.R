@@ -323,7 +323,8 @@ non_alt_loci_set_string <- non_alt_loci_set %>%
 ############################################
 ## add gene coordinates from ensembl
 # add ensembl_gene_id_version for hg19 and hg38 using the ensembl functions
-# add genocode id using the GTEx API and the get_multiple_gencode_ids function
+# add gencode id using the GTEx API and the get_multiple_gencode_ids function
+# TODO: if the gencode id is empty, retry with the prev_symbol as input
 # TODO: fix warning "! Ensembl will soon enforce the use of https. Ensure the 'host' argument includes https://""
 non_alt_loci_set_coordinates <- non_alt_loci_set_string %>%
   mutate(ensembl_gene_id_version_hg19 =
@@ -359,6 +360,29 @@ non_alt_loci_set_coordinates <- non_alt_loci_set_string %>%
     -hg19_coordinates_from_symbol,
     -hg38_coordinates_from_ensembl,
     -hg38_coordinates_from_symbol)
+
+# repair the gencode_id column using the prev_symbol
+# for this we separate the prev_symbol column into multiple rows
+# then we use the get_multiple_gencode_ids function to get the gencode_id
+# finally we group by hgnc_id and use the first gencode_id
+# we then join the result with the non_alt_loci_set_coordinates table
+# and set the gencode_id column from the repair table if it is NA
+non_alt_loci_set_coordinates_gencode_from_prev_symbol <- non_alt_loci_set_coordinates %>% 
+    filter(is.na(gencode_id) & !is.na(prev_symbol)) %>%
+    dplyr::select(hgnc_id, prev_symbol) %>%
+    tidyr::separate_rows(prev_symbol, sep = "\\|") %>%
+    rowwise() %>%
+    mutate(gencode_id = get_multiple_gencode_ids(prev_symbol)$gencode_id)
+
+non_alt_loci_set_coordinates_gencode_repair <- non_alt_loci_set_coordinates_gencode_from_prev_symbol %>%
+    group_by(hgnc_id) %>%
+    summarise(gencode_id = first(gencode_id))
+
+non_alt_loci_set_coordinates_gencode <- non_alt_loci_set_coordinates %>%
+    left_join(non_alt_loci_set_coordinates_gencode_repair, by = "hgnc_id") %>%
+    mutate(gencode_id = case_when(!is.na(gencode_id.x) ~ gencode_id.x,
+        is.na(gencode_id.x) ~ gencode_id.y)) %>%
+    dplyr::select(-gencode_id.x, -gencode_id.y)
 ############################################
 
 
@@ -368,7 +392,7 @@ non_alt_loci_set_coordinates <- non_alt_loci_set_string %>%
 # TODO: future adaption use https://gnomad.broadinstitute.org/api/
 
 # split the mane_select column into mane_enst and mane_nm to find the corresponding transcript for the join
-non_alt_loci_set_coordinates_reformat <- non_alt_loci_set_coordinates %>%
+non_alt_loci_set_coordinates_reformat <- non_alt_loci_set_coordinates_gencode %>%
   separate(mane_select, into = c("mane_enst", "mane_nm"), sep = "\\|") %>%
   separate(mane_enst, into = c("mane_enst", "mane_enst_version"), sep = "\\.") %>%
   dplyr::select(symbol, mane_enst) %>%
