@@ -88,7 +88,7 @@ get_median_tissue_expression <- function(gencode_ids, tissue_site_detail_ids = N
 #'
 #' @param gencode_ids A character vector representing the GENCODE gene identifiers.
 #' @param max_ids_per_request An integer specifying the maximum number of identifiers
-#'        that can be queried in a single API request. Default is 50.
+#'        that can be queried in a single API request. Default is 5.
 #' @param tissue_site_detail_ids A character vector of tissue site detail IDs to filter the output. Default is NULL.
 #' @param wide_format A logical indicating whether to return the data in a wide format. Default is FALSE.
 #'
@@ -101,12 +101,12 @@ get_median_tissue_expression <- function(gencode_ids, tissue_site_detail_ids = N
 #'   print(median_expression)
 #' }
 #' \dontrun{
-#'   median_expression <- get_multiple_median_tissue_expression(c()"ENSG00000008710.19", "ENSG00000118762.7"), max_ids_per_request = 25)
+#'   median_expression <- get_multiple_median_tissue_expression(c("ENSG00000008710.19", "ENSG00000118762.7"), max_ids_per_request = 5)
 #'   print(median_expression)
 #' }
 #'
 #' @export
-get_multiple_median_tissue_expression <- function(gencode_ids, max_ids_per_request = 50, tissue_site_detail_ids = NULL, wide_format = FALSE) {
+get_multiple_median_tissue_expression <- function(gencode_ids, max_ids_per_request = 5, tissue_site_detail_ids = NULL, wide_format = FALSE) {
 
   # Split the gencode_ids into chunks that fit within the API's limitations
   id_chunks <- split(gencode_ids, ceiling(seq_along(gencode_ids) / max_ids_per_request))
@@ -193,7 +193,7 @@ get_gencode_ids <- function(gene_symbols) {
 #'
 #' @param gene_symbols A character vector representing the gene symbols.
 #' @param max_symbols_per_request An integer specifying the maximum number of
-#'        gene symbols that can be queried in a single API request. Default is 50.
+#'        gene symbols that can be queried in a single API request. Default is 5.
 #'
 #' @return A tibble with rows for each gene and a column containing the
 #'         GENCODE ID returned by the GTEx API.
@@ -204,11 +204,11 @@ get_gencode_ids <- function(gene_symbols) {
 #'   print(gencode_ids)
 #' }
 #' \dontrun{
-#'   gencode_ids <- get_multiple_gencode_ids(c("PKD1", "PKD2"), max_symbols_per_request = 25)
+#'   gencode_ids <- get_multiple_gencode_ids(c("PKD1", "PKD2"), max_symbols_per_request = 5)
 #'   print(gencode_ids)
 #' }
 #' @export
-get_multiple_gencode_ids <- function(gene_symbols, max_symbols_per_request = 50) {
+get_multiple_gencode_ids <- function(gene_symbols, max_symbols_per_request = 5) {
 
   # Split the gene_symbols into chunks that fit within the API's limitations
   symbol_chunks <- split(gene_symbols, ceiling(seq_along(gene_symbols) / max_symbols_per_request))
