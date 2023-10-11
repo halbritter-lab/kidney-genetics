@@ -8,14 +8,13 @@ This table shows the merged results of all analyses files as a wide table with s
 
 ```{r, echo=FALSE}
 merge_analyses_sources_reformat <- merge_analyses_sources %>%
-  mutate(hgnc_id = paste0('<a href="https://www.genenames.org/data/gene-symbol-report/#!/hgnc_id/HGNC:',
+  mutate(gene = paste0('<a href="https://www.genenames.org/data/gene-symbol-report/#!/hgnc_id/HGNC:',
     hgnc_id,
-    '" target="_blank" >',
-    hgnc_id,
-    '</a>')) %>%
-  mutate(approved_symbol = paste0('<i>',
+    '" target="_blank" ><i>',
     approved_symbol,
-    '</i>'))
+    '</i></a>'),
+    , .before = approved_symbol) %>%
+  select(-hgnc_id, -approved_symbol)
 
 datatable(merge_analyses_sources_reformat,
           filter = 'top', # this argument positions the filtering input at the top of the table
@@ -23,6 +22,8 @@ datatable(merge_analyses_sources_reformat,
           extensions = 'Buttons', # this argument adds an extension for download buttons
           options = list(
             dom = 'Blfrtip',
+            scrollX = '400px',
+            scroller = TRUE,
             buttons = c('copy',
               'csv',
               'excel',
@@ -40,14 +41,13 @@ This table shows results of the first analysis searching kidney disease associat
 
 ```{r, echo=FALSE}
 PanelApp_genes_reformat <- PanelApp_genes %>%
-  mutate(hgnc_id = paste0('<a href="https://www.genenames.org/data/gene-symbol-report/#!/hgnc_id/HGNC:',
+  mutate(gene = paste0('<a href="https://www.genenames.org/data/gene-symbol-report/#!/hgnc_id/HGNC:',
     hgnc_id,
-    '" target="_blank" >',
-    hgnc_id,
-    '</a>')) %>%
-  mutate(approved_symbol = paste0('<i>',
+    '" target="_blank" ><i>',
     approved_symbol,
-    '</i>'))
+    '</i></a>'),
+    , .before = approved_symbol) %>%
+  select(-hgnc_id, -approved_symbol, -gene_name_reported)
 
 datatable(PanelApp_genes_reformat,
           filter = 'top', # this argument positions the filtering input at the top of the table
@@ -61,14 +61,13 @@ This table shows results of the second analysis searching kidney disease associa
 
 ```{r, echo=FALSE}
 Literature_genes_reformat <- Literature_genes %>%
-  mutate(hgnc_id = paste0('<a href="https://www.genenames.org/data/gene-symbol-report/#!/hgnc_id/HGNC:',
+  mutate(gene = paste0('<a href="https://www.genenames.org/data/gene-symbol-report/#!/hgnc_id/HGNC:',
     hgnc_id,
-    '" target="_blank" >',
-    hgnc_id,
-    '</a>')) %>%
-  mutate(approved_symbol = paste0('<i>',
+    '" target="_blank" ><i>',
     approved_symbol,
-    '</i>'))
+    '</i></a>'),
+    , .before = approved_symbol) %>%
+  select(-hgnc_id, -approved_symbol, -gene_name_reported)
 
 datatable(Literature_genes_reformat,
           filter = 'top', # this argument positions the filtering input at the top of the table
@@ -82,14 +81,13 @@ This table shows results of the third analysis searching kidney disease associat
 
 ```{r, echo=FALSE}
 DiagnosticPanels_genes_reformat <- DiagnosticPanels_genes %>%
-  mutate(hgnc_id = paste0('<a href="https://www.genenames.org/data/gene-symbol-report/#!/hgnc_id/HGNC:',
+  mutate(gene = paste0('<a href="https://www.genenames.org/data/gene-symbol-report/#!/hgnc_id/HGNC:',
     hgnc_id,
-    '" target="_blank" >',
-    hgnc_id,
-    '</a>')) %>%
-  mutate(approved_symbol = paste0('<i>',
+    '" target="_blank" ><i>',
     approved_symbol,
-    '</i>'))
+    '</i></a>'),
+    , .before = approved_symbol) %>%
+  select(-hgnc_id, -approved_symbol, -gene_name_reported)
 
 datatable(DiagnosticPanels_genes_reformat,
           filter = 'top', # this argument positions the filtering input at the top of the table
@@ -103,14 +101,13 @@ This table shows results of the fourth analysis searching kidney disease associa
 
 ```{r, echo=FALSE}
 HPO_genes_reformat <- HPO_genes %>%
-  mutate(hgnc_id = paste0('<a href="https://www.genenames.org/data/gene-symbol-report/#!/hgnc_id/HGNC:',
+  mutate(gene = paste0('<a href="https://www.genenames.org/data/gene-symbol-report/#!/hgnc_id/HGNC:',
     hgnc_id,
-    '" target="_blank" >',
-    hgnc_id,
-    '</a>')) %>%
-  mutate(approved_symbol = paste0('<i>',
+    '" target="_blank" ><i>',
     approved_symbol,
-    '</i>'))
+    '</i></a>'),
+    , .before = approved_symbol) %>%
+  select(-hgnc_id, -approved_symbol, -gene_name_reported)
 
 datatable(HPO_genes_reformat,
           filter = 'top', # this argument positions the filtering input at the top of the table
@@ -124,14 +121,13 @@ This table shows results of the fifth analysis searching kidney disease associat
 
 ```{r, echo=FALSE}
 PubTator_genes_reformat <- PubTator_genes %>%
-  mutate(hgnc_id = paste0('<a href="https://www.genenames.org/data/gene-symbol-report/#!/hgnc_id/HGNC:',
+  mutate(gene = paste0('<a href="https://www.genenames.org/data/gene-symbol-report/#!/hgnc_id/HGNC:',
     hgnc_id,
-    '" target="_blank" >',
-    hgnc_id,
-    '</a>')) %>%
-  mutate(approved_symbol = paste0('<i>',
+    '" target="_blank" ><i>',
     approved_symbol,
-    '</i>'))
+    '</i></a>'),
+    , .before = approved_symbol) %>%
+  select(-hgnc_id, -approved_symbol, -gene_name_reported)
 
 datatable(PubTator_genes_reformat,
           filter = 'top', # this argument positions the filtering input at the top of the table

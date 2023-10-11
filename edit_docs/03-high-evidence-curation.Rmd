@@ -1,0 +1,33 @@
+# Curation of high evidence genes {#manual-curation}
+
+## Table of high evidence genes
+
+This table shows the annotated high evidence genes.
+
+```{r, echo=FALSE, warning=FALSE, out.width = "100%"}
+high_evidence_annotated_table_reformat <- high_evidence_annotated_table %>%
+  mutate(gene = paste0('<a href="https://www.genenames.org/data/gene-symbol-report/#!/hgnc_id/HGNC:',
+    hgnc_id,
+    '" target="_blank" ><i>',
+    approved_symbol,
+    '</i></a>'),
+    , .before = approved_symbol) %>%
+  select(-hgnc_id, -approved_symbol)
+
+datatable(high_evidence_annotated_table_reformat,
+          filter = 'top', # this argument positions the filtering input at the top of the table
+          escape = FALSE, # this argument renders the links as HTML
+          extensions = 'Buttons', # this argument adds an extension for download buttons
+          options = list(
+            dom = 'Blfrtip',
+            scrollX = '400px',
+            scroller = TRUE,
+            buttons = c('copy',
+              'csv',
+              'excel',
+              'pdf'), # here we add the download buttons for different formats
+            lengthMenu = list(c(10, 30, 50, -1), 
+                              c('10', '30', '50', 'All')) # here we change the selection options
+          )
+        )
+```

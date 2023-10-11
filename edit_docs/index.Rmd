@@ -18,13 +18,14 @@ url: https://halbritter-lab.github.io/kidney-genetics/
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 ## Load libraries
-library(readr) # needed to import CSV result files
-library(tidyverse) # needed to transform the tables
-library(DT) # needed to generate nice data tables in html
-library(plotly) # needed for upset plots
-library(knitr) # needed for draw.io files
-library(knitrdrawio) # needed for draw.io files
-library(config) # needed to load the config file
+library(readr)        # needed to import CSV result files
+library(tidyverse)    # needed to transform the tables
+library(DT)           # needed to generate nice data tables in html
+library(plotly)       # needed for upset plots
+library(knitr)        # needed for draw.io files
+library(knitrdrawio)  # needed for draw.io files
+library(config)       # needed to load the config file
+library(ggplot2)      # needed for plots
 ```
 
 <!-- here we load the config file -->
@@ -57,20 +58,29 @@ source("../analyses/functions/string-functions.R", local = TRUE)
 <!-- here we load the result csv file and compute numbers to update the diagrams -->
 ```{r, echo=FALSE, message=FALSE, warning=FALSE}
 ## load the CSV data
-## load and filter (newest) the files automatically
+## load and filter the (newest) files automatically
+
+# the merge_analyses_sources table
 merge_analyses_sources <- read_csv(get_newest_file("A_MergeAnalysesSources", "../analyses/A_MergeAnalysesSources/results"))
+
+# the other analyses tables
 PanelApp_genes <- read_csv(get_newest_file("01_PanelApp_genes", "../analyses/01_PanelApp/results"))
 Literature_genes <- read_csv(get_newest_file("02_Literature_genes", "../analyses/02_Literature/results"))
 DiagnosticPanels_genes <- read_csv(get_newest_file("03_DiagnosticPanels_genes", "../analyses/03_DiagnosticPanels/results"))
 HPO_genes <- read_csv(get_newest_file("04_HPO_genes", "../analyses/04_HPO/results"))
 PubTator_genes <- read_csv(get_newest_file("05_PubTator_genes", "../analyses/05_PubTator/results"))
 
+# the high_evidence_annotated_table
+high_evidence_annotated_table <- read_csv(get_newest_file("C_high_evidence_annotated_csv_table", "../analyses/C_AnnotateMergedTable/results"))
+
 # compute numbers for the diagrams
 all_genes <- merge_analyses_sources %>%
     nrow()
 
 high_evidence_genes <- merge_analyses_sources %>%
-    filter(evidence_count > 2) %>%
+    filter(evidence_count > 2)
+    
+high_evidence_genes_count <- high_evidence_genes %>%
     nrow()
 
 clingen_genes <- "XXX"
@@ -79,7 +89,7 @@ manualscoring_genes <- "YYY"
 replace_strings("static/img/figures/raw/curation_flow_diagram_raw.drawio",
     "static/img/figures/updated/curation_flow_diagram_current.drawio",
     c("ALL_GENES", "HIGHEVIDENCE_GENES", "CLINGEN_GENES", "MANUALSCORING_GENES"),
-    c(all_genes, high_evidence_genes, clingen_genes, manualscoring_genes))
+    c(all_genes, high_evidence_genes_count, clingen_genes, manualscoring_genes))
 
 # compute per source numbers with placeholders
 summary_counts <- merge_analyses_sources %>%
@@ -185,8 +195,8 @@ To automatically group the genes, we will present the results of phenotypic and 
 <!-- TODO: Provide clustering and grouping results with numbers and proportions -->
 
 The number of genes extracted from the five analyzed sources of information is as follows: (1) `r format_number(summary_counts$count_01_PanelApp)`, (2) `r format_number(summary_counts$count_02_Literature)`, (3) `r format_number(summary_counts$count_03_DiagnosticPanels)`, (4) `r format_number(summary_counts$count_04_HPO)`, and (5) `r format_number(summary_counts$count_05_PubTator)`  
-Notably, **`r format_number(high_evidence_genes)`** genes (`r percent(high_evidence_genes / all_genes, digits = 1)`) of the **total `r format_number(all_genes)`** genes are present in three or more of the analyzed information sources, thus meeting our evidence criteria, indicating high confidence and their potential for diagnostic use.
-Of these high evidence genes, **`r format_number(genes_at_least_one_diagnostic_panel)`** (`r percent(genes_at_least_one_diagnostic_panel / high_evidence_genes, digits = 1)`) are present in at least one, and **`r format_number(genes_all_diagnostic_panels)`** (`r percent(genes_all_diagnostic_panels / high_evidence_genes, digits = 1)`) are present in all 10 comprehensive diagnostic laboratory panels.
+Notably, **`r format_number(high_evidence_genes_count)`** genes (`r percent(high_evidence_genes_count / all_genes, digits = 1)`) of the **total `r format_number(all_genes)`** genes are present in three or more of the analyzed information sources, thus meeting our evidence criteria, indicating high confidence and their potential for diagnostic use.
+Of these high evidence genes, **`r format_number(genes_at_least_one_diagnostic_panel)`** (`r percent(genes_at_least_one_diagnostic_panel / high_evidence_genes_count, digits = 1)`) are present in at least one, and **`r format_number(genes_all_diagnostic_panels)`** (`r percent(genes_all_diagnostic_panels / high_evidence_genes_count, digits = 1)`) are present in all 10 comprehensive diagnostic laboratory panels.
 
 To ensure currency, Kidney-Genetics will be updated regularly and automatically at XXX week intervals. We will also provide phenotypic and functional clustering results to facilitate gene grouping.  
 <!-- TODO: Provide information about the planned update framework -->

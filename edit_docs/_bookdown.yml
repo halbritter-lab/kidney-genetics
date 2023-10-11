@@ -5,6 +5,8 @@ rmd_files:
     - "index.Rmd"
     - "01-analyses-tables.Rmd"
     - "02-analyses-plots.Rmd"
+    - "03-high-evidence-curation.Rmd"
+    - "04-additional-analyses.Rmd"
     - "references.Rmd"
 delete_merged_file: true
 language:
