@@ -12,3 +12,7 @@ bar-plot-of-literature-results
 bar-plot-of-diagnostic-panels-results
 bar-plot-of-hpo-in-rare-disease-databases-results
 bar-plot-of-pubtator-results
+manual-curation
+table-of-high-evidence-genes
+additional-analyses
+diagnostic-panels-content-overlap

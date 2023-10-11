@@ -1,4 +1,4 @@
-This is XeTeX, Version 3.141592653-2.6-0.999995 (MiKTeX 23.5) (preloaded format=xelatex 2023.6.25)  5 OCT 2023 16:33
+This is XeTeX, Version 3.141592653-2.6-0.999995 (MiKTeX 23.5) (preloaded format=xelatex 2023.6.25)  11 OCT 2023 15:13
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -999,21 +999,22 @@ phic file (type pdf)
 File: KidneyGenetics_documentation_files/figure-latex/unnamed-chunk-6-1.pdf Gra
 phic file (type pdf)
 <use KidneyGenetics_documentation_files/figure-latex/unnamed-chunk-6-1.pdf>
+[6]
 File: KidneyGenetics_documentation_files/figure-latex/unnamed-chunk-7-1.pdf Gra
 phic file (type pdf)
 <use KidneyGenetics_documentation_files/figure-latex/unnamed-chunk-7-1.pdf>
-[6]
 File: KidneyGenetics_documentation_files/figure-latex/unnamed-chunk-8-1.pdf Gra
 phic file (type pdf)
 <use KidneyGenetics_documentation_files/figure-latex/unnamed-chunk-8-1.pdf>
+[7]
 File: KidneyGenetics_documentation_files/figure-latex/unnamed-chunk-9-1.pdf Gra
 phic file (type pdf)
 <use KidneyGenetics_documentation_files/figure-latex/unnamed-chunk-9-1.pdf>
-[7]
+[8]
 File: KidneyGenetics_documentation_files/figure-latex/unnamed-chunk-10-1.pdf Gr
 aphic file (type pdf)
 <use KidneyGenetics_documentation_files/figure-latex/unnamed-chunk-10-1.pdf>
-[8]
+[9]
 Underfull \hbox (badness 10000) in paragraph at lines 315--317
 
  []
@@ -1026,7 +1027,7 @@ Underfull \hbox (badness 10000) in paragraph at lines 317--319
 File: KidneyGenetics_documentation_files/figure-latex/unnamed-chunk-11-1.pdf Gr
 aphic file (type pdf)
 <use KidneyGenetics_documentation_files/figure-latex/unnamed-chunk-11-1.pdf>
-
+[10]
 Underfull \hbox (badness 10000) in paragraph at lines 336--338
 
  []
@@ -1039,7 +1040,7 @@ Underfull \hbox (badness 10000) in paragraph at lines 338--340
 File: KidneyGenetics_documentation_files/figure-latex/unnamed-chunk-12-1.pdf Gr
 aphic file (type pdf)
 <use KidneyGenetics_documentation_files/figure-latex/unnamed-chunk-12-1.pdf>
-[9]
+[11]
 Underfull \hbox (badness 10000) in paragraph at lines 359--361
 
  []
@@ -1052,7 +1053,7 @@ Underfull \hbox (badness 10000) in paragraph at lines 361--363
 File: KidneyGenetics_documentation_files/figure-latex/unnamed-chunk-13-1.pdf Gr
 aphic file (type pdf)
 <use KidneyGenetics_documentation_files/figure-latex/unnamed-chunk-13-1.pdf>
-[10]
+[12]
 Underfull \hbox (badness 10000) in paragraph at lines 380--382
 
  []
@@ -1065,7 +1066,7 @@ Underfull \hbox (badness 10000) in paragraph at lines 382--384
 File: KidneyGenetics_documentation_files/figure-latex/unnamed-chunk-14-1.pdf Gr
 aphic file (type pdf)
 <use KidneyGenetics_documentation_files/figure-latex/unnamed-chunk-14-1.pdf>
-[11]
+[13]
 Underfull \hbox (badness 10000) in paragraph at lines 403--405
 
  []
@@ -1078,7 +1079,7 @@ Underfull \hbox (badness 10000) in paragraph at lines 405--407
 File: KidneyGenetics_documentation_files/figure-latex/unnamed-chunk-15-1.pdf Gr
 aphic file (type pdf)
 <use KidneyGenetics_documentation_files/figure-latex/unnamed-chunk-15-1.pdf>
-[12]
+[14]
 Underfull \hbox (badness 10000) in paragraph at lines 424--426
 
  []
@@ -1091,7 +1092,14 @@ Underfull \hbox (badness 10000) in paragraph at lines 426--428
 File: KidneyGenetics_documentation_files/figure-latex/unnamed-chunk-16-1.pdf Gr
 aphic file (type pdf)
 <use KidneyGenetics_documentation_files/figure-latex/unnamed-chunk-16-1.pdf>
-(KidneyGenetics_documentation.bbl [13] [14]) [15] (KidneyGenetics_documentation
+[15]
+File: KidneyGenetics_documentation_files/figure-latex/unnamed-chunk-17-1.pdf Gr
+aphic file (type pdf)
+<use KidneyGenetics_documentation_files/figure-latex/unnamed-chunk-17-1.pdf>
+File: KidneyGenetics_documentation_files/figure-latex/unnamed-chunk-18-1.pdf Gr
+aphic file (type pdf)
+<use KidneyGenetics_documentation_files/figure-latex/unnamed-chunk-18-1.pdf>
+(KidneyGenetics_documentation.bbl [16] [17]) [18] (KidneyGenetics_documentation
 .aux)
  ***********
 LaTeX2e <2023-06-01> patch level 1
@@ -1099,12 +1107,12 @@ L3 programming layer <2023-06-16>
  ***********
  ) 
 Here is how much of TeX's memory you used:
- 19869 strings out of 411164
- 362299 string characters out of 5809999
- 1861394 words of memory out of 5000000
- 40148 multiletter control sequences out of 15000+600000
+ 19899 strings out of 411164
+ 364006 string characters out of 5809999
+ 1863394 words of memory out of 5000000
+ 40176 multiletter control sequences out of 15000+600000
  519822 words of font info for 85 fonts, out of 8000000 for 9000
  1348 hyphenation exceptions out of 8191
  90i,8n,120p,1027b,547s stack positions out of 10000i,1000n,20000p,200000b,200000s
 
-Output written on KidneyGenetics_documentation.pdf (15 pages).
+Output written on KidneyGenetics_documentation.pdf (18 pages).
