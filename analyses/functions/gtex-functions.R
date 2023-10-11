@@ -79,6 +79,8 @@ get_median_tissue_expression <- function(gencode_ids, tissue_site_detail_ids = N
 }
 
 
+# TODO: fix the gtex function get_multiple_median_tissue_expression to work properly with multiple gencode ids instead of using rowwise
+# TODO: fix the gtex functions to implement retry logic if the API call results in an error or empty result
 #' Fetch Median Tissue Expression Levels from GTEx API for Multiple Genes
 #'
 #' This function takes a character vector of GENCODE gene identifiers as input,
