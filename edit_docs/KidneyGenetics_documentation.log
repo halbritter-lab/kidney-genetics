@@ -1,4 +1,4 @@
-This is XeTeX, Version 3.141592653-2.6-0.999995 (MiKTeX 23.5) (preloaded format=xelatex 2023.6.25)  11 OCT 2023 15:13
+This is XeTeX, Version 3.141592653-2.6-0.999995 (MiKTeX 23.5) (preloaded format=xelatex 2023.6.25)  12 OCT 2023 12:08
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -961,17 +961,12 @@ Underfull \hbox (badness 10000) in paragraph at lines 174--177
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 184--186
+Underfull \hbox (badness 10000) in paragraph at lines 183--185
 
  []
 
-
-Underfull \hbox (badness 10000) in paragraph at lines 186--191
-
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 205--208
+[3]
+Underfull \hbox (badness 10000) in paragraph at lines 252--255
 
  []
 
@@ -980,139 +975,140 @@ File: KidneyGenetics_documentation_files/figure-latex/curation_flow_diagram.pdf
 <use KidneyGenetics_documentation_files/figure-latex/curation_flow_diagram.pdf>
 
 
-LaTeX Warning: Float too large for page by 24.50066pt on input line 219.
+LaTeX Warning: Float too large for page by 24.50066pt on input line 266.
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 226--228
-
- []
-
-[3] [4]
-Underfull \hbox (badness 10000) in paragraph at lines 234--235
+Underfull \hbox (badness 10000) in paragraph at lines 273--275
 
  []
 
-File: KidneyGenetics_documentation_files/figure-latex/unnamed-chunk-5-2.pdf Gra
+
+Underfull \hbox (badness 10000) in paragraph at lines 281--282
+
+ []
+
+[4] [5]
+File: KidneyGenetics_documentation_files/figure-latex/unnamed-chunk-7-2.pdf Gra
 phic file (type pdf)
-<use KidneyGenetics_documentation_files/figure-latex/unnamed-chunk-5-2.pdf>
-[5]
-File: KidneyGenetics_documentation_files/figure-latex/unnamed-chunk-6-1.pdf Gra
-phic file (type pdf)
-<use KidneyGenetics_documentation_files/figure-latex/unnamed-chunk-6-1.pdf>
-[6]
-File: KidneyGenetics_documentation_files/figure-latex/unnamed-chunk-7-1.pdf Gra
-phic file (type pdf)
-<use KidneyGenetics_documentation_files/figure-latex/unnamed-chunk-7-1.pdf>
+<use KidneyGenetics_documentation_files/figure-latex/unnamed-chunk-7-2.pdf>
 File: KidneyGenetics_documentation_files/figure-latex/unnamed-chunk-8-1.pdf Gra
 phic file (type pdf)
 <use KidneyGenetics_documentation_files/figure-latex/unnamed-chunk-8-1.pdf>
-[7]
+[6]
 File: KidneyGenetics_documentation_files/figure-latex/unnamed-chunk-9-1.pdf Gra
 phic file (type pdf)
 <use KidneyGenetics_documentation_files/figure-latex/unnamed-chunk-9-1.pdf>
-[8]
+[7]
 File: KidneyGenetics_documentation_files/figure-latex/unnamed-chunk-10-1.pdf Gr
 aphic file (type pdf)
 <use KidneyGenetics_documentation_files/figure-latex/unnamed-chunk-10-1.pdf>
-[9]
-Underfull \hbox (badness 10000) in paragraph at lines 315--317
-
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 317--319
-
- []
-
+[8]
 File: KidneyGenetics_documentation_files/figure-latex/unnamed-chunk-11-1.pdf Gr
 aphic file (type pdf)
 <use KidneyGenetics_documentation_files/figure-latex/unnamed-chunk-11-1.pdf>
-[10]
-Underfull \hbox (badness 10000) in paragraph at lines 336--338
-
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 338--340
-
- []
-
+[9]
 File: KidneyGenetics_documentation_files/figure-latex/unnamed-chunk-12-1.pdf Gr
 aphic file (type pdf)
 <use KidneyGenetics_documentation_files/figure-latex/unnamed-chunk-12-1.pdf>
-[11]
-Underfull \hbox (badness 10000) in paragraph at lines 359--361
+[10]
+Underfull \hbox (badness 10000) in paragraph at lines 362--364
 
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 361--363
+Underfull \hbox (badness 10000) in paragraph at lines 364--366
 
  []
 
 File: KidneyGenetics_documentation_files/figure-latex/unnamed-chunk-13-1.pdf Gr
 aphic file (type pdf)
 <use KidneyGenetics_documentation_files/figure-latex/unnamed-chunk-13-1.pdf>
-[12]
-Underfull \hbox (badness 10000) in paragraph at lines 380--382
+[11]
+Underfull \hbox (badness 10000) in paragraph at lines 383--385
 
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 382--384
+Underfull \hbox (badness 10000) in paragraph at lines 385--387
 
  []
 
 File: KidneyGenetics_documentation_files/figure-latex/unnamed-chunk-14-1.pdf Gr
 aphic file (type pdf)
 <use KidneyGenetics_documentation_files/figure-latex/unnamed-chunk-14-1.pdf>
-[13]
-Underfull \hbox (badness 10000) in paragraph at lines 403--405
+[12]
+Underfull \hbox (badness 10000) in paragraph at lines 406--408
 
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 405--407
+Underfull \hbox (badness 10000) in paragraph at lines 408--410
 
  []
 
 File: KidneyGenetics_documentation_files/figure-latex/unnamed-chunk-15-1.pdf Gr
 aphic file (type pdf)
 <use KidneyGenetics_documentation_files/figure-latex/unnamed-chunk-15-1.pdf>
-[14]
-Underfull \hbox (badness 10000) in paragraph at lines 424--426
+[13]
+Underfull \hbox (badness 10000) in paragraph at lines 427--429
 
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 426--428
+Underfull \hbox (badness 10000) in paragraph at lines 429--431
 
  []
 
 File: KidneyGenetics_documentation_files/figure-latex/unnamed-chunk-16-1.pdf Gr
 aphic file (type pdf)
 <use KidneyGenetics_documentation_files/figure-latex/unnamed-chunk-16-1.pdf>
-[15]
+[14]
+Underfull \hbox (badness 10000) in paragraph at lines 450--452
+
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 452--454
+
+ []
+
 File: KidneyGenetics_documentation_files/figure-latex/unnamed-chunk-17-1.pdf Gr
 aphic file (type pdf)
 <use KidneyGenetics_documentation_files/figure-latex/unnamed-chunk-17-1.pdf>
+[15]
+Underfull \hbox (badness 10000) in paragraph at lines 471--473
+
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 473--475
+
+ []
+
 File: KidneyGenetics_documentation_files/figure-latex/unnamed-chunk-18-1.pdf Gr
 aphic file (type pdf)
 <use KidneyGenetics_documentation_files/figure-latex/unnamed-chunk-18-1.pdf>
-(KidneyGenetics_documentation.bbl [16] [17]) [18] (KidneyGenetics_documentation
-.aux)
+[16]
+File: KidneyGenetics_documentation_files/figure-latex/unnamed-chunk-19-1.pdf Gr
+aphic file (type pdf)
+<use KidneyGenetics_documentation_files/figure-latex/unnamed-chunk-19-1.pdf>
+File: KidneyGenetics_documentation_files/figure-latex/unnamed-chunk-20-1.pdf Gr
+aphic file (type pdf)
+<use KidneyGenetics_documentation_files/figure-latex/unnamed-chunk-20-1.pdf>
+(KidneyGenetics_documentation.bbl [17] [18] [19]) [20] (KidneyGenetics_document
+ation.aux)
  ***********
 LaTeX2e <2023-06-01> patch level 1
 L3 programming layer <2023-06-16>
  ***********
  ) 
 Here is how much of TeX's memory you used:
- 19899 strings out of 411164
- 364006 string characters out of 5809999
- 1863394 words of memory out of 5000000
- 40176 multiletter control sequences out of 15000+600000
+ 19947 strings out of 411164
+ 365515 string characters out of 5809999
+ 1881394 words of memory out of 5000000
+ 40224 multiletter control sequences out of 15000+600000
  519822 words of font info for 85 fonts, out of 8000000 for 9000
  1348 hyphenation exceptions out of 8191
- 90i,8n,120p,1027b,547s stack positions out of 10000i,1000n,20000p,200000b,200000s
+ 90i,8n,120p,1027b,679s stack positions out of 10000i,1000n,20000p,200000b,200000s
 
-Output written on KidneyGenetics_documentation.pdf (18 pages).
+Output written on KidneyGenetics_documentation.pdf (20 pages).
