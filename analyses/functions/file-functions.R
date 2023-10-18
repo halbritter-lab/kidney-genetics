@@ -46,7 +46,7 @@ replace_strings <- function(input_file, output_file, find_vector, replace_vector
   new_text <- text
   for (i in seq_along(find_vector)) {
     new_text <- str_replace_all(new_text, pattern = find_vector[i],
-        replacement = replace_vector[i])
+        replacement = as.character(replace_vector[i]))
   }
 
   # Write the new text to a file
