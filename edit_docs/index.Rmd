@@ -110,18 +110,32 @@ all_genes <- merge_analyses_sources %>%
 
 high_evidence_genes <- merge_analyses_sources %>%
     filter(evidence_count > 2)
-    
+
 high_evidence_genes_count <- high_evidence_genes %>%
     nrow()
 
-# TODO: compute the number of genes or entities already curated by ClinGen or other sources (GenCC)
-clingen_genes <- "XXX"
-manualscoring_genes <- "YYY"
+low_evidence_genes <- merge_analyses_sources %>%
+    filter(evidence_count <= 2)
+
+low_evidence_genes_count <- low_evidence_genes %>%
+    nrow()
+
+clingen_genes <- high_evidence_annotated_table %>%
+    filter(clingen_summary != "NULL")
+
+clingen_genes_count <- clingen_genes %>%
+    nrow()
+
+manualscoring_genes <- high_evidence_annotated_table %>%
+    filter(clingen_summary == "NULL")
+
+manualscoring_genes_count <- manualscoring_genes %>%
+    nrow()
 
 replace_strings("static/img/figures/raw/curation_flow_diagram_raw.drawio",
     "static/img/figures/updated/curation_flow_diagram_current.drawio",
-    c("ALL_GENES", "HIGHEVIDENCE_GENES", "CLINGEN_GENES", "MANUALSCORING_GENES"),
-    c(all_genes, high_evidence_genes_count, clingen_genes, manualscoring_genes))
+    c("ALL_GENES", "HIGHEVIDENCE_GENES", "LOWEVIDENCE_GENES", "CLINGEN_GENES", "MANUALSCORING_GENES"),
+    c(all_genes, high_evidence_genes_count, low_evidence_genes_count, clingen_genes_count, manualscoring_genes_count))
 
 # compute per source numbers with placeholders
 summary_counts <- merge_analyses_sources %>%
