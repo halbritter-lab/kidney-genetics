@@ -5,6 +5,7 @@
 .DS_Store
 
 # analysis data download files
+analyses/01_PanelAPp/data/downloads
 analyses/02_Literature/data/downloads
 analyses/03_DiagnosticPanels/data/downloads
 analyses/B_AnnotationHGNC/data
