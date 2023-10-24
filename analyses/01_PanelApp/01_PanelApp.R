@@ -1,11 +1,11 @@
 ############################################
 ## load libraries
-library(readr)
-library(tidyverse)
-library(rvest)
-library(jsonlite)
+library(readr)      ## needed to read files
+library(tidyverse)  ## needed for general table operations
+library(rvest)      ## needed for scraping
+library(jsonlite)   ## needed for HGNC requests
 library("R.utils")  ## gzip downloaded and result files
-library(config)
+library(config)     ## needed for config loading
 ############################################
 
 
@@ -31,20 +31,23 @@ options(scipen = 999)
 # load global functions
 # hgnc functions
 source("../functions/hgnc-functions.R", local = TRUE)
+source("../functions/panelapp-functions.R", local = TRUE)
 ############################################
 
 
 ############################################
 ## get a list of all PanelApp panels and filter
 
-# TODO: add logic to find all pages through API call
-
 ## PanelApp UK
 # store all pages in a list first
-baseurl <- "https://panelapp.genomicsengland.co.uk/api/v1/panels/?format=json"
+baseurl <- "https://panelapp.genomicsengland.co.uk/api/v1/panels/?format=json&page="
+
+# find all pages through API call
+panelapp_uk_last_page <- find_last_page(baseurl)
+
 panelapp_uk_pages <- list()
-for (i in 1:4){
-  panelapp_uk_page <- fromJSON(paste0(baseurl, "&page=", i))
+for (i in 1:panelapp_uk_last_page){
+  panelapp_uk_page <- fromJSON(paste0(baseurl, i))
   message("Retrieving page ", i)
   panelapp_uk_pages[[i + 1]] <- panelapp_uk_page$results
 }
@@ -61,9 +64,13 @@ panelapp_uk <- rbind_pages(panelapp_uk_pages) %>%
 
 ## PanelApp Australia
 # store all pages in a list first
-baseurl <- "https://panelapp.agha.umccr.org/api/v1/panels/?format=json"
+baseurl <- "https://panelapp.agha.umccr.org/api/v1/panels/?format=json&page="
+
+# find all pages through API call
+panelapp_australia_last_page <- find_last_page(baseurl)
+
 panelapp_australia_pages <- list()
-for (i in 1:3){
+for (i in 1:panelapp_australia_last_page){
   panelapp_australia_page <- fromJSON(paste0(baseurl, "&page=", i))
   message("Retrieving page ", i)
   panelapp_australia_pages[[i + 1]] <- panelapp_australia_page$results
@@ -80,8 +87,7 @@ panelapp_australia <- rbind_pages(panelapp_australia_pages) %>%
 
 # combine into one tibble
 # filter for kidney related panels
-# TODO: Issue #10 and move regex filter to config file
-filter_string <- "[Kk]idney|[Rr]enal|[Nn]ephro"
+filter_string <- config_vars_proj$panelap_filter_string
 
 panelapp_panels <- bind_rows(panelapp_uk, panelapp_australia) %>%
   mutate(kidney_disease = str_detect(name, filter_string))
