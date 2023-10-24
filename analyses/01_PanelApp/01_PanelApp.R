@@ -32,6 +32,7 @@ options(scipen = 999)
 # hgnc functions
 source("../functions/hgnc-functions.R", local = TRUE)
 source("../functions/panelapp-functions.R", local = TRUE)
+source("../functions/file-functions.R", local = TRUE)
 ############################################
 
 
@@ -98,15 +99,34 @@ panelapp_panels_kidney <- panelapp_panels %>%
 ############################################
 
 
-
 ############################################
 ## load all kidney related PanelApp panels into one tibble
 
-# TODO: download API call data for reproducibility
+# directory to save JSON files
+download_path <- "data/downloads"
 
-panelapp_genes <- panelapp_panels_kidney %>%
+# check if files are older than 1 month
+panelapp_panels_kidney_checked <- panelapp_panels_kidney %>%
+  mutate(json_file_name = paste0(id, "_", str_replace_all(name, "[[:punct:]]", ""))) %>%
   rowwise() %>%
-  mutate(panel = list(fromJSON(api_call))) %>%
+  mutate(file_is_young = check_file_age(json_file_name, download_path, 1))
+
+# panelapp JSON file download
+if (all(panelapp_panels_kidney_checked$file_is_young)) {
+  panelapp_panels_kidney_files <- panelapp_panels_kidney_checked %>%
+    rowwise() %>%
+    mutate(json_download_file = get_newest_file(json_file_name, download_path))
+} else {
+  panelapp_panels_kidney_files <- panelapp_panels_kidney_checked %>%
+    mutate(json_file_path = file.path(download_path, paste0(json_file_name, ".json"))) %>%
+    rowwise() %>%
+    mutate(json_download_file = download_and_save_json(api_call, json_file_path))
+}
+
+# now read the local JSON files using jsonlite and reprocess
+panelapp_genes <- panelapp_panels_kidney_files %>%
+  rowwise() %>%
+  mutate(panel = list(fromJSON(json_download_file))) %>%
   unnest_wider(panel, names_repair = "unique") %>%
   select(id = id...1,
     name = name...2,
