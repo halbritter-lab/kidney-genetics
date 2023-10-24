@@ -163,3 +163,60 @@ get_newest_file <- function(file_basename, folder) {
     return(newest_files)
   }
 }
+
+
+#' Download and Save JSON from PanelApp API Endpoint
+#'
+#' This function queries the specified PanelApp API endpoint and saves the
+#' JSON response to a local file. The saved filename will include the current
+#' date in ISO 8601 format. If the `gzip` argument is set to TRUE (default),
+#' the file will be saved with a .json.gz extension in gzipped format. Otherwise,
+#' it will be saved with a .json extension.
+#'
+#' @param api_url A character string representing the API endpoint URL from which 
+#'        the JSON response will be fetched.
+#' @param save_path A character string representing the base path (including filename 
+#'        without date) where the JSON response will be saved. The current date in 
+#'        ISO 8601 format will be appended to the filename before the extension.
+#' @param gzip A logical value indicating whether the JSON file should be gzipped. 
+#'        Defaults to TRUE.
+#' @return A character string representing the saved filename if successful, 
+#'         or an error message otherwise.
+#'
+#' @examples
+#' \dontrun{
+#'   api_url <- "https://panelapp.genomicsengland.co.uk/api/v1/panels/283/?format=json"
+#'   save_path <- "/path/to/your/directory/283.json"
+#'   result <- download_and_save_json(api_url, save_path)
+#'   print(result)
+#' }
+#'
+#' @export
+download_and_save_json <- function(api_url, save_path, gzip = TRUE) {
+  # Get the current date in ISO 8601 format
+  date_iso <- format(Sys.Date(), "%Y-%m-%d")
+
+  # Determine the extension based on the gzip argument
+  extension <- ifelse(gzip, ".json.gz", ".json")
+
+  # Append the date to the filename before the determined extension
+  save_path_with_date <- sub("\\.json$", paste0(".", date_iso, extension), save_path)
+
+  response <- GET(api_url)
+  if (status_code(response) == 200) {
+    content <- rawToChar(response$content)
+
+    if (gzip) {
+      # Write and gzip the content
+      gzcon <- gzfile(save_path_with_date, "w")
+      writeLines(content, con = gzcon)
+      close(gzcon)
+    } else {
+      writeLines(content, con = save_path_with_date)
+    }
+
+    return(save_path_with_date)
+  } else {
+    return(paste("Failed to fetch data from", api_url))
+  }
+}
