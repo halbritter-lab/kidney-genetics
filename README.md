@@ -117,3 +117,19 @@ This project is licensed under the terms of the MIT license. For more informatio
 ## Contact
 
 If you have any questions, suggestions, or feedback, please feel free to [contact us](contact.md).
+
+## TODO
+- Additional analyses:
+    - [] first publication date
+    - [] networks interaction
+    - [] graph visualization (clinical, syndromic, etc.)
+    - [] phenotype annotation (SAMS)
+- Docs update
+    - [] detailed methods
+    - [] update figures (flow diagram, etc.)
+    - [] add presentation slides and posters
+    - [] update tables (descriptions, add links)
+    - [] remove hardcoded magic numbers from analysis plots
+    - [] use MONDO instead of OMIM as primary disease ontology
+    - [] add table with ClinGen/ GenCC entity scores
+    - [] can we render bookdown pages with information for all genes? Yes, parameterized reports (https://bookdown.org/yihui/rmarkdown/params-knit.html)
