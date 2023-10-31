@@ -33,6 +33,7 @@ options(scipen = 999)
 source("../functions/hgnc-functions.R", local = TRUE)
 source("../functions/panelapp-functions.R", local = TRUE)
 source("../functions/file-functions.R", local = TRUE)
+source("../functions/helper-functions.R", local = TRUE)
 ############################################
 
 
@@ -154,26 +155,32 @@ panelapp_genes <- panelapp_panels_kidney_files %>%
 # sapply used to collapse all list entries into one string
 all_panelapp_genes <- panelapp_genes %>%
   arrange(panel_id, entity_name) %>%
-  mutate(evidence = sapply(evidence, paste, collapse = "; "),
+  mutate(
+    evidence = sapply(evidence, paste, collapse = "; "),
     phenotypes = sapply(phenotypes, paste, collapse = "; "),
-    publications = sapply(publications, paste, collapse = "; ")) %>%
+    publications = sapply(publications, paste, collapse = "; ")
+  ) %>%
   mutate(evidence_category =
     case_when(
       confidence_level == 3 ~ "Green",
       confidence_level == 2 ~ "Amber",
-      confidence_level == 1 | confidence_level == 0 ~ "Red",
+      confidence_level == 1 | confidence_level == 0 ~ "Red"
     )
   ) %>%
-  mutate(panel = paste0(panel_name,
+  mutate(
+    panel = paste0(panel_name,
       " (id=",
       panel_id,
       ", version=",
       panel_version,
       ", confidence=",
       evidence_category,
-      ")")) %>%
+      ")"),
+    Green_or_Amber_count = as.integer(grepl("Green|Amber", evidence_category))
+  ) %>%
   group_by(entity_name) %>%
-  summarise(entity_name = paste(unique(entity_name), collapse = " | "),
+  summarise(
+    entity_name = paste(unique(entity_name), collapse = " | "),
     entity_type = paste(unique(entity_type), collapse = " | "),
     gene_symbol = paste(unique(gene_symbol), collapse = " | "),
     hgnc_id = paste(unique(hgnc_id), collapse = " | "),
@@ -188,26 +195,29 @@ all_panelapp_genes <- panelapp_genes %>%
     panel_id = paste(unique(panel_id), collapse = " | "),
     panel_name = paste(unique(panel_name), collapse = " | "),
     panel_version = paste(unique(panel_version), collapse = " | "),
-    panel_version_created = paste(unique(panel_version_created),
-      collapse = " | "),
+    panel_version_created = paste(unique(panel_version_created), collapse = " | "),
     panel_source = paste(unique(panel_source), collapse = " | "),
-    PanelApp_Green_or_amber = grepl("Green|Amber", evidence_category),
-    source_count = n(),
-    .groups = "keep") %>%
+    source_count = sum(Green_or_Amber_count),
+    .groups = "keep"
+  ) %>%
   ungroup() %>%
   mutate(hgnc_id = hgnc_id_from_symbol_grouped(gene_symbol)) %>%
-  mutate(approved_symbol = symbol_from_hgnc_id_grouped(hgnc_id))
+  mutate(approved_symbol = symbol_from_hgnc_id_grouped(hgnc_id)) %>%
+  mutate(source_evidence = grepl("Green|Amber", evidence_category))
 
 all_panelapp_genes_format <- all_panelapp_genes %>%
-  select(approved_symbol,
+  select(
+    approved_symbol,
     hgnc_id,
     gene_name_reported = gene_symbol,
     source = panel,
     source_count,
-    source_evidence = PanelApp_Green_or_amber)
+    source_evidence
+  )
 
-# TODO: normalize source_evidence to 0/1 as percentiles
-# TODO: write a function for this normalization step
+# normalize source_count to 0/1 as percentiles
+all_panelapp_genes_format_normalize <- all_panelapp_genes_format %>%
+  normalize_percentile("source_count")
 
 ############################################
 
