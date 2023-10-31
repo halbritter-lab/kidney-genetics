@@ -1,12 +1,12 @@
 ############################################
 ## load libraries
-library(readxl) # needed to load Excel files
-library(tidyverse) # needed for data processing
-library(jsonlite) # needed for HGNC functions
-library(officer) # needed for docx files
-library(pdftools) # needed for pdf files
-library("R.utils")  ## gzip downloaded and result files
-library(config) # needed for config loading
+library(readxl)       ## needed to load Excel files
+library(tidyverse)    ## needed for data processing
+library(jsonlite)     ## needed for HGNC functions
+library(officer)      ## needed for docx files
+library(pdftools)     ## needed for pdf files
+library("R.utils")    ## gzip downloaded and result files
+library(config)       ## needed for config loading
 ############################################
 
 
@@ -32,13 +32,14 @@ options(scipen = 999)
 # load global functions
 # hgnc functions
 source("../functions/hgnc-functions.R", local = TRUE)
+# helper functions
+source("../functions/helper-functions.R", local = TRUE)
 ############################################
 
 
 ############################################
 ## load manually curated overview Excel table with download links and filter
-# TODO: the file location should be a config variable
-pub_file <- "data/230220_Kidney_Genes_Publication_List.xlsx"
+pub_file <- config_vars_proj$kidney_genes_pub_file
 
 kidney_genes_publication_list <- read_excel(pub_file, skip = 4, na = "NA") %>%
   filter(!is.na(Type))
@@ -293,9 +294,9 @@ literature_genes <- kidney_genes_publication_list %>%
     source_count = publication_count,
     source_evidence = at_least_two_publications)
 
-# TODO: normalize source_evidence to 0/1 as percentiles
-# TODO: write a function for this normalization step
-
+# normalize source_count to 0/1 as percentiles
+literature_genes_normalize <- literature_genes %>%
+  normalize_percentile("source_count")
 ############################################
 
 
@@ -306,7 +307,7 @@ creation_date <- strftime(as.POSIXlt(Sys.time(),
   "UTC",
   "%Y-%m-%dT%H:%M:%S"), "%Y-%m-%d")
 
-write_csv(literature_genes,
+write_csv(literature_genes_normalize,
   file = paste0("results/02_Literature_genes.",
     creation_date,
     ".csv"),

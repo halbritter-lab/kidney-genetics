@@ -4,4 +4,4 @@ default:
   drawio_path: "<fill the local path to your drawio executable>"
 nephrology:
   projectsdir: "<fill in your local project dir>"
-  panelap_filter_string: ((?=.*[Kk]idney)|(?=.*[Rr]enal)|(?=.*[Nn]ephro))(^((?!adrenal).)*$)
+  panelapp_filter_string: ((?=.*[Kk]idney)|(?=.*[Rr]enal)|(?=.*[Nn]ephro))(^((?!adrenal).)*$)

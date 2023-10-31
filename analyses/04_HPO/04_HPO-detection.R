@@ -1,12 +1,12 @@
 ############################################
 ## load libraries
-library(tidyverse)  ##needed for general table operations
-library(jsonlite)  ##needed for HGNC requests
-library(rvest)    ##needed for scraping
-library(httr)    ##needed for scraping
-library(kableExtra)  ##needed to present scraped data
+library(tidyverse)  ## needed for general table operations
+library(jsonlite)   ## needed for HGNC requests
+library(rvest)      ## needed for scraping
+library(httr)       ## needed for scraping
+library(kableExtra) ## needed to present scraped data
 library("R.utils")  ## gzip downloaded and result files
-library(config) # needed for config loading
+library(config)     ## needed for config loading
 ############################################
 
 
@@ -34,15 +34,13 @@ options(scipen = 999)
 source("../functions/hgnc-functions.R", local = TRUE)
 source("../functions/hpo-functions.R", local = TRUE)
 source("../functions/file-functions.R", local = TRUE)
+# helper functions
+source("../functions/helper-functions.R", local = TRUE)
 ############################################
 
 
 ############################################
 ## get relevant HPO terms for kidney disease classification
-# get the current date
-
-# TODO: compute date only once or somehow in config
-current_date <- strftime(as.POSIXlt(Sys.time(), "UTC", "%Y-%m-%dT%H:%M:%S"), "%Y-%m-%d")
 
 # get all children of term upper urinary tract (HP:0010935) for classification into kidney disease groups
 # walk through the ontology tree and add all unique terms descending from
@@ -59,15 +57,15 @@ if (check_file_age("hpo_list_kidney", "../shared/", 1)) {
     unlist() %>%
     tibble(`term` = .) %>%
     unique() %>%
-    mutate(query_date = current_date)
+    mutate(query_date = get_current_date_iso8601())
 
   write_csv(hpo_list_kidney,
     file = paste0("../shared/hpo_list_kidney.",
-      current_date,
+      get_current_date_iso8601(),
       ".csv"),
     na = "NULL")
 
-  gzip(paste0("../shared/hpo_list_kidney.", current_date, ".csv"),
+  gzip(paste0("../shared/hpo_list_kidney.", get_current_date_iso8601(), ".csv"),
     overwrite = TRUE)
 }
 ############################################
@@ -81,18 +79,14 @@ if (check_file_age("hpo_list_kidney", "../shared/", 1)) {
 if (check_file_age("phenotype", "../shared/data/downloads/", 1)) {
   phenotype_hpoa_filename <- get_newest_file("phenotype", "../shared/data/downloads/")
 } else {
-  # TODO: compute date only once or somehow in config
-  file_date <- strftime(as.POSIXlt(Sys.time(), "UTC", "%Y-%m-%dT%H:%M:%S"), "%Y-%m-%d")
 
   # disease ontology annotations from HPO
-  # TODO: this should be a config variable
-  phenotype_hpoa_url <- "http://purl.obolibrary.org/obo/hp/hpoa/phenotype.hpoa"
 
   phenotype_hpoa_filename <- paste0("../shared/data/downloads/phenotype.",
-    file_date,
+    get_current_date_iso8601(),
     ".hpoa")
 
-  download.file(phenotype_hpoa_url, phenotype_hpoa_filename, mode = "wb")
+  download.file(config_vars_proj$phenotype_hpoa_url, phenotype_hpoa_filename, mode = "wb")
 
   gzip(phenotype_hpoa_filename,
     overwrite = TRUE)
@@ -106,15 +100,13 @@ if (check_file_age("phenotype", "../shared/data/downloads/", 1)) {
 if (check_file_age("omim_genemap2", "../shared/data/downloads/", 1)) {
   omim_genemap2_filename <- get_newest_file("omim_genemap2", "../shared/data/downloads/")
 } else {
-  # TODO: compute date only once or somehow in config
-  file_date <- strftime(as.POSIXlt(Sys.time(), "UTC", "%Y-%m-%dT%H:%M:%S"), "%Y-%m-%d")
 
   # OMIM links to genemap2 file needs to be set in config and applied for at
   # https://www.omim.org/downloads
   omim_genemap2_url <- config_vars_proj$omim_genemap2_url
 
   omim_genemap2_filename <- paste0("../shared/data/downloads/omim_genemap2.",
-    file_date,
+    get_current_date_iso8601(),
     ".txt")
 
   download.file(omim_genemap2_url, omim_genemap2_filename, mode = "wb")
@@ -217,9 +209,9 @@ hpo_gene_list <- phenotype_hpoa_filter %>%
     source_count,
     source_evidence)
 
-# TODO: normalize source_evidence to 0/1 as percentiles
-# TODO: write a function for this normalization step
-
+# normalize source_count to 0/1 as percentiles
+hpo_gene_list_normalize <- hpo_gene_list %>%
+  normalize_percentile("source_count")
 ############################################
 
 
@@ -229,7 +221,7 @@ creation_date <- strftime(as.POSIXlt(Sys.time(),
   "UTC",
   "%Y-%m-%dT%H:%M:%S"), "%Y-%m-%d")
 
-write_csv(hpo_gene_list,
+write_csv(hpo_gene_list_normalize,
   file = paste0("results/04_HPO_genes.",
     creation_date,
     ".csv"),

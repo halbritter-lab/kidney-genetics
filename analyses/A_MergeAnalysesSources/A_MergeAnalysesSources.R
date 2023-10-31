@@ -1,10 +1,10 @@
 ############################################
 ## load libraries
 library(tidyverse)  ## needed for general table operations
-library(readr)  ## needed to read files
-library(tools)  ## needed for checksums
+library(readr)      ## needed to read files
+library(tools)      ## needed for checksums
 library("R.utils")  ## gzip downloaded and result files
-library(config)
+library(config)     ## needed for config loading
 ############################################
 
 
@@ -78,9 +78,10 @@ results_genes <- results_csv_table %>%
 # evidence_count = sum of lists where the source_evidence is TRUE
 # list_count = sum lists where gene is found (source_evidence is TRUE or FALSE)
 results_genes_wider <- results_genes %>%
-  select(approved_symbol, hgnc_id, analysis, source_evidence) %>%
+  select(approved_symbol, hgnc_id, analysis, source_evidence, source_count_percentile) %>%
   group_by(approved_symbol, hgnc_id) %>%
-  mutate(evidence_count = sum(source_evidence == TRUE)) %>%
+  mutate(evidence_count = sum(source_evidence == TRUE),
+    source_count_percentile = sum(source_count_percentile)) %>%
   mutate(list_count =
     sum(source_evidence == TRUE | source_evidence == FALSE)) %>%
   ungroup %>%

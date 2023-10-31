@@ -7,9 +7,9 @@ library(rvest)
 library(jsonlite)
 library(curl)
 library(httr)
-library(webdriver) # needed for headless browsing
+library(webdriver)  ## needed for headless browsing
 library("R.utils")  ## gzip downloaded and result files
-library(config) # needed for config loading
+library(config)     ## needed for config loading
 ############################################
 
 
@@ -38,6 +38,8 @@ source("../functions/hgnc-functions.R", local = TRUE)
 source("../functions/phantomjs-functions.R", local = TRUE)
 source("../functions/natera-functions.R", local = TRUE)
 source("../functions/blueprintgenetics-functions.R", local = TRUE)
+# helper functions
+source("../functions/helper-functions.R", local = TRUE)
 ############################################
 
 
@@ -45,8 +47,7 @@ source("../functions/blueprintgenetics-functions.R", local = TRUE)
 ## download web urls
 
 # load the list of sources
-# TODO: the file location should be in a config file
-diagnostic_panels_list <- read_excel("data/kidney_diagnostic_panels_list.xlsx") %>%
+diagnostic_panels_list <- read_excel(config_vars_proj$kidney_diagnostic_panels) %>%
   filter(use == "yes")
 
 # TODO: implement using already download files if they are not too old
@@ -309,12 +310,9 @@ all_diagnostic_panels_genes <- bind_rows(centogene_nephrology_genes,
 all_diagnostic_panels_genes_format <- all_diagnostic_panels_genes %>%
   select(approved_symbol, hgnc_id, gene_name_reported, source = panel_diagnostic, source_count = panel_diagnostic_count, source_evidence = at_least_two_panels)
 
-# TODO: normalize source_evidence to 0/1 as percentiles
-# TODO: write a function for this normalization step
-
-all_diagnostic_panels_genes_formats_norm <- all_diagnostic_panels_genes_format %>%
-         mutate(source_count_percent_rank = percent_rank(source_count))
-
+# normalize source_count to 0/1 as percentiles
+all_diagnostic_panels_genes_normalize <- all_diagnostic_panels_genes_format %>%
+  normalize_percentile("source_count")
 ############################################
 
 
@@ -324,7 +322,7 @@ creation_date <- strftime(as.POSIXlt(Sys.time(),
   "UTC",
   "%Y-%m-%dT%H:%M:%S"), "%Y-%m-%d")
 
-write_csv(all_diagnostic_panels_genes_format,
+write_csv(all_diagnostic_panels_genes_normalize,
   file = paste0("results/03_DiagnosticPanels_genes.",
     creation_date,
     ".csv"),

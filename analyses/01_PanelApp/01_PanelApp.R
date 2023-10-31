@@ -33,6 +33,7 @@ options(scipen = 999)
 source("../functions/hgnc-functions.R", local = TRUE)
 source("../functions/panelapp-functions.R", local = TRUE)
 source("../functions/file-functions.R", local = TRUE)
+# helper functions
 source("../functions/helper-functions.R", local = TRUE)
 ############################################
 
@@ -89,7 +90,7 @@ panelapp_australia <- rbind_pages(panelapp_australia_pages) %>%
 
 # combine into one tibble
 # filter for kidney related panels
-filter_string <- config_vars_proj$panelap_filter_string
+filter_string <- config_vars_proj$panelapp_filter_string
 
 panelapp_panels <- bind_rows(panelapp_uk, panelapp_australia) %>%
   mutate(kidney_disease = str_detect(name, filter_string))
@@ -237,7 +238,7 @@ write_csv(panelapp_panels_kidney,
 gzip(paste0("results/01_PanelApp_panels.", creation_date, ".csv"),
   overwrite = TRUE)
 
-write_csv(all_panelapp_genes_format,
+write_csv(all_panelapp_genes_format_normalize,
   file = paste0("results/01_PanelApp_genes.",
     creation_date,
     ".csv"),

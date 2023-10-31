@@ -1,11 +1,11 @@
 ############################################
 ## load libraries
-library(readr)
-library(tidyverse)
-library(httr)
-library(jsonlite)
-library("R.utils")  ## gzip downloaded and result files
-library(config)
+library(readr)        ## needed to read files
+library(tidyverse)    ## needed for general table operations
+library(httr)         ## needed for scraping
+library(jsonlite)     ## needed for HGNC requests
+library("R.utils")    ## gzip downloaded and result files
+library(config)       ## needed for config loading
 ############################################
 
 
@@ -41,6 +41,8 @@ source("../functions/hgnc-functions.R", local = TRUE)
 source("../functions/PubTator-functions.R", local = TRUE)
 # NCBI functions
 source("../functions/NCBI-datasets-v2-API-functions.R", local = TRUE)
+# helper functions
+source("../functions/helper-functions.R", local = TRUE)
 ############################################
 
 
@@ -71,9 +73,8 @@ page_tibble_genes <- page_tibble_unnest %>%
   unnest(info)
 
 # filter for human only, select columns
-# TODO: tax id should be a parameter in a config file (no magic numbers)
 pubtator_genes <- page_tibble_genes %>%
-  filter(tax_id == 9606) %>%
+  filter(tax_id == config_vars_proj$pubtator_tax_id) %>%
   select(pmid, symbol, text_part) %>%
   group_by(symbol) %>%
   summarise(symbol = paste(unique(symbol), collapse = "; "),
@@ -83,8 +84,8 @@ pubtator_genes <- page_tibble_genes %>%
     .groups = "keep") %>%
   ungroup()
 
-# normalize using same functions as in other analyses
-pubtator_genes_normalize <- pubtator_genes %>%
+# format using same functions as in other analyses
+pubtator_genes_format <- pubtator_genes %>%
   mutate(hgnc_id = hgnc_id_from_symbol_grouped(symbol)) %>%
   filter(!is.na(hgnc_id)) %>%
   mutate(approved_symbol = symbol_from_hgnc_id_grouped(hgnc_id)) %>%
@@ -96,9 +97,9 @@ pubtator_genes_normalize <- pubtator_genes %>%
     source_count,
     source_evidence = at_least_three_pub)
 
-# TODO: normalize source_evidence to 0/1 as percentiles
-# TODO: write a function for this normalization step
-
+# normalize source_count to 0/1 as percentiles
+pubtator_genes_format_normalize <- pubtator_genes_format %>%
+  normalize_percentile("source_count")
 ############################################
 
 
@@ -108,7 +109,7 @@ creation_date <- strftime(as.POSIXlt(Sys.time(),
   "UTC",
   "%Y-%m-%dT%H:%M:%S"), "%Y-%m-%d")
 
-write_csv(pubtator_genes_normalize,
+write_csv(pubtator_genes_format_normalize,
   file = paste0("results/05_PubTator_genes.",
     creation_date,
     ".csv"),
