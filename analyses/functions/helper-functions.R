@@ -33,3 +33,20 @@ normalize_percentile <- function(data, colname) {
   data %>%
     mutate("{colname}_percentile" := rank(!!sym(colname), ties.method = "average") / n()) 
 }
+
+
+#' Get Current Date in ISO 8601 Format
+#'
+#' This function returns the current date in ISO 8601 format ("YYYY-MM-DD"). 
+#' The date is calculated based on Coordinated Universal Time (UTC).
+#'
+#' @return A character string representing the current date in "YYYY-MM-DD" format.
+#'
+#' @examples
+#' current_date <- get_current_date_iso8601()
+#' print(current_date)
+#'
+#' @export
+get_current_date_iso8601 <- function() {
+  strftime(as.POSIXlt(Sys.time(), "UTC"), "%Y-%m-%d")
+}
