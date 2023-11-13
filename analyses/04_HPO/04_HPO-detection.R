@@ -113,6 +113,9 @@ if (check_file_age("omim_genemap2", "../shared/data/downloads/", 1)) {
 
   gzip(omim_genemap2_filename,
     overwrite = TRUE)
+
+  omim_genemap2_filename <- paste0(omim_genemap2_filename,
+    ".gz")
 }
 ############################################
 
