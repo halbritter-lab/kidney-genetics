@@ -50,6 +50,7 @@ source("../functions/helper-functions.R", local = TRUE)
 ## perform analysis
 
 # define search query
+# TODO: this query should be in a config file
 search_query <- '("kidney disease" OR "renal disease") AND (gene OR syndrome) AND (variant OR mutation)'
 
 # get number of pages for search query

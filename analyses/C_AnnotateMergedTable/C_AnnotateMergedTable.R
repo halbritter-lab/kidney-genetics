@@ -435,7 +435,7 @@ omim_genemap2 <- read_delim(omim_genemap2_filename, "\t",
 # https://clinicalgenome.org/working-groups/clinical-domain/clingen-kidney-disease-clinical-domain-working-group/
 
 # TODO: safe the results of the API calls or websites for reproducibility
-# TODO: maybe other kidney diseases like in Becherucci et al. 2023
+# TODO: maybe other kidney diseases like in Becherucci et al. 2023 (PMID: 36753701)
 
 ## general workflow:
 # A) get all genes from all kidney groups
@@ -1052,6 +1052,7 @@ merge_analyses_sources_high_evidence_annotated <- merge_analyses_sources_high_ev
 # TODO: scoring logic: we further use the category "no known relation" for genes that are not trustworthy associated with kidney disease
 # TODO: maybe annotate with publications (from OMIM) and GeneReviews
 # TODO: annotate phenotypes as phenopackets for each entity?
+# TODO: use MONDO instead of OMIM as primary disease ontology in the manual curation effort
 ############################################
 
 
@@ -1070,3 +1071,10 @@ write_csv(merge_analyses_sources_high_evidence_annotated,
 gzip(paste0("results/C_high_evidence_annotated_csv_table.", creation_date, ".csv"),
   overwrite = TRUE)
 ############################################
+
+# Perform manual curation
+# This milestone contains all issues that need to be addressed for the manual curation effort.
+# We need to define the scoring logic for the final table with cutoffs for the different categories.
+# We need to define a workflow for the manual curation effort and document this for all expert curators involved.
+# Ideally, we would like to have a web interface for the manual curation effort, but this is not a requirement for this milestone.
+# The scoring logic and the workflow for the manual curation effort should be adaptable for future database updates and include recomputation intervals for the different data sources and re-evaluation intervals for curated genes.

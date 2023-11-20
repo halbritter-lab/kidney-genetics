@@ -1,4 +1,4 @@
-# Kidney-Genetics Documentation
+# Kidney-Genetics Documentation Markdown and Scripts
 
 The repository subfolder for the Kidney-Genetics documentation.
 
