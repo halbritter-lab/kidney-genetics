@@ -28,7 +28,7 @@ setwd(paste0(config_vars_proj$projectsdir, project_name, script_path))
 options(scipen = 999)
 
 # compute date only once or somehow in config
-current_date <- strftime(as.POSIXlt(Sys.time(), "UTC", "%Y-%m-%dT%H:%M:%S"), "%Y-%m-%d")
+current_date <- get_current_date_iso8601()
 ############################################
 
 
@@ -1058,23 +1058,12 @@ merge_analyses_sources_high_evidence_annotated <- merge_analyses_sources_high_ev
 
 ############################################
 ## save results
-creation_date <- strftime(as.POSIXlt(Sys.time(),
-  "UTC",
-  "%Y-%m-%dT%H:%M:%S"), "%Y-%m-%d")
-
 write_csv(merge_analyses_sources_high_evidence_annotated,
   file = paste0("results/C_high_evidence_annotated_csv_table.",
-    creation_date,
+    current_date,
     ".csv"),
   na = "NULL")
 
-gzip(paste0("results/C_high_evidence_annotated_csv_table.", creation_date, ".csv"),
+gzip(paste0("results/C_high_evidence_annotated_csv_table.", current_date, ".csv"),
   overwrite = TRUE)
 ############################################
-
-# Perform manual curation
-# This milestone contains all issues that need to be addressed for the manual curation effort.
-# We need to define the scoring logic for the final table with cutoffs for the different categories.
-# We need to define a workflow for the manual curation effort and document this for all expert curators involved.
-# Ideally, we would like to have a web interface for the manual curation effort, but this is not a requirement for this milestone.
-# The scoring logic and the workflow for the manual curation effort should be adaptable for future database updates and include recomputation intervals for the different data sources and re-evaluation intervals for curated genes.

@@ -25,6 +25,9 @@ setwd(paste0(config_vars_proj$projectsdir, project_name, script_path))
 
 ## set global options
 options(scipen = 999)
+
+# compute date only once or somehow in config
+current_date <- get_current_date_iso8601()
 ############################################
 
 
@@ -220,16 +223,12 @@ hpo_gene_list_normalize <- hpo_gene_list %>%
 
 ############################################
 ## save results
-creation_date <- strftime(as.POSIXlt(Sys.time(),
-  "UTC",
-  "%Y-%m-%dT%H:%M:%S"), "%Y-%m-%d")
-
 write_csv(hpo_gene_list_normalize,
   file = paste0("results/04_HPO_genes.",
-    creation_date,
+    current_date,
     ".csv"),
   na = "NULL")
 
-gzip(paste0("results/04_HPO_genes.", creation_date, ".csv"),
+gzip(paste0("results/04_HPO_genes.", current_date, ".csv"),
   overwrite = TRUE)
 ############################################

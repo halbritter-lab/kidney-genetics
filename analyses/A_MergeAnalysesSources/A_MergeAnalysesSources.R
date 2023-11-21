@@ -23,6 +23,9 @@ setwd(paste0(config_vars_proj$projectsdir, project_name, script_path))
 
 ## set global options
 options(scipen = 999)
+
+# compute date only once or somehow in config
+current_date <- get_current_date_iso8601()
 ############################################
 
 
@@ -95,25 +98,21 @@ results_genes_wider <- results_genes %>%
 
 ############################################
 ## save results
-creation_date <- strftime(as.POSIXlt(Sys.time(),
-  "UTC",
-  "%Y-%m-%dT%H:%M:%S"), "%Y-%m-%d")
-
 write_csv(results_genes_wider,
   file = paste0("results/A_MergeAnalysesSources.",
-    creation_date,
+    current_date,
     ".csv"),
   na = "NULL")
 
-gzip(paste0("results/A_MergeAnalysesSources.", creation_date, ".csv"),
+gzip(paste0("results/A_MergeAnalysesSources.", current_date, ".csv"),
   overwrite = TRUE)
 
 write_csv(results_csv_table,
   file = paste0("results/A_results_csv_table.",
-    creation_date,
+    current_date,
     ".csv"),
   na = "NULL")
 
-gzip(paste0("results/A_results_csv_table.", creation_date, ".csv"),
+gzip(paste0("results/A_results_csv_table.", current_date, ".csv"),
   overwrite = TRUE)
 ############################################

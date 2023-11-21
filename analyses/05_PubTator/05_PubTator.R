@@ -24,6 +24,9 @@ setwd(paste0(config_vars_proj$projectsdir, project_name, script_path))
 
 ## set global options
 options(scipen = 999)
+
+# compute date only once or somehow in config
+current_date <- get_current_date_iso8601()
 ############################################
 
 
@@ -106,16 +109,12 @@ pubtator_genes_format_normalize <- pubtator_genes_format %>%
 
 ############################################
 ## save results
-creation_date <- strftime(as.POSIXlt(Sys.time(),
-  "UTC",
-  "%Y-%m-%dT%H:%M:%S"), "%Y-%m-%d")
-
 write_csv(pubtator_genes_format_normalize,
   file = paste0("results/05_PubTator_genes.",
-    creation_date,
+    current_date,
     ".csv"),
   na = "NULL")
 
-gzip(paste0("results/05_PubTator_genes.", creation_date, ".csv"),
+gzip(paste0("results/05_PubTator_genes.", current_date, ".csv"),
   overwrite = TRUE)
 ############################################

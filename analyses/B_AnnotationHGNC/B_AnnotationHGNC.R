@@ -25,6 +25,9 @@ setwd(paste0(config_vars_proj$projectsdir, project_name, script_path))
 
 ## set global options
 options(scipen = 999)
+
+# compute date only once or somehow in config
+current_date <- get_current_date_iso8601()
 ############################################
 
 
@@ -41,10 +44,6 @@ source("../functions/file-functions.R", local = TRUE)
 ############################################
 ## download all required database sources from HGNC, OMIM, gnomAD, clinvar and genCC
 # we load and use the results of previous walks through the ontology tree if not older then 1 month
-
-current_date <- strftime(as.POSIXlt(Sys.time(),
-    "UTC", "%Y-%m-%dT%H:%M:%S"),
-  "%Y-%m-%d")
 
 # HGNC file download
 if (check_file_age("non_alt_loci_set", "../shared/data/downloads/", 1)) {
@@ -531,13 +530,9 @@ non_alt_loci_set_coordinates_gnomad_omim_gencc_clingen_clinvar <- non_alt_loci_s
 
 ############################################
 ## export table as csv with date of creation
-creation_date <- strftime(as.POSIXlt(Sys.time(),
-    "UTC", "%Y-%m-%dT%H:%M:%S"),
-  "%Y-%m-%d")
-
 write_csv(non_alt_loci_set_coordinates_gnomad_omim_gencc_clingen_clinvar,
-  file = paste0("results/non_alt_loci_set_coordinates.", creation_date, ".csv"))
+  file = paste0("results/non_alt_loci_set_coordinates.", current_date, ".csv"))
 
-gzip(paste0("results/non_alt_loci_set_coordinates.", creation_date, ".csv"),
+gzip(paste0("results/non_alt_loci_set_coordinates.", current_date, ".csv"),
   overwrite = TRUE)
 ############################################

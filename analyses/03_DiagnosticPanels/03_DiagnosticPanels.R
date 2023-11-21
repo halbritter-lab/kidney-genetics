@@ -28,6 +28,9 @@ setwd(paste0(config_vars_proj$projectsdir, project_name, script_path))
 
 ## set global options
 options(scipen = 999)
+
+# compute date only once or somehow in config
+current_date <- get_current_date_iso8601()
 ############################################
 
 
@@ -318,25 +321,21 @@ all_diagnostic_panels_genes_normalize <- all_diagnostic_panels_genes_format %>%
 
 ############################################
 ## save results
-creation_date <- strftime(as.POSIXlt(Sys.time(),
-  "UTC",
-  "%Y-%m-%dT%H:%M:%S"), "%Y-%m-%d")
-
 write_csv(all_diagnostic_panels_genes_normalize,
   file = paste0("results/03_DiagnosticPanels_genes.",
-    creation_date,
+    current_date,
     ".csv"),
   na = "NULL")
 
-gzip(paste0("results/03_DiagnosticPanels_genes.", creation_date, ".csv"),
+gzip(paste0("results/03_DiagnosticPanels_genes.", current_date, ".csv"),
   overwrite = TRUE)
 
 write_csv(diagnostic_panels,
   file = paste0("results/03_DiagnosticPanels_list.",
-    creation_date,
+    current_date,
     ".csv"),
   na = "NULL")
 
-gzip(paste0("results/03_DiagnosticPanels_list.", creation_date, ".csv"),
+gzip(paste0("results/03_DiagnosticPanels_list.", current_date, ".csv"),
   overwrite = TRUE)
 ############################################

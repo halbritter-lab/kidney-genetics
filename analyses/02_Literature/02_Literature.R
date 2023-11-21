@@ -25,6 +25,9 @@ setwd(paste0(config_vars_proj$projectsdir, project_name, script_path))
 
 ## set global options
 options(scipen = 999)
+
+# compute date only once or somehow in config
+current_date <- get_current_date_iso8601()
 ############################################
 
 
@@ -303,16 +306,13 @@ literature_genes_normalize <- literature_genes %>%
 ############################################
 ## save results
 # TODO: add kidney_genes_publication_list_download with checksums to results
-creation_date <- strftime(as.POSIXlt(Sys.time(),
-  "UTC",
-  "%Y-%m-%dT%H:%M:%S"), "%Y-%m-%d")
 
 write_csv(literature_genes_normalize,
   file = paste0("results/02_Literature_genes.",
-    creation_date,
+    current_date,
     ".csv"),
   na = "NULL")
 
-gzip(paste0("results/02_Literature_genes.", creation_date, ".csv"),
+gzip(paste0("results/02_Literature_genes.", current_date, ".csv"),
   overwrite = TRUE)
 ############################################

@@ -24,6 +24,9 @@ setwd(paste0(config_vars_proj$projectsdir, project_name, script_path))
 
 ## set global options
 options(scipen = 999)
+
+# compute date only once or somehow in config
+current_date <- get_current_date_iso8601()
 ############################################
 
 
@@ -225,26 +228,21 @@ all_panelapp_genes_format_normalize <- all_panelapp_genes_format %>%
 
 ############################################
 ## save results
-# TODO: replace with the function get_current_date_iso8601 and add to top of script for each script
-creation_date <- strftime(as.POSIXlt(Sys.time(),
-  "UTC",
-  "%Y-%m-%dT%H:%M:%S"), "%Y-%m-%d")
-
 write_csv(panelapp_panels_kidney,
   file = paste0("results/01_PanelApp_panels.",
-    creation_date,
+    current_date,
     ".csv"),
   na = "NULL")
 
-gzip(paste0("results/01_PanelApp_panels.", creation_date, ".csv"),
+gzip(paste0("results/01_PanelApp_panels.", current_date, ".csv"),
   overwrite = TRUE)
 
 write_csv(all_panelapp_genes_format_normalize,
   file = paste0("results/01_PanelApp_genes.",
-    creation_date,
+    current_date,
     ".csv"),
   na = "NULL")
 
-gzip(paste0("results/01_PanelApp_genes.", creation_date, ".csv"),
+gzip(paste0("results/01_PanelApp_genes.", current_date, ".csv"),
   overwrite = TRUE)
 ############################################
