@@ -24,9 +24,6 @@ setwd(paste0(config_vars_proj$projectsdir, project_name, script_path))
 
 ## set global options
 options(scipen = 999)
-
-# compute date only once or somehow in config
-current_date <- get_current_date_iso8601()
 ############################################
 
 
@@ -50,11 +47,16 @@ source("../functions/helper-functions.R", local = TRUE)
 
 
 ############################################
+# compute date only once or somehow in config
+current_date <- get_current_date_iso8601()
+############################################
+
+
+############################################
 ## perform analysis
 
 # define search query
-# TODO: this query should be in a config file
-search_query <- '("kidney disease" OR "renal disease") AND (gene OR syndrome) AND (variant OR mutation)'
+search_query <- config_vars_proj$pubtator_search_query
 
 # get number of pages for search query
 pages_request <- pubtator_pages_request(search_query)

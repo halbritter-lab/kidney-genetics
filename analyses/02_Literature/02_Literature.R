@@ -25,9 +25,6 @@ setwd(paste0(config_vars_proj$projectsdir, project_name, script_path))
 
 ## set global options
 options(scipen = 999)
-
-# compute date only once or somehow in config
-current_date <- get_current_date_iso8601()
 ############################################
 
 
@@ -37,6 +34,12 @@ current_date <- get_current_date_iso8601()
 source("../functions/hgnc-functions.R", local = TRUE)
 # helper functions
 source("../functions/helper-functions.R", local = TRUE)
+############################################
+
+
+############################################
+# compute date only once or somehow in config
+current_date <- get_current_date_iso8601()
 ############################################
 
 

@@ -25,9 +25,6 @@ setwd(paste0(config_vars_proj$projectsdir, project_name, script_path))
 
 ## set global options
 options(scipen = 999)
-
-# compute date only once or somehow in config
-current_date <- get_current_date_iso8601()
 ############################################
 
 
@@ -39,6 +36,38 @@ source("../functions/hpo-functions.R", local = TRUE)
 source("../functions/file-functions.R", local = TRUE)
 # helper functions
 source("../functions/helper-functions.R", local = TRUE)
+############################################
+
+
+############################################
+# compute date only once or somehow in config
+current_date <- get_current_date_iso8601()
+############################################
+
+############################################
+## download all required database sources from HPO
+# we load and use the results of previous walks through the ontology tree if not older then 1 month
+
+# HPO obo file download
+if (check_file_age("hpo_obo", "../shared/data/downloads/", 1)) {
+  hpo_obo_filename <- get_newest_file("hpo_obo", "../shared/data/downloads/")
+} else {
+  # HPO links to hpo_obo file needs to be set in config
+  hpo_obo_url <- config_vars_proj$hpo_obo_url
+
+  hpo_obo_filename <- paste0("../shared/data/downloads/hpo_obo.",
+    current_date,
+    ".obo")
+
+  download.file(hpo_obo_url, hpo_obo_filename, mode = "wb")
+}
+
+hpo <- get_ontology(
+    hpo_obo_filename,
+    propagate_relationships = "is_a",
+    extract_tags = "minimal",
+    merge_equivalent_terms = TRUE
+)
 ############################################
 
 
