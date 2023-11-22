@@ -56,6 +56,7 @@ current_date <- get_current_date_iso8601()
 diagnostic_panels_list <- read_excel(config_vars_proj$kidney_diagnostic_panels) %>%
   filter(use == "yes")
 
+# TODO: implement making wayback machine snapshots and using these as download source for reproducibility
 # TODO: implement using already download files if they are not too old
 # download using phantomJS
 diagnostic_panels <- diagnostic_panels_list %>%

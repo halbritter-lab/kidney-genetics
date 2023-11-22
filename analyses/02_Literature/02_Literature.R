@@ -57,6 +57,7 @@ kidney_genes_publication_list <- read_excel(pub_file, skip = 4, na = "NA") %>%
 # TODO: replace wininet method
 # TODO: make download of supplements more stable (2,7,15,16), maybe get links from website
 # TODO: implement using already download files if they are not to old
+# TODO: change the logic for this analysis to only compute the results for new publications (the supplements for old ones won't change)
 kidney_genes_publication_list_download <- kidney_genes_publication_list %>%
   rowwise() %>%
   mutate(downloaded = download.file(Download_link,
