@@ -109,13 +109,13 @@ all_genes <- merge_analyses_sources %>%
     nrow()
 
 high_evidence_genes <- merge_analyses_sources %>%
-    filter(evidence_count > 2)
+    filter(evidence_count > 1)
 
 high_evidence_genes_count <- high_evidence_genes %>%
     nrow()
 
 low_evidence_genes <- merge_analyses_sources %>%
-    filter(evidence_count <= 2)
+    filter(evidence_count <= 1)
 
 low_evidence_genes_count <- low_evidence_genes %>%
     nrow()
@@ -142,10 +142,10 @@ summary_counts <- merge_analyses_sources %>%
   summarize(across(starts_with("01_PanelApp"):(ncol(merge_analyses_sources)), 
                    ~sum(!is.null(.x) & (.x == TRUE | .x == FALSE)), .names = "count_{.col}"))
 
-# join the merge_analyses_sources and DiagnosticPanels_genes tables and filter for evidence_count >= 3
+# join the merge_analyses_sources and DiagnosticPanels_genes tables and filter for evidence_count > 1
 filtered_merge <- merge_analyses_sources %>%
   left_join(DiagnosticPanels_genes, by = "hgnc_id") %>%
-  filter(evidence_count >= 3)
+  filter(evidence_count > 1)
 
 # Compute the number of unique genes in all panels
 genes_all_diagnostic_panels <- filtered_merge %>%
