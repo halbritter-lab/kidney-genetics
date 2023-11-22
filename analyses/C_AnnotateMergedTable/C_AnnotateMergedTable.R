@@ -26,9 +26,6 @@ setwd(paste0(config_vars_proj$projectsdir, project_name, script_path))
 
 ## set global options
 options(scipen = 999)
-
-# compute date only once or somehow in config
-current_date <- get_current_date_iso8601()
 ############################################
 
 
@@ -42,6 +39,14 @@ source("../functions/gtex-functions.R", local = TRUE)
 source("../functions/descartes-functions.R", local = TRUE)
 source("../functions/stringdb-functions.R", local = TRUE)
 source("../functions/mpo-mousemine-functions.R", local = TRUE)
+# helper functions
+source("../functions/helper-functions.R", local = TRUE)
+############################################
+
+
+############################################
+# compute date only once or somehow in config
+current_date <- get_current_date_iso8601()
 ############################################
 
 
@@ -58,9 +63,9 @@ merge_analyses_sources <- read_csv(get_newest_file("A_MergeAnalysesSources", mer
 non_alt_loci_set_coordinates <- read_csv(get_newest_file("non_alt_loci_set_coordinates", annotation_path)) %>%
   mutate(hgnc_id = as.integer(str_remove(hgnc_id, "HGNC:")))
 
-# filter for genes with at least 3 evidence sources
+# filter for genes with at least 2 evidence sources
 merge_analyses_sources_high_evidence <- merge_analyses_sources %>%
-    filter(evidence_count > 2)
+    filter(evidence_count > 1)
 ############################################
 
 
@@ -159,7 +164,7 @@ if (check_file_age("hpo_list_adult", "../shared/", 1) && check_file_age("hpo_lis
 
   # walk through the ontology tree and add all unique terms descending from
   # Antenatal onset HP:0030674 or Congenital onset HP:0003577
-  hpo_list_antenatal_or_congenital <- union(hpo_all_children_from_term("HP:0030674"),
+  hpo_list_antenatal_or_congenital <- dplyr::union(hpo_all_children_from_term("HP:0030674"),
     hpo_all_children_from_term("HP:0003577"))
 
   write_csv(hpo_list_antenatal_or_congenital,
@@ -173,7 +178,7 @@ if (check_file_age("hpo_list_adult", "../shared/", 1) && check_file_age("hpo_lis
 
   # walk through the ontology tree and add all unique terms descending from
   # Neonatal onset HP:0003623 or Pediatric onset HP:0410280
-  hpo_list_neonatal_or_pediatric <- union(hpo_all_children_from_term("HP:0003623"),
+  hpo_list_neonatal_or_pediatric <- dplyr::union(hpo_all_children_from_term("HP:0003623"),
     hpo_all_children_from_term("HP:0410280"))
 
   write_csv(hpo_list_neonatal_or_pediatric,
@@ -945,7 +950,7 @@ if (check_file_age("merge_analyses_sources_high_evidence_mgi", "results", 1)) {
 ############################################
 # annotate StringDB interactions with strong evidence kidney genes
 # use download tables: https://string-db.org/cgi/download?sessionId=bVJC28yKCRz5&species_text=Homo+sapiens
-# eg physical: https://stringdb-downloads.org/download/protein.physical.links.v12.0/9606.protein.physical.links.v12.0.txt.gz
+# e.g. physical: https://stringdb-downloads.org/download/protein.physical.links.v12.0/9606.protein.physical.links.v12.0.txt.gz
 # sum the interactions for each gene with the high evidence list, then percentile normalize, additionally show a string with interacting genes and scores
 # select only the columns we want to keep for the final table join
 # we load and use the results of previous walks through the ontology tree if not older then 1 month
@@ -969,6 +974,9 @@ if (check_file_age("merge_analyses_sources_high_evidence_string", "results", 1))
   gzip(paste0("results/merge_analyses_sources_high_evidence_string.", current_date, ".csv"),
     overwrite = TRUE)
 }
+
+# TODO: Implement cutoffs for stringdb interaction scores as columns
+# TODO: cutoffs: 0 points (below one standard deviation), 0.5 points (above one standard deviation), 1 point (above two standard deviations)
 ############################################
 
 
@@ -981,7 +989,8 @@ if (check_file_age("merge_analyses_sources_high_evidence_expression", "results",
 } else {
   merge_analyses_sources_high_evidence_gencode <- merge_analyses_sources_high_evidence %>%
     dplyr::select(approved_symbol, hgnc_id) %>%
-    left_join(non_alt_loci_set_coordinates %>% dplyr::select(hgnc_id, gencode_id, ensembl_gene_id_version_hg19, ensembl_gene_id_version_hg38), by = c("hgnc_id"))
+    left_join(non_alt_loci_set_coordinates %>% 
+    dplyr::select(hgnc_id, gencode_id, ensembl_gene_id_version_hg19, ensembl_gene_id_version_hg38), by = c("hgnc_id"))
 
   # use gtex functions to compute TPM GTEx kidney expression
   # we need the gencode_ids from the HGNC table for this
@@ -989,9 +998,9 @@ if (check_file_age("merge_analyses_sources_high_evidence_expression", "results",
   gtex_results_kidney <- merge_analyses_sources_high_evidence_gencode %>%
     filter(!is.na(gencode_id)) %>%
     rowwise() %>%
-    mutate(gencode = get_multiple_median_tissue_expression(gencode_id, wide_format = TRUE, max_ids_per_request = 5)) %>%
-    unnest(cols = gencode, names_sep = "_") %>%
-    select(hgnc_id, gencode_kidney_medulla, gencode_kidney_cortex)
+    mutate(gtex = get_multiple_median_tissue_expression(gencode_id, wide_format = TRUE, max_ids_per_request = 5)) %>%
+    unnest(cols = gtex, names_sep = "_") %>%
+    select(hgnc_id, gtex_kidney_medulla, gtex_kidney_cortex)
 
   # add expression in embryonic kidney from descartes (https://descartes.brotmanbaty.org/)
   descartes_results_kidney <- merge_analyses_sources_high_evidence_gencode %>%
@@ -1001,10 +1010,33 @@ if (check_file_age("merge_analyses_sources_high_evidence_expression", "results",
 
   # join the results back to the main merge_analyses_sources_high_evidence_gencode table
   # select the columns we want to keep for the final table join
+  # add cutoff column for expression data from GTEx and Descartes as columns
+  # EBI categorization (expression atlas):
+  # 1. White box: there is no data available (0.0 FPKM 0.0 TPM)
+  # 2. Yellow box: expression level is below cutoff (0.5 FPKM or 0.5 TPM)
+  # 3. Light blue box: expression level is low (between 0.5 to 10 FPKM or 0.5 to 10 TPM)
+  # 4. Medium blue box: expression level is medium (between 11 to 1000 FPKM or 11 to 1000 TPM)
+  # 5. Dark blue box: expression level is high (more than 1000 FPKM or more than 1000 TPM)
+  # GTEx categorization:
+  # 1. yellow: 0.0 TPM
+  # 2. light green: >3.6 TPM
+  # 3. dark green: >20.0 TPM
+  # 4. light blue: >98.0 TPM
+  # 5. medium blue: >460.0 TPM
+  # 6. dark blue: >2100.0 TPM
+  # use EBI categorization for Descartes
+  # use GTEx categorization for GTEx
+  # category should be three  classes, e.h. low, medium and high and associate them with 0 (< light blue category), 0.5 (>= light blue category) or 1 (>= dark blue category) scoring points
+  # the points are assigned if either GTEx or Descartes is above the cutoff
   merge_analyses_sources_high_evidence_expression <- merge_analyses_sources_high_evidence_gencode %>%
     left_join(gtex_results_kidney, by = c("hgnc_id")) %>%
     left_join(descartes_results_kidney, by = c("hgnc_id")) %>%
-    select(hgnc_id, gencode_kidney_medulla, gencode_kidney_cortex, descartes_kidney_tpm)
+    mutate(expression_score = case_when(
+      (gtex_kidney_medulla >= 2100.0) | (gtex_kidney_cortex >= 2100.0) | (descartes_kidney_tpm >= 1000.0) ~ 1,
+      (gtex_kidney_medulla >= 98.0 & gtex_kidney_medulla < 460.0) | (gtex_kidney_cortex >= 98.0 & gtex_kidney_cortex < 460.0) | (descartes_kidney_tpm >= 10.0 & descartes_kidney_tpm < 1000.0) ~ 0.5,
+      (gtex_kidney_medulla >= 0.0 & gtex_kidney_medulla < 98.0) | (gtex_kidney_cortex >= 0.0 & gtex_kidney_cortex < 98.0) | (descartes_kidney_tpm >= 0.0 & descartes_kidney_tpm < 10.0) ~ 0,
+      TRUE ~ NA_real_)) %>%
+    select(hgnc_id, expression_score, gtex_kidney_medulla, gtex_kidney_cortex, descartes_kidney_tpm)
 
   write_csv(merge_analyses_sources_high_evidence_expression,
     file = paste0("results/merge_analyses_sources_high_evidence_expression.",
@@ -1039,10 +1071,12 @@ merge_analyses_sources_high_evidence_annotated <- merge_analyses_sources_high_ev
   left_join(merge_analyses_sources_high_evidence_mgi, by = c("hgnc_id")) %>%
   left_join(merge_analyses_sources_high_evidence_string, by = c("hgnc_id")) %>%
   left_join(merge_analyses_sources_high_evidence_expression, by = c("hgnc_id")) %>%
-  mutate(publication_score = NA) %>%
-  mutate(publications_used = NA) %>%
   mutate(cur_id = paste0("cur_", formatC(1:nrow(.), width = 3, flag = "0")))
 
+# TODO: add evidence percentile column to the final table
+
+# TODO: remove the publication columns as they only need to go in the curation results table
+# TODO: other columns for the curation results table are: extra functional points, nephropathy (yes/no), comment on classification, expert discussion needed, disease inclusion or equality
 
 # TODO: workflow: if the respective gene/entity from our kidney list is in the ClinGen or GenCC curated list apply this group, if not apply the group with the highest score after reviewing the groups manually
 # TODO: define the scoring logic for the final table with cutoffs for the different categories
