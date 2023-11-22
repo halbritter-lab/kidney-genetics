@@ -617,10 +617,11 @@ hereditary_cancer_gene_list <- hereditary_cancer_response$rows %>%
     kidney_disease_group,
     kidney_disease_group_short)
 
-# 7) Nephrocalcinosis / Nephrolithiasis Diseases Gene Curation Expert Panel: https://www.clinicalgenome.org/affiliation/40069/ (no clingen gene list, use https://panelapp.agha.umccr.org/panels/149/)
+# 7) Nephrocalcinosis / Nephrolithiasis Diseases Gene Curation Expert Panel: https://www.clinicalgenome.org/affiliation/40069/ (no clingen gene list, use https://panelapp.genomicsengland.co.uk/panels/149/)
 
+# TODO: these URLs should be set in the config
 api_call <- paste0(
-    "https://panelapp.agha.umccr.org/api/v1/panels/",
+    "https://panelapp.genomicsengland.co.uk/api/v1/panels/",
     "149",
     "/?format=json")
 
@@ -667,6 +668,7 @@ all_kidney_groups <- bind_rows(complement_mediated_kidney_diseases_gene_list,
 # C) compute for each list in A) the relative frequency of kidney phenotypes in 2), this will be the kidney group score
 # D) compute for each gene a list of all kidney group scores and sort by the highest score (the gene is in the kidney group with the highest score, but this needs to be checked manually)
 # TODO: describe the logic of the analysis in comments step by step
+# TODO: investigate if we should somehow penalize/reward for the number of HPO terms per gene
 omim_genemap2_disease_and_gene <- omim_genemap2 %>%
   select(disease_ontology_id, approved_symbol)
 
@@ -1080,14 +1082,10 @@ merge_analyses_sources_high_evidence_annotated <- merge_analyses_sources_high_ev
   left_join(merge_analyses_sources_high_evidence_expression, by = c("hgnc_id")) %>%
   mutate(cur_id = paste0("cur_", formatC(1:nrow(.), width = 3, flag = "0")))
 
-# TODO: add evidence percentile column to the final table
+# TODO: columns for the curation results table are: publication_score and publications_used columns, extra functional points, nephropathy (yes/no), comment on classification, expert discussion needed, disease inclusion or equality
 
-# TODO: remove the publication columns as they only need to go in the curation results table
-# TODO: other columns for the curation results table are: extra functional points, nephropathy (yes/no), comment on classification, expert discussion needed, disease inclusion or equality
-
-# TODO: workflow: if the respective gene/entity from our kidney list is in the ClinGen or GenCC curated list apply this group, if not apply the group with the highest score after reviewing the groups manually
 # TODO: define the scoring logic for the final table with cutoffs for the different categories
-# TODO: see GitHub issue for cutoffs in expression
+# TODO: workflow: if the respective gene/entity from our kidney list is in the ClinGen or GenCC curated list apply this group, if not apply the group with the highest score after reviewing the groups manually
 # TODO: scoring logic for publications (screening = 1 point, first clinical description = 2 points, clinical replication = 3 points)
 # TODO: scoring logic: if only screening publication then the category cant be more then Limited, if there is a clinical description then the category can be Moderate, if there is a clinical replication then the category can be Definitive
 # TODO: scoring logic: we further use the category "no known relation" for genes that are not trustworthy associated with kidney disease
