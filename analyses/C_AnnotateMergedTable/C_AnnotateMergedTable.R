@@ -958,12 +958,22 @@ if (check_file_age("merge_analyses_sources_high_evidence_mgi", "results", 1)) {
 if (check_file_age("merge_analyses_sources_high_evidence_string", "results", 1)) {
   merge_analyses_sources_high_evidence_string <- read_csv(get_newest_file("merge_analyses_sources_high_evidence_string", "results"))
 } else {
+  # use stringdb functions and the STRING_id from non_alt_loci_set_coordinates to compute interactions
+  # add cutoff column for interaction data using the stringdb stringdb_interaction_normalized_score 
+  # cutoffs: 0 points (below one standard deviation), 0.5 points (above one standard deviation), 1 point (above two standard deviations)
+  # select the columns we want to keep for the final table join
   merge_analyses_sources_high_evidence_string <- merge_analyses_sources_high_evidence %>%
     select(approved_symbol, hgnc_id) %>%
-    left_join(non_alt_loci_set_coordinates %>% select(hgnc_id, STRING_id), by = c("hgnc_id")) %>%
+    left_join(non_alt_loci_set_coordinates %>% 
+    select(hgnc_id, STRING_id), by = c("hgnc_id")) %>%
     mutate(stringdb = compute_protein_interactions(STRING_id), directory = "../shared/downloads/") %>%
     unnest(cols = stringdb, names_sep = "_") %>%
-    select(hgnc_id, stringdb_interaction_sum_score, stringdb_interaction_normalized_score, stringdb_interaction_string)
+    mutate(interaction_score = case_when(
+      stringdb_interaction_normalized_score < 0.16 ~ 0,
+      stringdb_interaction_normalized_score >= 0.16 & stringdb_interaction_normalized_score < 0.84 ~ 0.5,
+      stringdb_interaction_normalized_score >= 0.84 ~ 1,
+      TRUE ~ 0)) %>%
+    select(hgnc_id, interaction_score, stringdb_interaction_sum_score, stringdb_interaction_normalized_score, stringdb_interaction_string)
 
   write_csv(merge_analyses_sources_high_evidence_string,
     file = paste0("results/merge_analyses_sources_high_evidence_string.",
@@ -974,9 +984,6 @@ if (check_file_age("merge_analyses_sources_high_evidence_string", "results", 1))
   gzip(paste0("results/merge_analyses_sources_high_evidence_string.", current_date, ".csv"),
     overwrite = TRUE)
 }
-
-# TODO: Implement cutoffs for stringdb interaction scores as columns
-# TODO: cutoffs: 0 points (below one standard deviation), 0.5 points (above one standard deviation), 1 point (above two standard deviations)
 ############################################
 
 
@@ -1009,7 +1016,6 @@ if (check_file_age("merge_analyses_sources_high_evidence_expression", "results",
     select(hgnc_id, descartes_kidney_tpm = descartes_tpm)
 
   # join the results back to the main merge_analyses_sources_high_evidence_gencode table
-  # select the columns we want to keep for the final table join
   # add cutoff column for expression data from GTEx and Descartes as columns
   # EBI categorization (expression atlas):
   # 1. White box: there is no data available (0.0 FPKM 0.0 TPM)
@@ -1028,6 +1034,7 @@ if (check_file_age("merge_analyses_sources_high_evidence_expression", "results",
   # use GTEx categorization for GTEx
   # category should be three  classes, e.h. low, medium and high and associate them with 0 (< light blue category), 0.5 (>= light blue category) or 1 (>= dark blue category) scoring points
   # the points are assigned if either GTEx or Descartes is above the cutoff
+  # select the columns we want to keep for the final table join
   merge_analyses_sources_high_evidence_expression <- merge_analyses_sources_high_evidence_gencode %>%
     left_join(gtex_results_kidney, by = c("hgnc_id")) %>%
     left_join(descartes_results_kidney, by = c("hgnc_id")) %>%
@@ -1035,7 +1042,7 @@ if (check_file_age("merge_analyses_sources_high_evidence_expression", "results",
       (gtex_kidney_medulla >= 2100.0) | (gtex_kidney_cortex >= 2100.0) | (descartes_kidney_tpm >= 1000.0) ~ 1,
       (gtex_kidney_medulla >= 98.0 & gtex_kidney_medulla < 460.0) | (gtex_kidney_cortex >= 98.0 & gtex_kidney_cortex < 460.0) | (descartes_kidney_tpm >= 10.0 & descartes_kidney_tpm < 1000.0) ~ 0.5,
       (gtex_kidney_medulla >= 0.0 & gtex_kidney_medulla < 98.0) | (gtex_kidney_cortex >= 0.0 & gtex_kidney_cortex < 98.0) | (descartes_kidney_tpm >= 0.0 & descartes_kidney_tpm < 10.0) ~ 0,
-      TRUE ~ NA_real_)) %>%
+      TRUE ~ 0)) %>%
     select(hgnc_id, expression_score, gtex_kidney_medulla, gtex_kidney_cortex, descartes_kidney_tpm)
 
   write_csv(merge_analyses_sources_high_evidence_expression,
@@ -1063,7 +1070,7 @@ non_alt_loci_set_coordinates_annotation <- non_alt_loci_set_coordinates %>%
 # 4. add an empty column in the final table for publication (screening = 1 point, first clinical description = 2 points, clinical replication = 3 points) and add an empty column in the final table for publications used
 # 5. add a unique id column for each entry in the final table (format "cur_XXX", with leading zeros if necessary)
 merge_analyses_sources_high_evidence_annotated <- merge_analyses_sources_high_evidence %>%
-  select(approved_symbol, hgnc_id, evidence_count) %>%
+  select(approved_symbol, hgnc_id, evidence_count, source_count_percentile) %>%
   left_join(non_alt_loci_set_coordinates_annotation, by = c("hgnc_id")) %>%
   left_join(hpo_gene_list_kidney_all_kidney_groups_summarized_for_join, by = c("approved_symbol")) %>%
   left_join(hpo_gene_list_onset_groups_summarized_for_join, by = c("approved_symbol")) %>%
