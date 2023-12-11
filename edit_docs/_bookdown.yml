@@ -7,6 +7,7 @@ rmd_files:
     - "02-analyses-plots.Rmd"
     - "03-high-evidence-curation.Rmd"
     - "04-additional-analyses.Rmd"
+    - "05-visualizations.Rmd"
     - "references.Rmd"
 delete_merged_file: true
 language:

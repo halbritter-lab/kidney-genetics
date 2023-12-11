@@ -16,3 +16,7 @@ manual-curation
 table-of-high-evidence-genes
 additional-analyses
 diagnostic-panels-content-overlap
+visualizations
+objectives
+presentations
+posters
