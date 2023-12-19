@@ -1,0 +1,54 @@
+# based onhttps://github.com/horosin/pages-deploy
+# and https://lucacozzuto.medium.com/automatic-reports-with-bookdown-and-github-actions-3c19498394aa
+name: github pages
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+
+jobs:
+    bookdown:
+        name: Render-Book
+        runs-on: ubuntu-20.04
+        steps:
+            - uses: actions/checkout@v4
+            - uses: r-lib/actions/setup-r@v1
+            - uses: r-lib/actions/setup-pandoc@v1
+            - name: Install TinyTeX
+              uses: r-lib/actions/setup-tinytex@v1
+              env:
+                TINYTEX_INSTALLER: TinyTeX
+            - name: Install packages
+              run: Rscript -e 'install.packages(c("rmarkdown", "bookdown", "config", "remotes", "webshot", "readr", "tidyverse", "DT", "plotly", "knitr", "knitrdrawio", "config", "ggplot2", "snakecase", "readxl", "shinyLP"))'
+            - name: Install knitrdrawio
+              run: Rscript -e 'remotes::install_github("rchaput/knitrdrawio")'
+            - name: Install phantomjs
+              run: Rscript -e 'webshot::install_phantomjs()'
+            - name: Render Book
+              run: Rscript -e 'bookdown::render_book("index.Rmd", "all")'
+            - uses: actions/upload-artifact@v2
+              with:
+                name: _book
+                path: _book/
+    checkout-and-deploy:
+        runs-on: ubuntu-20.04
+        needs: bookdown
+        steps:
+            - name: Checkout
+              uses: actions/checkout@v2
+            - name: Download artifact
+              uses: actions/download-artifact@v2
+              with:
+                # Artifact name
+                name: _book # optional
+                # Destination path
+                path: _book # optional
+            - name: Deploy to GitHub Pages
+              uses: Cecilapp/GitHub-Pages-deploy@v3
+              env:
+                GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+              with:
+                build_dir: _book
+                branch: gh-pages
