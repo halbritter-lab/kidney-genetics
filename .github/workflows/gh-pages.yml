@@ -1,5 +1,6 @@
 # based onhttps://github.com/horosin/pages-deploy
 # and https://lucacozzuto.medium.com/automatic-reports-with-bookdown-and-github-actions-3c19498394aa
+# and https://stackoverflow.com/questions/76723921/install-a-github-r-package-for-a-github-action
 name: github pages
 
 on:
@@ -23,7 +24,7 @@ jobs:
             - name: Install packages
               run: Rscript -e 'install.packages(c("rmarkdown", "bookdown", "config", "remotes", "webshot", "readr", "tidyverse", "DT", "plotly", "knitr", "knitrdrawio", "config", "ggplot2", "snakecase", "readxl", "shinyLP"))'
             - name: Install knitrdrawio
-              run: Rscript -e 'remotes::install_github("rchaput/knitrdrawio")'
+              run: Rscript -e 'remotes::install_url("https://github.com/rchaput/knitrdrawio/archive/refs/tags/v0.2.2.tar.gz")'
             - name: Install phantomjs
               run: Rscript -e 'webshot::install_phantomjs()'
             - name: Render Book
