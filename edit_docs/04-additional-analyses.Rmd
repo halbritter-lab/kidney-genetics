@@ -1,0 +1,43 @@
+# Additional analyses {#additional-analyses}
+
+## Diagnostic panels content overlap
+
+> Below you can see a bar plot of the diagnostic panels content overlap.
+
+We used ten common diagnostic panels that can be ordered for kidney disease analysis and extracted the screened genes from them.
+Here we show the overlap of the genes in the different panels.
+
+```{r, echo=FALSE, warning=FALSE, out.width = "100%"}
+# Summarize the data
+count_data <- DiagnosticPanels_genes %>%
+  group_by(source_count) %>%
+  summarise(n = n())
+
+# Calculate the total number of genes
+total_genes <- sum(count_data$n)
+
+# Calculate the percentage of genes
+count_data <- count_data %>%
+  mutate(percentage = (n / total_genes) * 100)
+
+# Create a new column for fill color based on source_count values
+count_data <- count_data %>%
+  mutate(fill_color = case_when(
+    source_count == 1 ~ "Red",
+    source_count == 10 ~ "Green",
+    TRUE ~ "Gray"
+  ))
+
+# Create the plot
+diagnostic_panels_overlap_plot <- ggplot(count_data, aes(x = source_count, y = n, fill = fill_color)) +
+  geom_col(show.legend = FALSE) +
+  geom_text(aes(label = paste0(round(percentage, 1), "%")), vjust = -0.5) +
+  scale_x_continuous(breaks = seq(min(count_data$source_count), max(count_data$source_count), by = 1)) +
+  scale_fill_identity() +
+  labs(x = "Count of panels", y = "Number of Genes",
+       title = paste0("Number of genes in 10 clinical diagnostic panels for kidney disease (n = ", total_genes, ")")) +
+  theme_minimal()
+
+# convert to interactive using ggplotly
+ggplotly(diagnostic_panels_overlap_plot)
+```
