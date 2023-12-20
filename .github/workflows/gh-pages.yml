@@ -1,7 +1,7 @@
 # based onhttps://github.com/horosin/pages-deploy
 # and https://lucacozzuto.medium.com/automatic-reports-with-bookdown-and-github-actions-3c19498394aa
 # and https://stackoverflow.com/questions/76723921/install-a-github-r-package-for-a-github-action
-# and https://stackoverflow.com/questions/76907259/installing-package-dependencies-only-from-binary-not-source-using-remotesins
+# and https://docs.github.com/en/actions/learn-github-actions/variables
 name: github pages
 
 on:
@@ -9,6 +9,10 @@ on:
     branches:
       - main
   pull_request:
+
+env:
+    CONFIG_FILE: config.yml
+    R_ENVIRONMENT: github
 
 jobs:
     bookdown:
@@ -25,10 +29,6 @@ jobs:
                 rtools-version: '42'
                 use-public-rspm: true
             - uses: r-lib/actions/setup-pandoc@v2
-            - name: Set env_production
-              run: echo "R_ENVIRONMENT='github'" >> "$R_ENVIRONMENT"
-            - name: Set env_config
-              run: echo "CONFIG_FILE='config.yml'" >> "$CONFIG_FILE"
             - name: Install TinyTeX
               uses: r-lib/actions/setup-tinytex@v2
               env:
