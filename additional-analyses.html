@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+<head>
+
+  <meta charset="utf-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <title>Chapter | 4 Additional analyses | The Kidney-Genetics Documentation</title>
+  <meta name="description" content="This documentation is intended to describe the Kidney-Genetics project" />
+  <meta name="generator" content="bookdown 0.34 and GitBook 2.6.7" />
+
+  <meta property="og:title" content="Chapter | 4 Additional analyses | The Kidney-Genetics Documentation" />
+  <meta property="og:type" content="book" />
+  
+  <meta property="og:description" content="This documentation is intended to describe the Kidney-Genetics project" />
+  <meta name="github-repo" content="halbritter-lab/kidney-genetics" />
+
+  <meta name="twitter:card" content="summary" />
+  <meta name="twitter:title" content="Chapter | 4 Additional analyses | The Kidney-Genetics Documentation" />
+  
+  <meta name="twitter:description" content="This documentation is intended to describe the Kidney-Genetics project" />
+  
+
+<meta name="author" content="Bernt Popp, Nina Rank, Constantin Wolff, Jan Halbritter" />
+
+
+<meta name="date" content="2023-12-11" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black" />
+  
+  
+<link rel="prev" href="manual-curation.html"/>
+<link rel="next" href="visualizations.html"/>
+<script src="libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/fuse.js@6.4.6/dist/fuse.min.js"></script>
+<link href="libs/gitbook-2.6.7/css/style.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-table.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-bookdown.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-highlight.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-search.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-fontsettings.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-clipboard.css" rel="stylesheet" />
+
+
+
+
+
+
+
+
+<link href="libs/anchor-sections-1.1.0/anchor-sections.css" rel="stylesheet" />
+<link href="libs/anchor-sections-1.1.0/anchor-sections-hash.css" rel="stylesheet" />
+<script src="libs/anchor-sections-1.1.0/anchor-sections.js"></script>
+<script src="libs/htmlwidgets-1.6.2/htmlwidgets.js"></script>
+<link href="libs/datatables-css-0.0.0/datatables-crosstalk.css" rel="stylesheet" />
+<script src="libs/datatables-binding-0.28/datatables.js"></script>
+<link href="libs/dt-core-1.13.4/css/jquery.dataTables.min.css" rel="stylesheet" />
+<link href="libs/dt-core-1.13.4/css/jquery.dataTables.extra.css" rel="stylesheet" />
+<script src="libs/dt-core-1.13.4/js/jquery.dataTables.min.js"></script>
+<script src="libs/jszip-1.13.4/jszip.min.js"></script>
+<script src="libs/pdfmake-1.13.4/pdfmake.js"></script>
+<script src="libs/pdfmake-1.13.4/vfs_fonts.js"></script>
+<link href="libs/dt-ext-buttons-1.13.4/css/buttons.dataTables.min.css" rel="stylesheet" />
+<script src="libs/dt-ext-buttons-1.13.4/js/dataTables.buttons.min.js"></script>
+<script src="libs/dt-ext-buttons-1.13.4/js/buttons.html5.min.js"></script>
+<script src="libs/dt-ext-buttons-1.13.4/js/buttons.colVis.min.js"></script>
+<script src="libs/dt-ext-buttons-1.13.4/js/buttons.print.min.js"></script>
+<link href="libs/nouislider-7.0.10/jquery.nouislider.min.css" rel="stylesheet" />
+<script src="libs/nouislider-7.0.10/jquery.nouislider.min.js"></script>
+<link href="libs/selectize-0.12.0/selectize.bootstrap3.css" rel="stylesheet" />
+<script src="libs/selectize-0.12.0/selectize.min.js"></script>
+<link href="libs/crosstalk-1.2.0/css/crosstalk.min.css" rel="stylesheet" />
+<script src="libs/crosstalk-1.2.0/js/crosstalk.min.js"></script>
+<script src="libs/plotly-binding-4.10.2/plotly.js"></script>
+<script src="libs/typedarray-0.1/typedarray.min.js"></script>
+<link href="libs/plotly-htmlwidgets-css-2.11.1/plotly-htmlwidgets.css" rel="stylesheet" />
+<script src="libs/plotly-main-2.11.1/plotly-latest.min.js"></script>
+
+
+
+<style type="text/css">
+  
+  div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+</style>
+<style type="text/css">
+/* Used with Pandoc 2.11+ new --citeproc when CSL is used */
+div.csl-bib-body { }
+div.csl-entry {
+  clear: both;
+}
+.hanging div.csl-entry {
+  margin-left:2em;
+  text-indent:-2em;
+}
+div.csl-left-margin {
+  min-width:2em;
+  float:left;
+}
+div.csl-right-inline {
+  margin-left:2em;
+  padding-left:1em;
+}
+div.csl-indent {
+  margin-left: 2em;
+}
+</style>
+
+<link rel="stylesheet" href="style.css" type="text/css" />
+</head>
+
+<body>
+
+
+
+  <div class="book without-animation with-summary font-size-2 font-family-1" data-basepath=".">
+
+    <div class="book-summary">
+      <nav role="navigation">
+
+<ul class="summary">
+<li><a href="./">Kidney-Genetics Documentation</a></li>
+
+<li class="divider"></li>
+<li class="chapter" data-level="" data-path="index.html"><a href="index.html"><i class="fa fa-check"></i>Preface</a>
+<ul>
+<li class="chapter" data-level="" data-path="index.html"><a href="index.html#objective"><i class="fa fa-check"></i>Objective</a></li>
+<li class="chapter" data-level="" data-path="index.html"><a href="index.html#methods"><i class="fa fa-check"></i>Methods</a></li>
+<li class="chapter" data-level="" data-path="index.html"><a href="index.html#results"><i class="fa fa-check"></i>Results</a></li>
+<li class="chapter" data-level="" data-path="index.html"><a href="index.html#conclusion"><i class="fa fa-check"></i>Conclusion</a></li>
+<li class="chapter" data-level="" data-path="index.html"><a href="index.html#outlook"><i class="fa fa-check"></i>Outlook</a></li>
+</ul></li>
+<li class="chapter" data-level="1" data-path="analyses-tables.html"><a href="analyses-tables.html"><i class="fa fa-check"></i><b>1</b> Analyses result tables</a>
+<ul>
+<li class="chapter" data-level="1.1" data-path="analyses-tables.html"><a href="analyses-tables.html#main-table-merged-analyses-sources"><i class="fa fa-check"></i><b>1.1</b> Main table: Merged analyses sources</a></li>
+<li class="chapter" data-level="1.2" data-path="analyses-tables.html"><a href="analyses-tables.html#result-table-panelapp"><i class="fa fa-check"></i><b>1.2</b> Result table: PanelApp</a></li>
+<li class="chapter" data-level="1.3" data-path="analyses-tables.html"><a href="analyses-tables.html#result-table-literature"><i class="fa fa-check"></i><b>1.3</b> Result table: Literature</a></li>
+<li class="chapter" data-level="1.4" data-path="analyses-tables.html"><a href="analyses-tables.html#result-table-diagnostic-panels"><i class="fa fa-check"></i><b>1.4</b> Result table: Diagnostic panels</a></li>
+<li class="chapter" data-level="1.5" data-path="analyses-tables.html"><a href="analyses-tables.html#result-table-hpo-in-rare-disease-databases"><i class="fa fa-check"></i><b>1.5</b> Result table: HPO in rare disease databases</a></li>
+<li class="chapter" data-level="1.6" data-path="analyses-tables.html"><a href="analyses-tables.html#result-table-pubtator"><i class="fa fa-check"></i><b>1.6</b> Result table: PubTator</a></li>
+</ul></li>
+<li class="chapter" data-level="2" data-path="analyses-plots.html"><a href="analyses-plots.html"><i class="fa fa-check"></i><b>2</b> Analyses plots</a>
+<ul>
+<li class="chapter" data-level="2.1" data-path="analyses-plots.html"><a href="analyses-plots.html#upset-plot-of-merged-analyses-sources"><i class="fa fa-check"></i><b>2.1</b> UpSet plot of merged analyses sources</a></li>
+<li class="chapter" data-level="2.2" data-path="analyses-plots.html"><a href="analyses-plots.html#bar-plot-of-panelapp-results"><i class="fa fa-check"></i><b>2.2</b> Bar plot of PanelApp results</a></li>
+<li class="chapter" data-level="2.3" data-path="analyses-plots.html"><a href="analyses-plots.html#bar-plot-of-literature-results"><i class="fa fa-check"></i><b>2.3</b> Bar plot of Literature results</a></li>
+<li class="chapter" data-level="2.4" data-path="analyses-plots.html"><a href="analyses-plots.html#bar-plot-of-diagnostic-panels-results"><i class="fa fa-check"></i><b>2.4</b> Bar plot of Diagnostic panels results</a></li>
+<li class="chapter" data-level="2.5" data-path="analyses-plots.html"><a href="analyses-plots.html#bar-plot-of-hpo-in-rare-disease-databases-results"><i class="fa fa-check"></i><b>2.5</b> Bar plot of HPO in rare disease databases results</a></li>
+<li class="chapter" data-level="2.6" data-path="analyses-plots.html"><a href="analyses-plots.html#bar-plot-of-pubtator-results"><i class="fa fa-check"></i><b>2.6</b> Bar plot of PubTator results</a></li>
+</ul></li>
+<li class="chapter" data-level="3" data-path="manual-curation.html"><a href="manual-curation.html"><i class="fa fa-check"></i><b>3</b> Curation of high evidence genes</a>
+<ul>
+<li class="chapter" data-level="3.1" data-path="manual-curation.html"><a href="manual-curation.html#table-of-high-evidence-genes"><i class="fa fa-check"></i><b>3.1</b> Table of high evidence genes</a></li>
+</ul></li>
+<li class="chapter" data-level="4" data-path="additional-analyses.html"><a href="additional-analyses.html"><i class="fa fa-check"></i><b>4</b> Additional analyses</a>
+<ul>
+<li class="chapter" data-level="4.1" data-path="additional-analyses.html"><a href="additional-analyses.html#diagnostic-panels-content-overlap"><i class="fa fa-check"></i><b>4.1</b> Diagnostic panels content overlap</a></li>
+</ul></li>
+<li class="chapter" data-level="5" data-path="visualizations.html"><a href="visualizations.html"><i class="fa fa-check"></i><b>5</b> Visualizations</a>
+<ul>
+<li class="chapter" data-level="5.1" data-path="visualizations.html"><a href="visualizations.html#objectives"><i class="fa fa-check"></i><b>5.1</b> Objectives</a></li>
+<li class="chapter" data-level="5.2" data-path="visualizations.html"><a href="visualizations.html#presentations"><i class="fa fa-check"></i><b>5.2</b> Presentations</a></li>
+<li class="chapter" data-level="5.3" data-path="visualizations.html"><a href="visualizations.html#posters"><i class="fa fa-check"></i><b>5.3</b> Posters</a></li>
+</ul></li>
+<li class="chapter" data-level="" data-path="references.html"><a href="references.html"><i class="fa fa-check"></i>References</a></li>
+</ul>
+
+      </nav>
+    </div>
+
+    <div class="book-body">
+      <div class="body-inner">
+        <div class="book-header" role="navigation">
+          <h1>
+            <i class="fa fa-circle-o-notch fa-spin"></i><a href="./">The Kidney-Genetics Documentation</a>
+          </h1>
+        </div>
+
+        <div class="page-wrapper" tabindex="-1" role="main">
+          <div class="page-inner">
+
+            <section class="normal" id="section-">
+<div id="additional-analyses" class="section level1 hasAnchor" number="4">
+<h1><span class="header-section-number">Chapter | 4</span> Additional analyses<a href="additional-analyses.html#additional-analyses" class="anchor-section" aria-label="Anchor link to header"></a></h1>
+<div id="diagnostic-panels-content-overlap" class="section level2 hasAnchor" number="4.1">
+<h2><span class="header-section-number">4.1</span> Diagnostic panels content overlap<a href="additional-analyses.html#diagnostic-panels-content-overlap" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<blockquote>
+<p>Below you can see a bar plot of the diagnostic panels content overlap.</p>
+</blockquote>
+<p>We used ten common diagnostic panels that can be ordered for kidney disease analysis and extracted the screened genes from them.
+Here we show the overlap of the genes in the different panels.</p>
+<div class="plotly html-widget html-fill-item-overflow-hidden html-fill-item" id="htmlwidget-b03a3c63cf6daedc651f" style="width:100%;height:480px;"></div>
+<script type="application/json" data-for="htmlwidget-b03a3c63cf6daedc651f">{"x":{"data":[{"orientation":"v","width":[0.9,0.9,0.9,0.9,0.9,0.9,0.899999999999999,0.899999999999999],"base":[0,0,0,0,0,0,0,0],"x":[2,3,4,5,6,7,8,9],"y":[134,73,60,41,40,45,52,53],"text":["source_count:  2<br />n: 134<br />fill_color: Gray","source_count:  3<br />n:  73<br />fill_color: Gray","source_count:  4<br />n:  60<br />fill_color: Gray","source_count:  5<br />n:  41<br />fill_color: Gray","source_count:  6<br />n:  40<br />fill_color: Gray","source_count:  7<br />n:  45<br />fill_color: Gray","source_count:  8<br />n:  52<br />fill_color: Gray","source_count:  9<br />n:  53<br />fill_color: Gray"],"type":"bar","textposition":"none","marker":{"autocolorscale":false,"color":"rgba(190,190,190,1)","line":{"width":1.88976377952756,"color":"transparent"}},"name":"Gray","legendgroup":"Gray","showlegend":true,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null},{"orientation":"v","width":0.899999999999999,"base":0,"x":[10],"y":[56],"text":"source_count: 10<br />n:  56<br />fill_color: Green","type":"bar","textposition":"none","marker":{"autocolorscale":false,"color":"rgba(0,255,0,1)","line":{"width":1.88976377952756,"color":"transparent"}},"name":"Green","legendgroup":"Green","showlegend":true,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null},{"orientation":"v","width":0.9,"base":0,"x":[1],"y":[402],"text":"source_count:  1<br />n: 402<br />fill_color: Red","type":"bar","textposition":"none","marker":{"autocolorscale":false,"color":"rgba(255,0,0,1)","line":{"width":1.88976377952756,"color":"transparent"}},"name":"Red","legendgroup":"Red","showlegend":true,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null},{"x":[2,3,4,5,6,7,8,9],"y":[134,73,60,41,40,45,52,53],"text":["14%","7.6%","6.3%","4.3%","4.2%","4.7%","5.4%","5.5%"],"hovertext":["source_count:  2<br />n: 134<br />fill_color: Gray<br />paste0(round(percentage, 1), \"%\"): 14%","source_count:  3<br />n:  73<br />fill_color: Gray<br />paste0(round(percentage, 1), \"%\"): 7.6%","source_count:  4<br />n:  60<br />fill_color: Gray<br />paste0(round(percentage, 1), \"%\"): 6.3%","source_count:  5<br />n:  41<br />fill_color: Gray<br />paste0(round(percentage, 1), \"%\"): 4.3%","source_count:  6<br />n:  40<br />fill_color: Gray<br />paste0(round(percentage, 1), \"%\"): 4.2%","source_count:  7<br />n:  45<br />fill_color: Gray<br />paste0(round(percentage, 1), \"%\"): 4.7%","source_count:  8<br />n:  52<br />fill_color: Gray<br />paste0(round(percentage, 1), \"%\"): 5.4%","source_count:  9<br />n:  53<br />fill_color: Gray<br />paste0(round(percentage, 1), \"%\"): 5.5%"],"textfont":{"size":14.6645669291339,"color":"rgba(0,0,0,1)"},"type":"scatter","mode":"text","hoveron":"points","name":"Gray","legendgroup":"Gray","showlegend":false,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null},{"x":[10],"y":[56],"text":"5.9%","hovertext":"source_count: 10<br />n:  56<br />fill_color: Green<br />paste0(round(percentage, 1), \"%\"): 5.9%","textfont":{"size":14.6645669291339,"color":"rgba(0,0,0,1)"},"type":"scatter","mode":"text","hoveron":"points","name":"Green","legendgroup":"Green","showlegend":false,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null},{"x":[1],"y":[402],"text":"42.1%","hovertext":"source_count:  1<br />n: 402<br />fill_color: Red<br />paste0(round(percentage, 1), \"%\"): 42.1%","textfont":{"size":14.6645669291339,"color":"rgba(0,0,0,1)"},"type":"scatter","mode":"text","hoveron":"points","name":"Red","legendgroup":"Red","showlegend":false,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null}],"layout":{"margin":{"t":43.7625570776256,"r":7.30593607305936,"b":40.1826484018265,"l":43.1050228310502},"font":{"color":"rgba(0,0,0,1)","family":"","size":14.6118721461187},"title":{"text":"Number of genes in 10 clinical diagnostic panels for kidney disease (n = 956)","font":{"color":"rgba(0,0,0,1)","family":"","size":17.5342465753425},"x":0,"xref":"paper"},"xaxis":{"domain":[0,1],"automargin":true,"type":"linear","autorange":false,"range":[0.0550000000000001,10.945],"tickmode":"array","ticktext":["1","2","3","4","5","6","7","8","9","10"],"tickvals":[1,2,3,4,5,6,7,8,9,10],"categoryorder":"array","categoryarray":["1","2","3","4","5","6","7","8","9","10"],"nticks":null,"ticks":"","tickcolor":null,"ticklen":3.65296803652968,"tickwidth":0,"showticklabels":true,"tickfont":{"color":"rgba(77,77,77,1)","family":"","size":11.689497716895},"tickangle":-0,"showline":false,"linecolor":null,"linewidth":0,"showgrid":true,"gridcolor":"rgba(235,235,235,1)","gridwidth":0.66417600664176,"zeroline":false,"anchor":"y","title":{"text":"Count of panels","font":{"color":"rgba(0,0,0,1)","family":"","size":14.6118721461187}},"hoverformat":".2f"},"yaxis":{"domain":[0,1],"automargin":true,"type":"linear","autorange":false,"range":[-20.1,422.1],"tickmode":"array","ticktext":["0","100","200","300","400"],"tickvals":[0,100,200,300,400],"categoryorder":"array","categoryarray":["0","100","200","300","400"],"nticks":null,"ticks":"","tickcolor":null,"ticklen":3.65296803652968,"tickwidth":0,"showticklabels":true,"tickfont":{"color":"rgba(77,77,77,1)","family":"","size":11.689497716895},"tickangle":-0,"showline":false,"linecolor":null,"linewidth":0,"showgrid":true,"gridcolor":"rgba(235,235,235,1)","gridwidth":0.66417600664176,"zeroline":false,"anchor":"x","title":{"text":"Number of Genes","font":{"color":"rgba(0,0,0,1)","family":"","size":14.6118721461187}},"hoverformat":".2f"},"shapes":[{"type":"rect","fillcolor":null,"line":{"color":null,"width":0,"linetype":[]},"yref":"paper","xref":"paper","x0":0,"x1":1,"y0":0,"y1":1}],"showlegend":true,"legend":{"bgcolor":null,"bordercolor":null,"borderwidth":0,"font":{"color":"rgba(0,0,0,1)","family":"","size":11.689497716895},"title":{"text":"","font":{"color":"rgba(0,0,0,1)","family":"","size":14.6118721461187}}},"hovermode":"closest","barmode":"relative"},"config":{"doubleClick":"reset","modeBarButtonsToAdd":["hoverclosest","hovercompare"],"showSendToCloud":false},"source":"A","attrs":{"1432406220b3":{"x":{},"y":{},"fill":{},"type":"bar"},"14326a50e8ca":{"x":{},"y":{},"fill":{},"label":{}}},"cur_data":"1432406220b3","visdat":{"1432406220b3":["function (y) ","x"],"14326a50e8ca":["function (y) ","x"]},"highlight":{"on":"plotly_click","persistent":false,"dynamic":false,"selectize":false,"opacityDim":0.2,"selected":{"opacity":1},"debounce":0},"shinyEvents":["plotly_hover","plotly_click","plotly_selected","plotly_relayout","plotly_brushed","plotly_brushing","plotly_clickannotation","plotly_doubleclick","plotly_deselect","plotly_afterplot","plotly_sunburstclick"],"base_url":"https://plot.ly"},"evals":[],"jsHooks":[]}</script>
+
+</div>
+</div>
+            </section>
+
+          </div>
+        </div>
+      </div>
+<a href="manual-curation.html" class="navigation navigation-prev " aria-label="Previous page"><i class="fa fa-angle-left"></i></a>
+<a href="visualizations.html" class="navigation navigation-next " aria-label="Next page"><i class="fa fa-angle-right"></i></a>
+    </div>
+  </div>
+<script src="libs/gitbook-2.6.7/js/app.min.js"></script>
+<script src="libs/gitbook-2.6.7/js/clipboard.min.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-search.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-sharing.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-fontsettings.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-bookdown.js"></script>
+<script src="libs/gitbook-2.6.7/js/jquery.highlight.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-clipboard.js"></script>
+<script>
+gitbook.require(["gitbook"], function(gitbook) {
+gitbook.start({
+"sharing": {
+"github": false,
+"facebook": true,
+"twitter": true,
+"linkedin": false,
+"weibo": false,
+"instapaper": false,
+"vk": false,
+"whatsapp": false,
+"all": ["facebook", "twitter", "linkedin", "weibo", "instapaper"]
+},
+"fontsettings": {
+"theme": "white",
+"family": "sans",
+"size": 2
+},
+"edit": {
+"link": "https://github.com/halbritter-lab/kidney-genetics/tree/master/edit_docs/04-additional-analyses.Rmd",
+"text": "Edit"
+},
+"history": {
+"link": null,
+"text": null
+},
+"view": {
+"link": "https://github.com/halbritter-lab/kidney-genetics/tree/master/docs/04-additional-analyses.Rmd",
+"text": null
+},
+"download": [["KidneyGenetics_documentation.pdf", "PDF"], ["KidneyGenetics_documentation.epub", "EPUB"], ["KidneyGenetics_documentation.docx", "DOCX"]],
+"search": {
+"engine": "fuse",
+"options": null
+},
+"toc": {
+"collapse": "subsection"
+}
+});
+});
+</script>
+
+</body>
+
+</html>
