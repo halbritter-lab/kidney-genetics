@@ -41,8 +41,10 @@ script_path <- "/edit_docs/"
 config_vars_proj <- config::get(file = Sys.getenv("CONFIG_FILE"),
     config = project_topic)
 
-## set working directory
-setwd(paste0(config_vars_proj$projectsdir, project_name, script_path))
+## conditionally set working directory based on environment
+if (Sys.getenv("R_ENVIRONMENT") != "github") {
+  setwd(paste0(config_vars_proj$projectsdir, project_name, script_path))
+}
 ```
 
 <!-- here we load global functions libraries -->
