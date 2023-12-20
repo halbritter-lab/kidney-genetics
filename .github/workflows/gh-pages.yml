@@ -18,10 +18,14 @@ jobs:
               working-directory: ./edit_docs
         steps:
             - uses: actions/checkout@v4
-            - uses: r-lib/actions/setup-r@v1
-            - uses: r-lib/actions/setup-pandoc@v1
+            - uses: r-lib/actions/setup-r@v2
+              with:
+                r-version: 'release'
+                rtools-version: '42'
+                use-public-rspm: true
+            - uses: r-lib/actions/setup-pandoc@v2
             - name: Install TinyTeX
-              uses: r-lib/actions/setup-tinytex@v1
+              uses: r-lib/actions/setup-tinytex@v2
               env:
                 TINYTEX_INSTALLER: TinyTeX
             - name: Install packages
