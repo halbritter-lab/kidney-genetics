@@ -13,6 +13,9 @@ jobs:
     bookdown:
         name: Render-Book
         runs-on: ubuntu-20.04
+        defaults:
+            run:
+              working-directory: ./edit_docs
         steps:
             - uses: actions/checkout@v4
             - uses: r-lib/actions/setup-r@v1
@@ -28,7 +31,6 @@ jobs:
             - name: Install phantomjs
               run: Rscript -e 'webshot::install_phantomjs()'
             - name: Render Book
-              working-directory: ./edit_docs
               run: Rscript -e 'bookdown::render_book("index.Rmd", "all")'
             - uses: actions/upload-artifact@v2
               with:
