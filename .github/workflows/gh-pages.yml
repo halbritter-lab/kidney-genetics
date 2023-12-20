@@ -26,7 +26,7 @@ jobs:
                 use-public-rspm: true
             - uses: r-lib/actions/setup-pandoc@v2
             - name: Set env_production
-              run: echo "R_ENVIRONMENT=github" >> "$R_ENVIRONMENT"
+              run: echo "R_ENVIRONMENT='github'" >> "$R_ENVIRONMENT"
             - name: Set env_config
               run: echo "CONFIG_FILE='config.yml'" >> "$CONFIG_FILE"
             - name: Install TinyTeX
