@@ -40,7 +40,7 @@ jobs:
               timeout-minutes: 3
               run: |
                   Xvfb :99 -screen 0 1024x768x24 > /dev/null 2>&1 &
-                  sudo mkdir /run/user/1001
+                  sudo mkdir -p /run/user/1001
                   sudo chmod -R 777 /run/user/1001
                   sudo snap install drawio
             - name: Install packages
