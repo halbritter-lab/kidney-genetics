@@ -26,6 +26,7 @@ library(knitr)        # needed for draw.io files
 library(knitrdrawio)  # needed for draw.io files
 library(config)       # needed to load the config file
 library(ggplot2)      # needed for plots
+library(ComplexUpset) # needed for upset plots
 library(snakecase)    # needed for string functions
 library(readxl)       # needed to load Excel files
 library(shinyLP)      # needed to plot presentations
