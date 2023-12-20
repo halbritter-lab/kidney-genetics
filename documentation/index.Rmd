@@ -36,7 +36,7 @@ library(shinyLP)      # needed to plot presentations
 ```{r, echo=FALSE, message=FALSE, warning=FALSE}
 project_topic <- "nephrology"
 project_name <- "kidney-genetics"
-script_path <- "/edit_docs/"
+script_path <- "/documentation/"
 
 ## read configs
 config_vars_proj <- config::get(file = Sys.getenv("CONFIG_FILE"),

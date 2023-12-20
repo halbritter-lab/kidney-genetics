@@ -14,3 +14,6 @@ _main.*
 !ga.html
 libs/
 nul
+
+# the build directory of bookdown
+build/

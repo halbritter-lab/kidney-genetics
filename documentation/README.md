@@ -2,7 +2,13 @@
 
 The repository subfolder for the Kidney-Genetics documentation.
 
-To build the documentation execute following commands:
+<mark style="background-color: red">The documentation is automatically built and deployed to [https://halbritter-lab.github.io/kidney-genetics/](https://halbritter-lab.github.io/kidney-genetics/) using GitHub Actions into the branch hg-pages.</mark>
+The configuration for the GitHub Pages build is in the `.github/workflows` folder.
+
+For local development only, the documentation can be built using the following commands:
+
+```
+To build the documentation locally execute following commands:
 
 ```
 ## load libraries
@@ -11,7 +17,7 @@ library(config)
 
 project_topic <- "nephrology"
 project_name <- "kidney-genetics"
-script_path <- "/edit_docs/"
+script_path <- "/documentation/"
 
 ## read configs
 config_vars_proj <- config::get(file = Sys.getenv("CONFIG_FILE"),
@@ -45,8 +51,3 @@ Rendering HTML widgets for PDF requires webshot and phantomjs [FROM:](https://bo
 install.packages("webshot")
 webshot::install_phantomjs()
 ```
-
-## TODO
-- automatic loading and filtering of current result tables in all Rmd files
-- change scripts to load the gzipped files
-- make a script that runs the above commands to re-generate the pages website

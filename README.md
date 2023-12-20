@@ -1,5 +1,5 @@
 <p align="center">
-    <img src="edit_docs/static/img/logo/kidney-genetics_logo.png" alt="Kidney-Genetics logo" width="192" height="192">
+    <img src="documentation/static/img/logo/kidney-genetics_logo.png" alt="Kidney-Genetics logo" width="192" height="192">
 </p>
 
 # Kidney-Genetics - Designing a reproducible and curated database of kidney-related genes
