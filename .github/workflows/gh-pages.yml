@@ -54,7 +54,7 @@ jobs:
             - uses: actions/upload-artifact@v4
               with:
                 name: docs
-                path: ../docs/
+                path: docs/
     checkout-and-deploy:
         runs-on: ubuntu-20.04
         needs: bookdown
@@ -67,11 +67,11 @@ jobs:
                 # Artifact name
                 name: docs # optional
                 # Destination path
-                path: ../docs # optional
+                path: docs/ # optional
             - name: Deploy to GitHub Pages
               uses: Cecilapp/GitHub-Pages-deploy@v3
               env:
                 GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
               with:
-                build_dir: docs
+                build_dir: _book
                 branch: gh-pages
