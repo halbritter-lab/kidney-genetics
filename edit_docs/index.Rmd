@@ -19,7 +19,7 @@ url: https://halbritter-lab.github.io/kidney-genetics/
 knitr::opts_chunk$set(echo = TRUE)
 ## Load libraries
 library(readr)        # needed to import CSV result files
-library(tidyverse)    # needed to transform the tables
+library(dplyr)    # needed to transform the tables
 library(DT)           # needed to generate nice data tables in html
 library(plotly)       # needed for upset plots
 library(knitr)        # needed for draw.io files
