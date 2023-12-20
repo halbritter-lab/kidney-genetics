@@ -54,7 +54,7 @@ jobs:
             - uses: actions/upload-artifact@v4
               with:
                 name: build
-                path: build
+                path: ./edit_docs/build
                 if-no-files-found: error
     checkout-and-deploy:
         runs-on: ubuntu-20.04
@@ -67,12 +67,10 @@ jobs:
               with:
                 # Artifact name
                 name: build
-                # Destination path
-                path: build
             - name: Deploy to GitHub Pages
               uses: Cecilapp/GitHub-Pages-deploy@v3
               env:
                 GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
               with:
-                build_dir: build
+                build_dir: ./
                 branch: gh-pages
