@@ -9,7 +9,15 @@ on:
   push:
     branches:
       - main
+    paths:
+      - 'documentation/**'
+      - '.github/workflows/**'
+      - 'analysis/**/results/**'
   pull_request:
+    paths:
+      - 'documentation/**'
+      - '.github/workflows/**'
+      - 'analysis/**/results/**'
 
 env:
     DRAWIO_DISABLE_UPDATE: true
