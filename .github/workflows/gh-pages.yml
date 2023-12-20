@@ -2,6 +2,7 @@
 # and https://lucacozzuto.medium.com/automatic-reports-with-bookdown-and-github-actions-3c19498394aa
 # and https://stackoverflow.com/questions/76723921/install-a-github-r-package-for-a-github-action
 # and https://docs.github.com/en/actions/learn-github-actions/variables
+# and https://github.com/salimkayabasi/drawio-github-action-installation/blob/main/.github/workflows/drawio.yml
 name: github pages
 
 on:
@@ -11,6 +12,8 @@ on:
   pull_request:
 
 env:
+    DRAWIO_DISABLE_UPDATE: true
+    DISPLAY: :99.0
     CONFIG_FILE: config.yml
     R_ENVIRONMENT: github
 
@@ -33,6 +36,13 @@ jobs:
               uses: r-lib/actions/setup-tinytex@v2
               env:
                 TINYTEX_INSTALLER: TinyTeX
+            - name: Instaling drawio
+              timeout-minutes: 3
+              run: |
+                  Xvfb :99 -screen 0 1024x768x24 > /dev/null 2>&1 &
+                  sudo mkdir /run/user/1001
+                  sudo chmod -R 777 /run/user/1001
+                  sudo snap install drawio
             - name: Install packages
               run: Rscript -e 'install.packages(c("rmarkdown", "bookdown", "config", "remotes", "webshot", "readr", "dplyr", "DT", "plotly", "knitr", "knitrdrawio", "config", "ggplot2", "snakecase", "readxl", "shinyLP"))'
             - name: Install knitrdrawio

@@ -1,4 +1,4 @@
 default:
-  drawio_path: "C:/Program Files/draw.io/draw.io.exe"
+  drawio_path: "/snap/bin/drawio"
 nephrology:
   projectsdir: "C:/development/"
