@@ -54,7 +54,8 @@ jobs:
             - uses: actions/upload-artifact@v4
               with:
                 name: build
-                path: build/
+                path: build
+                if-no-files-found: error
     checkout-and-deploy:
         runs-on: ubuntu-20.04
         needs: bookdown
@@ -65,9 +66,9 @@ jobs:
               uses: actions/download-artifact@v4
               with:
                 # Artifact name
-                name: build # optional
+                name: build
                 # Destination path
-                path: build/ # optional
+                path: build
             - name: Deploy to GitHub Pages
               uses: Cecilapp/GitHub-Pages-deploy@v3
               env:
