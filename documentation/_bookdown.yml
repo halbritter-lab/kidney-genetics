@@ -19,5 +19,5 @@ download:
   - ["KidneyGenetics_documentation.epub", "EPUB"]
   - ["KidneyGenetics_documentation.docx", "DOCX"]
 view: https://github.com/halbritter-lab/kidney-genetics/blob/master/documentation/%s
-edit: https://github.com/halbritter-lab/kidney-genetics/edit/master/documentation/%s
+edit: https://github.com/halbritter-lab/kidney-genetics/edit/main/documentation/%s
 output_dir: "build"
