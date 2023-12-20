@@ -44,6 +44,10 @@ jobs:
               uses: r-lib/actions/setup-tinytex@v2
               env:
                 TINYTEX_INSTALLER: TinyTeX
+            - name: Instaling librsvg2
+              timeout-minutes: 3
+              run: |
+                sudo apt-get install librsvg2-bin
             - name: Instaling drawio
               timeout-minutes: 3
               run: |
