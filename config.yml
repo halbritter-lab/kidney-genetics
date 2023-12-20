@@ -1,4 +1,0 @@
-default:
-  drawio_path: "/snap/bin/drawio"
-nephrology:
-  projectsdir: "C:/development/"
