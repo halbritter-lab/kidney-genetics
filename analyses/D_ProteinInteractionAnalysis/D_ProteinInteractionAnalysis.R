@@ -3,6 +3,7 @@
 library(tidyverse)
 library(STRINGdb)
 library(ggplot2)
+library(R.utils)
 ############################################
 
 # TODO: set in config?
@@ -123,8 +124,60 @@ cluster_index_df <- cluster_index_df %>%
 
 # join with gene symbol and HGNC ID
 cluster_index_df <- cluster_index_df %>% 
-  left_join(hgnc_annotated[c('STRING_id', 'symbol', 'hgnc_id')], by = "STRING_id")
+  left_join(hgnc_annotated[c("STRING_id", "symbol", "hgnc_id")], by = "STRING_id")
 
 # write csv
 write_csv(cluster_index_df,
           file = paste0("results/STRING_cluster_indices_min_gene_number-", min_gene_number_per_cluster, "-", current_date, ".csv"))
+
+gzip(paste0("results/STRING_cluster_indices_min_gene_number-", min_gene_number_per_cluster, "-", current_date, ".csv"),
+     overwrite = TRUE)
+
+
+############################################
+# plot distribution of kidney disease groups within subcluster
+
+# get most probable kidney disease group per gene and join with cluster index df
+max_groups_full <- kid_groups %>%
+  group_by(approved_symbol) %>%
+  filter(hpo_id_group_p == max(hpo_id_group_p)) %>% 
+  left_join(cluster_index_df[c("hgnc_id", "cluster_index")], by = "hgnc_id") %>% 
+  filter(!is.na(cluster_index))
+# NOTE: if genes have more than one group with same and highest hpo_id_group_p => keep all groups 
+
+# define a custom color palette for kidney_disease_group_short
+custom_colors <- c("tubulopathy" = "Red", 
+                   "glomerulopathy" = "Green", 
+                   "cancer" = "Blue", 
+                   "cakut" = "Purple", 
+                   "cyst_cilio" = "Orange", 
+                   "complement" = "Yellow",
+                   "nephrocalcinosis" = "Grey")  # Add more colors if needed
+
+# function to plot a pie chart showing the kidney disease group distribution within the subcluster
+plot_disease_group_distribution <- function(subcluster){
+  # get subset df based on specified subcluster
+  subset_df <- max_groups_full %>% 
+    filter(grepl(paste0("^", subcluster), cluster_index))
+  
+  if (nrow(subset_df) == 0){
+    message("Subcluster ", subcluster, " does not exist.")
+  }
+  
+  # plot the pie chart
+  pie_chart <- ggplot(subset_df, aes(x = "", fill = kidney_disease_group_short)) +
+    geom_bar(width = 1) +
+    scale_fill_manual(values = custom_colors) +
+    coord_polar(theta = "y") +
+    labs(title = paste("Full network - Cluster",  subcluster, "| Total Instances:", nrow(subset_df)))
+
+  # define the filename
+  filename <- paste0("results/prot_interact_full_network_cluster_", subcluster, "_pie_chart.", current_date, ".png")
+  
+  # save the pie chart as a PNG file
+  ggsave(filename, plot = pie_chart, width = 5, height = 5) # TODO: where to store plots?
+}
+
+# Example
+plot_disease_group_distribution(subcluster="3-1")
+
