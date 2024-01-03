@@ -132,6 +132,7 @@ write_csv(cluster_index_df,
 
 gzip(paste0("results/STRING_cluster_indices_min_gene_number-", min_gene_number_per_cluster, "-", current_date, ".csv"),
      overwrite = TRUE)
+############################################
 
 
 ############################################
