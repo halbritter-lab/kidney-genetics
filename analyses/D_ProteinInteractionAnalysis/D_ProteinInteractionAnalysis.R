@@ -7,7 +7,8 @@ library(ggplot2)
 
 # TODO: set in config?
 string_db_version <- "12.0"
-string_db_files_path <- "."
+string_db_files_path <- "../shared/"
+min_gene_number_per_cluster <- 60
 
 ############################################
 ## define relative script path
@@ -33,6 +34,8 @@ options(scipen = 999)
 source("../functions/file-functions.R", local = TRUE)
 # helper functions
 source("../functions/helper-functions.R", local = TRUE)
+# cluster analysis functions
+source("../functions/protein_interaction_analysis-functions.R", local = TRUE)
 ############################################
 
 
@@ -44,7 +47,7 @@ current_date <- get_current_date_iso8601()
 
 ############################################
 # create a directory to save the plots of the analysis
-output_dir <- "plots"
+output_dir <- "results"
 dir.create(output_dir, showWarnings = TRUE)
 ############################################
 
@@ -79,10 +82,10 @@ kid_groups <- high_evidence_annotated %>%
 
 
 ############################################
-## analysis with FULL network
+## Cluster analysis with FULL network
 # download STRING db protein links 
 protein_links_url <- paste0("https://stringdb-downloads.org/download/protein.links.v", string_db_version, "/9606.protein.links.v", string_db_version, ".txt.gz")
-protein_links_file <- paste0("9606.protein.links.v", string_db_version, ".txt.gz")
+protein_links_file <- paste0("../shared/9606.protein.links.v", string_db_version, ".txt.gz")
 
 if (!file.exists(protein_links_file)) {
   download.file(protein_links_url, destfile = protein_links_file, method = "auto")
@@ -97,193 +100,31 @@ string_db_full <- STRINGdb::STRINGdb$new(version = string_db_version,
                                     score_threshold = 100,
                                     input_directory = string_db_files_path)
 
-# get clusters
-clusters_list_full <- string_db_full$get_clusters(unique(kid_groups$STRING_id),
-                                        algorithm = "walktrap") # NOTE: some STRING_ids get lost here => no group for them???
+# get STRING IDs of genes that have a kidney disease group
+STRING_id_vec <- unique(kid_groups$STRING_id)
 
-clusters_tibble_full <- tibble(clusters_list_full) %>% 
-  select(STRING_id = clusters_list_full) %>% 
-  mutate(cluster = row_number()) %>% 
-  unnest_longer(col = "STRING_id")
+# get list of sublists that contain STRING subclusters 
+STRING_clusters_list <- get_STRING_clusters(STRING_id_vec = STRING_id_vec, min_number = min_gene_number_per_cluster) #TODO: define min_number
 
-max_groups_full <- kid_groups %>%
-  group_by(approved_symbol) %>%
-  filter(hpo_id_group_p == max(hpo_id_group_p)) %>% 
-  left_join(clusters_tibble_full, by = "STRING_id") %>% 
-  filter(!is.na(cluster))
-# NOTE: if genes have more than one group with same and highest hpo_id_group_p => keep all groups 
+# create a df that contains full index of each gene with the subclusters
+cluster_index_df <- STRING_clusters_list %>% 
+  unlist() %>% 
+  as.data.frame() %>%
+  setNames("STRING_id") %>% rowwise() %>% 
+  mutate(cluster_index = get_full_index(junk_test, STRING_id))
 
-# group the data by 'cluster' and calculate the counts for each group
-cluster_counts <- table(max_groups_full$cluster)
+# get the maximum cluster depth
+max_depth <- max(sapply(strsplit(cluster_index_df$cluster_index, "-"), length))
 
-# create an empty list to store the pie charts
-pie_charts <- list()
+# separate 'cluster_index' into multiple columns
+cluster_index_df <- cluster_index_df %>% 
+  mutate(split_col = cluster_index) %>% 
+  separate(split_col, into = paste0("hierarchy_", 1:max_depth), sep = "-", fill = 'right')
 
-# loop through each cluster group and create a pie chart
-for (i in unique(max_groups_full$cluster)) {
-  # filter the data for the current cluster group
-  subset_df <- subset(max_groups_full, cluster == i)
-  
-  # create a pie chart for the current cluster group
-  pie_chart <- ggplot(subset_df, aes(x = "", fill = kidney_disease_group_short)) +
-    geom_bar(width = 1) +
-    coord_polar(theta = "y") +
-    labs(title = paste("Cluster", i))
-  
-  # add the pie chart to the list
-  pie_charts[[i]] <- pie_chart
-}
+# join with gene symbol and HGNC ID
+cluster_index_df <- cluster_index_df %>% 
+  left_join(hgnc_annotated[c('STRING_id', 'symbol', 'hgnc_id')], by = "STRING_id")
 
-# calculate the relative frequency of each cluster
-cluster_freq <- prop.table(table(max_groups_full$cluster))
-
-# define a custom color palette for kidney_disease_group_short
-custom_colors <- c("tubulopathy" = "Red", 
-                   "glomerulopathy" = "Green", 
-                   "cancer" = "Blue", 
-                   "cakut" = "Purple", 
-                   "cyst_cilio" = "Orange", 
-                   "complement" = "Yellow",
-                   "nephrocalcinosis" = "Grey")  # Add more colors if needed
-
-# create a data frame for pie chart creation
-pie_data <- data.frame(cluster = names(cluster_freq), freq = cluster_freq)
-
-# create and save a pie chart for each cluster group
-for (i in seq_along(pie_data$cluster)) {
-  subset_df <- subset(max_groups_full, cluster == pie_data$cluster[i])
-  
-  # calculate the total number of instances in the current cluster
-  total_instances <- nrow(subset_df)
-  
-  pie_chart <- ggplot(subset_df, aes(x = "", fill = kidney_disease_group_short)) +
-    geom_bar(width = 1) +
-    scale_fill_manual(values = custom_colors) +
-    coord_polar(theta = "y") +
-    labs(title = paste("Full network - Cluster", pie_data$cluster[i], "- Total Instances:", total_instances))
-  
-  # define the filename based on cluster number
-  filename <- paste0(output_dir, "/protein_interactions_full_network_cluster_", pie_data$cluster[i], "_pie_chart.", current_date, ".png")
-  
-  # save the pie chart as a PNG file
-  ggsave(filename, plot = pie_chart, width = 5, height = 5)  
-}
-
-# TODO: get enrichment pathways etc
-# group1 <- max_groups_full %>% filter(cluster == 1)
-# 
-# string_db_full$get_enrichment(group1$STRING_id) %>%
-#   tibble() %>% View
-# junk <- string_db_full$get_enrichment(group1$STRING_id) %>%
-#   tibble()
-
-
-############################################
-## Analysis with PHYSICAL network
-# download STRING db protein physical links 
-protein_phys_links_url <- paste0("https://stringdb-static.org/download/protein.physical.links.v", string_db_version, "/9606.protein.physical.links.v", string_db_version, ".txt.gz")
-protein_phys_links_file <- paste0("9606.protein.physical.links.v", string_db_version, ".txt.gz")
-
-if (!file.exists(protein_phys_links_file)) {
-  download.file(protein_phys_links_url, destfile = protein_phys_links_file, method = "auto")
-  message("STRING protein physical links downloaded successfully.")
-} else {
-  message(paste0("\"", protein_phys_links_file, "\" already exists."))
-}
-
-# instantiate new STRING db reference class 
-string_db_phys <- STRINGdb::STRINGdb$new(version = string_db_version,
-                                         species = 9606,
-                                         score_threshold = 100,
-                                         network_type = "physical",
-                                         input_directory = string_db_files_path)
-
-# get clusters
-clusters_list_phys <- string_db_phys$get_clusters(unique(kid_groups$STRING_id),
-                                                  algorithm = "walktrap") # NOTE: some STRING_ids get lost here => no group for them???
-
-clusters_tibble_phys <- tibble(clusters_list_phys) %>% 
-  select(STRING_id = clusters_list_phys) %>% 
-  mutate(cluster = row_number()) %>% 
-  unnest_longer(col = "STRING_id")
-
-max_groups_phys <- kid_groups %>%
-  group_by(approved_symbol) %>%
-  filter(hpo_id_group_p == max(hpo_id_group_p)) %>% 
-  left_join(clusters_tibble_phys, by = "STRING_id") %>% 
-  filter(!is.na(cluster))
-# NOTE: if genes have more than one group with same and highest hpo_id_group_p => keep all groups 
-
-# group the data by 'cluster' and calculate the counts for each group
-cluster_counts <- max_groups_phys %>% 
-  group_by(cluster) %>% 
-  summarise(count = n())
-
-# get only clusters with minimum number of members
-min_no_members <- 15 #TODO: change?
-
-large_cluster_ids <- cluster_counts %>%
-  filter(count >= min_no_members) %>% 
-  .$cluster
-
-# create an empty list to store the pie charts
-pie_charts <- list()
-
-# loop through each cluster group and create a pie chart
-for (i in large_cluster_ids) {
-  # filter the data for the current cluster group
-  subset_df <- subset(max_groups_phys, cluster == i)
-  
-  # create a pie chart for the current cluster group
-  pie_chart <- ggplot(subset_df, aes(x = "", fill = kidney_disease_group_short)) +
-    geom_bar(width = 1) +
-    coord_polar(theta = "y") +
-    labs(title = paste("Cluster", i))
-  
-  # add the pie chart to the list
-  pie_charts[[i]] <- pie_chart
-}
-
-# calculate the relative frequency of each cluster
-cluster_freq <- prop.table(table(max_groups_phys$cluster))
-
-# define a custom color palette for kidney_disease_group_short
-custom_colors <- c("tubulopathy" = "Red", 
-                   "glomerulopathy" = "Green", 
-                   "cancer" = "Blue", 
-                   "cakut" = "Purple", 
-                   "cyst_cilio" = "Orange", 
-                   "complement" = "Yellow",
-                   "nephrocalcinosis" = "Grey") 
-
-# create a data frame for pie chart creation
-pie_data <- data.frame(cluster = names(cluster_freq), freq = cluster_freq)
-
-# create and save a pie chart for each cluster group
-for (i in large_cluster_ids) {
-  subset_df <- subset(max_groups_phys, cluster == i)
-  
-  # calculate the total number of instances in the current cluster
-  total_instances <- nrow(subset_df)
-  
-  pie_chart <- ggplot(subset_df, aes(x = "", fill = kidney_disease_group_short)) +
-    geom_bar(width = 1) +
-    scale_fill_manual(values = custom_colors) +
-    coord_polar(theta = "y") +
-    labs(title = paste("Physical network - Cluster", i, "- Total Instances:", total_instances))
-  
-  # define the filename based on cluster number
-  filename <- paste0(output_dir, "/protein_interactions_phys_network_cluster_", i, "_pie_chart.", current_date, ".png")
-  
-  # save the pie chart as a PNG file
-  ggsave(filename, plot = pie_chart, width = 5, height = 5)  
-}
-############################################
-
-# TODO: get enrichment pathways etc
-# group1 <- max_groups_full %>% filter(cluster == 1)
-# 
-# string_db_full$get_enrichment(group1$STRING_id) %>%
-#   tibble() %>% View
-# junk <- string_db_full$get_enrichment(group1$STRING_id) %>%
-#   tibble()
+# write csv
+write_csv(cluster_index_df,
+          file = paste0("results/STRING_cluster_indices_min_gene_number-", min_gene_number_per_cluster, "-", current_date, ".csv"))
