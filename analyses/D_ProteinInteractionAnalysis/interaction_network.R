@@ -1,4 +1,9 @@
 # TODO: check which libraries to omit
+# TODO: combine with D_ProteinInteractionAnalysis.R
+# TODO: clean
+# TODO: change plot_interaction_network(), so that the input is already a network object
+# TODO: move functions to function file
+
 library(plotly)
 library(ggnet)
 library(network)
