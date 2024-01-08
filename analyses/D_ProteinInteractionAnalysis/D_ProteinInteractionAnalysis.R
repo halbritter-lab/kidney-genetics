@@ -12,7 +12,7 @@ library(GGally)
 # TODO: set in config?
 string_db_version <- "12.0"
 string_db_files_path <- "../shared/"
-min_gene_number_per_cluster <- 60  # TODO: StackError if min_gene_number_per_cluster < 60
+min_gene_number_per_cluster <- 60  # TODO: StackError if min_gene_number_per_cluster < 60 (recursive function)
 
 ############################################
 ## define relative script path
@@ -33,7 +33,7 @@ options(scipen = 999)
 
 
 ############################################
-# load global functions
+## load global functions
 # hgnc functions
 source("../functions/file-functions.R", local = TRUE)
 # helper functions
@@ -57,6 +57,8 @@ dir.create(output_dir, showWarnings = TRUE)
 
 
 ############################################
+## load df with most probable kidney disease group
+
 # load annotated HGNC table, select required columns
 hgnc_annotated_path <- get_newest_file(file_basename = "non_alt_loci_set_coordinates",
                                        folder = "../B_AnnotationHGNC/results")
@@ -86,7 +88,7 @@ kid_groups <- high_evidence_annotated %>%
 
 
 ############################################
-## Cluster analysis with FULL network
+## cluster analysis with FULL network
 # download STRING db protein links 
 protein_links_url <- paste0("https://stringdb-downloads.org/download/protein.links.v", string_db_version, "/9606.protein.links.v", string_db_version, ".txt.gz")
 protein_links_file <- paste0("../shared/9606.protein.links.v", string_db_version, ".txt.gz")
@@ -139,7 +141,7 @@ gzip(paste0("results/STRING_cluster_indices_min_gene_number-", min_gene_number_p
 
 
 ############################################
-# Plot distribution of kidney disease groups within subcluster
+## plot distribution of kidney disease groups within subcluster
 
 # get most probable kidney disease group per gene and join with cluster index df
 max_groups_full <- kid_groups %>%
@@ -162,41 +164,14 @@ ex1 <- plot_disease_group_distribution(subcluster="3-1", max_groups_full)
 
 
 ############################################
-# Plot interaction network
+## plot interaction network
 
-
-plot_network_of_index_gene <- function(index_gene, string_db, min_comb_score, STRING_id_vec, disease_group_df){
-  
-  # get all STRING interactions between all genes in STRING_id_vec with a minimum combined score in STRING
-  all_interactions <- get_all_interactions_above_score(STRING_id_vec = STRING_id_vec,
-                                                       string_db = string_db,
-                                                       min_comb_score = min_comb_score)
-  # get all contacts of the index_gene above the minimum combined score in STRING
-  
-  all_contacts_to_index <- get_all_contacts(index_gene = index_gene,
-                                            connection_df = all_interactions,
-                                            min_comb_score = min_comb_score)
-  
-  # create an edgelist of all contacts of the index gene (direct/indirect contacts)
-  edgelist <- create_edgelist(connection_df = all_interactions, 
-                              all_contacts_to_index = all_contacts_to_index, 
-                              min_comb_score = min_comb_score, 
-                              symbol_annotation_df = distinct(disease_group_df[c("STRING_id", "symbol")]))
-  
-  
-  # plot interaction network of index gene
-  interaction_plot <- plot_interaction_network(edgelist = edgelist,
-                                               disease_group_df = disease_group_df)
-  
-  return(interaction_plot)
-}
-
-# 
-# # example network plot for "MAPK1" ("9606.ENSP00000215832")
-# ia_plot <- plot_network_of_index_gene(index_gene = "9606.ENSP00000215832", 
-#                            string_db = string_db_full, 
-#                            min_comb_score = 980, 
-#                            STRING_id_vec = STRING_id_vec, 
-#                            disease_group_df = max_groups_full)
+# # example network plot for "MAPK1" ("9606.ENSP00000215832") with minimum combined score = 980
+ia_plot <- plot_network_of_index_gene(index_gene = "9606.ENSP00000215832",
+                           string_db = string_db_full,
+                           min_comb_score = 980,
+                           STRING_id_vec = STRING_id_vec,
+                           disease_group_df = max_groups_full)
 # 
 # ia_plot
+
