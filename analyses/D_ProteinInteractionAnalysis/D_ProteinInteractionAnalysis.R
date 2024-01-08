@@ -166,7 +166,8 @@ ex1 <- plot_disease_group_distribution(subcluster="3-1", max_groups_full)
 ############################################
 ## plot interaction network
 
-# # example network plot for "MAPK1" ("9606.ENSP00000215832") with minimum combined score = 980
+# # examples of network plots 
+# "MAPK1" ("9606.ENSP00000215832") with minimum combined score = 980
 ia_plot <- plot_network_of_index_gene(index_gene = "9606.ENSP00000215832",
                            string_db = string_db_full,
                            min_comb_score = 980,
@@ -175,3 +176,19 @@ ia_plot <- plot_network_of_index_gene(index_gene = "9606.ENSP00000215832",
 # 
 # ia_plot
 
+# "ALPL" ("9606.ENSP00000363973") with minimum combined score = 680
+ia_plot2 <- plot_network_of_index_gene(index_gene = "9606.ENSP00000363973",
+                                      string_db = string_db_full,
+                                      min_comb_score = 680,
+                                      STRING_id_vec = STRING_id_vec,
+                                      disease_group_df = max_groups_full)
+ia_plot2
+
+# TODO: correct Error if edgelist is empty, e.g.:
+# ia_plot2 <- plot_network_of_index_gene(index_gene = "9606.ENSP00000239891",
+#                                        string_db = string_db_full,
+#                                        min_comb_score = 890,
+#                                        STRING_id_vec = STRING_id_vec,
+#                                        disease_group_df = max_groups_full)
+
+# TODO: add a maximum edge option
