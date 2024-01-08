@@ -182,7 +182,7 @@ ia_plot2 <- plot_network_of_index_gene(index_gene = "9606.ENSP00000363973",
                                       min_comb_score = 680,
                                       STRING_id_vec = STRING_id_vec,
                                       disease_group_df = max_groups_full)
-ia_plot2
+# ia_plot2
 
 # TODO: correct Error if edgelist is empty, e.g.:
 # ia_plot2 <- plot_network_of_index_gene(index_gene = "9606.ENSP00000239891",
