@@ -2,8 +2,11 @@
 ## load libraries
 library(tidyverse)
 library(STRINGdb)
-library(ggplot2)
 library(R.utils)
+library(plotly)
+library(network)
+library(ggplot2)
+library(GGally)
 ############################################
 
 # TODO: set in config?
@@ -153,6 +156,47 @@ write_csv(max_groups_full,
 gzip(paste0("results/disease_group_STRING_cluster_indices_min_gene_number-", min_gene_number_per_cluster, "-", current_date, ".csv"),
      overwrite = TRUE)
 
-# example plot
-# plot_disease_group_distribution(subcluster="3-1", max_groups_full)
+# example plot of kidney disease group distribution within subcluster
+ex1 <- plot_disease_group_distribution(subcluster="3-1", max_groups_full)
 ############################################
+
+
+############################################
+# Plot interaction network
+
+
+plot_network_of_index_gene <- function(index_gene, string_db, min_comb_score, STRING_id_vec, disease_group_df){
+  
+  # get all STRING interactions between all genes in STRING_id_vec with a minimum combined score in STRING
+  all_interactions <- get_all_interactions_above_score(STRING_id_vec = STRING_id_vec,
+                                                       string_db = string_db,
+                                                       min_comb_score = min_comb_score)
+  # get all contacts of the index_gene above the minimum combined score in STRING
+  
+  all_contacts_to_index <- get_all_contacts(index_gene = index_gene,
+                                            connection_df = all_interactions,
+                                            min_comb_score = min_comb_score)
+  
+  # create an edgelist of all contacts of the index gene (direct/indirect contacts)
+  edgelist <- create_edgelist(connection_df = all_interactions, 
+                              all_contacts_to_index = all_contacts_to_index, 
+                              min_comb_score = min_comb_score, 
+                              symbol_annotation_df = distinct(disease_group_df[c("STRING_id", "symbol")]))
+  
+  
+  # plot interaction network of index gene
+  interaction_plot <- plot_interaction_network(edgelist = edgelist,
+                                               disease_group_df = disease_group_df)
+  
+  return(interaction_plot)
+}
+
+# 
+# # example network plot for "MAPK1" ("9606.ENSP00000215832")
+# ia_plot <- plot_network_of_index_gene(index_gene = "9606.ENSP00000215832", 
+#                            string_db = string_db_full, 
+#                            min_comb_score = 980, 
+#                            STRING_id_vec = STRING_id_vec, 
+#                            disease_group_df = max_groups_full)
+# 
+# ia_plot
