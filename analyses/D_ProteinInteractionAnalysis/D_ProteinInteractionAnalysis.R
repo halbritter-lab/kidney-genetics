@@ -9,7 +9,7 @@ library(R.utils)
 # TODO: set in config?
 string_db_version <- "12.0"
 string_db_files_path <- "../shared/"
-min_gene_number_per_cluster <- 60
+min_gene_number_per_cluster <- 60  # TODO: StackError if min_gene_number_per_cluster < 60
 
 ############################################
 ## define relative script path
@@ -105,14 +105,14 @@ string_db_full <- STRINGdb::STRINGdb$new(version = string_db_version,
 STRING_id_vec <- unique(kid_groups$STRING_id)
 
 # get list of sublists that contain STRING subclusters 
-STRING_clusters_list <- get_STRING_clusters(STRING_id_vec = STRING_id_vec, min_number = min_gene_number_per_cluster) #TODO: define min_number
+STRING_clusters_list <- get_STRING_clusters(STRING_id_vec = STRING_id_vec, min_number = min_gene_number_per_cluster)
 
 # create a df that contains full index of each gene with the subclusters
 cluster_index_df <- STRING_clusters_list %>% 
   unlist() %>% 
   as.data.frame() %>%
   setNames("STRING_id") %>% rowwise() %>% 
-  mutate(cluster_index = get_full_index(junk_test, STRING_id))
+  mutate(cluster_index = get_full_index(STRING_clusters_list, STRING_id))
 
 # get the maximum cluster depth
 max_depth <- max(sapply(strsplit(cluster_index_df$cluster_index, "-"), length))
@@ -136,7 +136,7 @@ gzip(paste0("results/STRING_cluster_indices_min_gene_number-", min_gene_number_p
 
 
 ############################################
-# plot distribution of kidney disease groups within subcluster
+# Plot distribution of kidney disease groups within subcluster
 
 # get most probable kidney disease group per gene and join with cluster index df
 max_groups_full <- kid_groups %>%
@@ -146,39 +146,13 @@ max_groups_full <- kid_groups %>%
   filter(!is.na(cluster_index))
 # NOTE: if genes have more than one group with same and highest hpo_id_group_p => keep all groups 
 
-# define a custom color palette for kidney_disease_group_short
-custom_colors <- c("tubulopathy" = "Red", 
-                   "glomerulopathy" = "Green", 
-                   "cancer" = "Blue", 
-                   "cakut" = "Purple", 
-                   "cyst_cilio" = "Orange", 
-                   "complement" = "Yellow",
-                   "nephrocalcinosis" = "Grey")  # Add more colors if needed
+# write csv
+write_csv(max_groups_full,
+          file = paste0("results/disease_group_STRING_cluster_indices_min_gene_number-", min_gene_number_per_cluster, "-", current_date, ".csv"))
 
-# function to plot a pie chart showing the kidney disease group distribution within the subcluster
-plot_disease_group_distribution <- function(subcluster){
-  # get subset df based on specified subcluster
-  subset_df <- max_groups_full %>% 
-    filter(grepl(paste0("^", subcluster), cluster_index))
-  
-  if (nrow(subset_df) == 0){
-    message("Subcluster ", subcluster, " does not exist.")
-  }
-  
-  # plot the pie chart
-  pie_chart <- ggplot(subset_df, aes(x = "", fill = kidney_disease_group_short)) +
-    geom_bar(width = 1) +
-    scale_fill_manual(values = custom_colors) +
-    coord_polar(theta = "y") +
-    labs(title = paste("Full network - Cluster",  subcluster, "| Total Instances:", nrow(subset_df)))
+gzip(paste0("results/disease_group_STRING_cluster_indices_min_gene_number-", min_gene_number_per_cluster, "-", current_date, ".csv"),
+     overwrite = TRUE)
 
-  # define the filename
-  filename <- paste0("results/prot_interact_full_network_cluster_", subcluster, "_pie_chart.", current_date, ".png")
-  
-  # save the pie chart as a PNG file
-  ggsave(filename, plot = pie_chart, width = 5, height = 5) # TODO: where to store plots?
-}
-
-# Example
-plot_disease_group_distribution(subcluster="3-1")
-
+# example plot
+# plot_disease_group_distribution(subcluster="3-1", max_groups_full)
+############################################
