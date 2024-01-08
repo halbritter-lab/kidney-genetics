@@ -48,3 +48,44 @@ get_full_index <- function(cluster_list, searchterm, res = c()){
     get_full_index(cluster_list[[sublist_index]], searchterm, res=res)
   }
 } 
+
+
+# function to plot a pie chart showing the kidney disease group distribution within the subcluster
+plot_disease_group_distribution <- function(subcluster, max_groups_full){
+  
+  
+  # define a custom color palette for kidney_disease_group_short
+  custom_colors <- c("tubulopathy" = "Red", 
+                     "glomerulopathy" = "Green", 
+                     "cancer" = "Blue", 
+                     "cakut" = "Purple", 
+                     "cyst_cilio" = "Orange", 
+                     "complement" = "Yellow",
+                     "nephrocalcinosis" = "Grey") 
+  
+  # get subset df based on specified subcluster
+  subset_df <- max_groups_full %>% 
+    filter(grepl(paste0("^", subcluster), cluster_index))
+  
+  if (nrow(subset_df) == 0){
+    message("Subcluster ", subcluster, " does not exist.")
+  }
+  
+  # plot the pie chart
+  pie_chart <- ggplot(subset_df, aes(x = "", fill = kidney_disease_group_short)) +
+    geom_bar(width = 1) +
+    scale_fill_manual(values = custom_colors) +
+    coord_polar(theta = "y") +
+    labs(title = paste("Full network - Cluster",  subcluster, "| Total Instances:", nrow(subset_df)))
+  
+  # define the filename
+  filename <- paste0("results/prot_interact_full_network_cluster_", subcluster, "_pie_chart.", current_date, ".png")
+  
+  # save the pie chart as a PNG file
+  ggsave(filename, plot = pie_chart, width = 5, height = 5) # TODO: where to store plots?
+}
+
+
+
+
+
