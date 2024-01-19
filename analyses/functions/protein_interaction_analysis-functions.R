@@ -53,16 +53,6 @@ get_full_index <- function(cluster_list, searchterm, res = c()){
 # function to plot a pie chart showing the kidney disease group distribution within the subcluster
 plot_disease_group_distribution <- function(subcluster, disease_group_df){
   
-  
-  # # define a custom color palette for kidney_disease_group_short
-  # custom_colors <- c("tubulopathy" = "Red", 
-  #                    "glomerulopathy" = "Green", 
-  #                    "cancer" = "Blue", 
-  #                    "cakut" = "Purple", 
-  #                    "cyst_cilio" = "Orange", 
-  #                    "complement" = "Yellow",
-  #                    "nephrocalcinosis" = "Grey") 
-  
   # define a custom (colorblind readable) color palette for kidney_disease_group_short
   custom_colors <- c("tubulopathy" = "#88CCEE", 
                      "glomerulopathy" = "#CC6677", 
@@ -139,8 +129,8 @@ get_direct_contacts <- function(index_gene, connection_df, min_comb_score){
 }
 
 
-# function to all direct and indirect contacts of an index gene (without recursive call, faster)
-get_all_contacts <- function(index_gene, connection_df, min_comb_score){
+# function to get all direct and indirect contacts of an index gene (without recursive call, faster)
+# get_all_contacts <- function(index_gene, connection_df, min_comb_score){
   # get direct contacts of index_gene
   con_list <- get_direct_contacts(index_gene, connection_df, min_comb_score)
   
@@ -170,15 +160,59 @@ get_all_contacts <- function(index_gene, connection_df, min_comb_score){
   return(res)
 }
 
-
+# function to get all direct and indirect contacts of a vector of index genes with at least the mininum combined
+# score in STRING and a maximum distance (level) from the index_genes
+get_all_contacts_by_level <- function(index_genes, connection_df, min_comb_score, max_level){
+  # set starting level to 0
+  level <- 0
+  
+  # create a results vector
+  res <- c(index_genes)
+  
+  # create a vector for all genes that should be checked in the current level
+  this_level_genes <- index_genes
+  
+  # create a vector for all genes that should be checked in the next level
+  next_level_genes <- c()
+  
+  while (level <= max_level){
+    # check all genes in the current level
+    for (gene in this_level_genes){
+      
+      # get connection list of checked gene
+      con_list <- get_direct_contacts(index_gene = gene,
+                                      connection_df = connection_df,
+                                      min_comb_score = min_comb_score)
+      
+      # fill the results vector with the current gene
+      res <- union(res, gene)
+      
+      # add direct contacts of the current gene to next level genes (if not in results yet)
+      next_level_genes <- setdiff(union(next_level_genes, con_list$direct_contacts), res)
+      
+      # overwrite connection df with smaller sub connection df
+      connection_df <- con_list$sub_connection_df
+    }
+    
+    # increase level
+    level <- level + 1
+    
+    # turn next level genes to current level genes
+    this_level_genes <- next_level_genes
+    
+    # empty next level genes for next round
+    next_level_genes <- c()
+  }
+  return(res)
+}
 
 
 # function to create an edglist from all direct and indirect contacts of an index gene
 # (and the index gene itself) above a minimum combined STRING score
-create_edgelist <- function(connection_df, all_contacts_to_index, min_comb_score, symbol_annotation_df){
+create_edgelist <- function(connection_df, all_contacts, min_comb_score, symbol_annotation_df){
   # filter connection df for genes to plot
   interactions <- connection_df %>% 
-    filter(from %in% all_contacts_to_index, to %in% all_contacts_to_index, combined_score > min_comb_score)
+    filter(from %in% all_contacts, to %in% all_contacts, combined_score >= min_comb_score)
   
   # annotate with symbols
   interactions <- interactions %>% 
@@ -196,14 +230,18 @@ create_edgelist <- function(connection_df, all_contacts_to_index, min_comb_score
 }
 
 
-# function to plot the interaction network given by an edgelist
-plot_interaction_network <- function(edgelist, disease_group_df){
+# function to plot the interaction network given by an edgelist. The index gene symbols have a square marker
+plot_interaction_network <- function(edgelist, disease_group_df, index_gene_symbols){
   
   # create a network from the edgelist
   netw <- network(edgelist, directed = F)
   
+  # add size info
+  netw %v% "is_index_gene" = ifelse(network.vertex.names(netw) %in% index_gene_symbols, "yes", "no")
+  
   # get unique vertex names
   unique_vertices <- unique(c(edgelist[, 1], edgelist[, 2]))
+  print(length(unique_vertices))
   
   # define a custom (colorblind readable) color palette for kidney_disease_group_short
   custom_colors <- c("tubulopathy" = "#88CCEE", 
@@ -225,9 +263,29 @@ plot_interaction_network <- function(edgelist, disease_group_df){
   vertex_colors <- sapply(network.vertex.names(netw), function(v) vertex_color_map[[v]])
   
   # create a plotly object
-  p <- ggnet2(netw, label = TRUE, color = vertex_colors, label.size = 2.5)
+  p <- ggnet2(netw, 
+              label = TRUE, 
+              color = vertex_colors, 
+              label.size = 2.5, 
+              # size = "is_index_gene", 
+              # size.palette = c("yes" = 12, "no" = 8),
+              shape = "is_index_gene",
+              shape.palette = c("yes" = 15, "no" = 19))
   
   p_plotly <- ggplotly(p)
+  
+  # remove legend for 'is_index_gene'
+  p_plotly <- p_plotly %>% layout(showlegend = FALSE)
+  
+  # # Set showlegend to FALSE for all traces
+  # for (i in seq_along(p_plotly$x$data)) {
+  #   p_plotly$x$data[[i]]$showlegend <- FALSE
+  # }
+  # 
+  # # Find the trace corresponding to the "phono" variable and set showlegend to FALSE
+  # trace_index <- which(sapply(p_plotly$x$data, function(trace) "is_index_gene" %in% names(trace$data)))
+  # p_plotly$x$data[[trace_index]]$showlegend <- FALSE
+  # 
   
   # add legend to the plot
   p_plotly <- p_plotly %>%
@@ -264,12 +322,13 @@ plot_interaction_network <- function(edgelist, disease_group_df){
   # disable hover info
   p_plotly <- style(p_plotly, hoverinfo = "none") 
   
+  
   return(p_plotly)
 }
 
 # function to create a plotly plot of a network of direct and indirect contacts with a of an index gene
 # minimum combined score in STRING
-plot_network_of_index_gene <- function(index_gene, string_db, min_comb_score, STRING_id_vec, disease_group_df){
+# plot_network_of_index_gene <- function(index_gene, string_db, min_comb_score, STRING_id_vec, disease_group_df){
   
   # get all STRING interactions between all genes in STRING_id_vec with a minimum combined score in STRING
   all_interactions <- get_all_interactions_above_score(STRING_id_vec = STRING_id_vec,
@@ -283,7 +342,7 @@ plot_network_of_index_gene <- function(index_gene, string_db, min_comb_score, ST
   
   # create an edgelist of all contacts of the index gene (direct/indirect contacts)
   edgelist <- create_edgelist(connection_df = all_interactions, 
-                              all_contacts_to_index = all_contacts_to_index, 
+                              all_contacts = all_contacts_to_index, 
                               min_comb_score = min_comb_score, 
                               symbol_annotation_df = distinct(disease_group_df[c("STRING_id", "symbol")]))
   
@@ -294,5 +353,41 @@ plot_network_of_index_gene <- function(index_gene, string_db, min_comb_score, ST
   return(interaction_plot)
 }
 
-
+# function to create a plotly object of a network of direct and indirect contacts a of an index gene vector with
+# minimum combined score in STRING and a maximum contact distance (level) of the index genes
+plot_network_by_level <- function(index_genes, string_db, min_comb_score, STRING_id_vec, disease_group_df, max_level){
+  
+  # get all STRING interactions between all genes in STRING_id_vec with a minimum combined score in STRING
+  all_interactions <- get_all_interactions_above_score(STRING_id_vec = STRING_id_vec,
+                                                       string_db = string_db,
+                                                       min_comb_score = min_comb_score)
+  
+  # get all contacts to index genes with a minimum combined score and a maximum distance
+  all_contacts_by_level <- get_all_contacts_by_level(index_genes = index_genes, 
+                                                     connection_df = all_interactions, 
+                                                     min_comb_score = min_comb_score, 
+                                                     max_level = max_level)
+  
+  # create an edgelist of all contacts of the index gene (direct/indirect contacts)
+  edgelist <- create_edgelist(connection_df = all_interactions, 
+                              all_contacts = all_contacts_by_level, 
+                              min_comb_score = min_comb_score, 
+                              symbol_annotation_df = distinct(disease_group_df[c("STRING_id", "symbol")]))
+  
+  # add edges from the index genes to themselves (as they might not have any other connections) to the edgelist
+  index_gene_symbols <- disease_group_df[c("STRING_id", "symbol")] %>% 
+    filter(STRING_id %in% index_genes) %>% 
+    .$symbol %>% 
+    unique()
+  
+  index_edges <- matrix(rep(index_gene_symbols, each = 2), ncol = 2, byrow = TRUE)
+  edgelist <- rbind(edgelist, index_edges)
+  
+  # plot interaction network of index gene
+  interaction_plot <- plot_interaction_network(edgelist = edgelist,
+                                               disease_group_df = disease_group_df,
+                                               index_gene_symbols = index_gene_symbols)
+  
+  return(interaction_plot)
+}
 
