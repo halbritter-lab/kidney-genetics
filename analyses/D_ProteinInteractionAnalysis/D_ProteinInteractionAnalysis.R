@@ -166,23 +166,27 @@ ex1 <- plot_disease_group_distribution(subcluster="3-1", max_groups_full)
 ############################################
 ## plot interaction network
 
-# # examples of network plots 
-# "MAPK1" ("9606.ENSP00000215832") with minimum combined score = 980
-ia_plot <- plot_network_of_index_gene(index_gene = "9606.ENSP00000215832",
-                           string_db = string_db_full,
-                           min_comb_score = 980,
-                           STRING_id_vec = STRING_id_vec,
-                           disease_group_df = max_groups_full)
-# 
-# ia_plot
+# # examples of network plots (index genes: MAPK1, BRCA2, ALPL)
+ial_plot1 <- plot_network_by_level(index_genes = c("9606.ENSP00000363973", "9606.ENSP00000369497", "9606.ENSP00000215832"),
+                                  string_db = string_db_full,
+                                  min_comb_score = 800,
+                                  STRING_id_vec = STRING_id_vec,
+                                  disease_group_df = max_groups_full,
+                                  max_level = 1)
 
-# "ALPL" ("9606.ENSP00000363973") with minimum combined score = 680
-ia_plot2 <- plot_network_of_index_gene(index_gene = "9606.ENSP00000363973",
-                                      string_db = string_db_full,
-                                      min_comb_score = 680,
-                                      STRING_id_vec = STRING_id_vec,
-                                      disease_group_df = max_groups_full)
-# ia_plot2
+ial_plot2 <- plot_network_by_level(index_genes = c("9606.ENSP00000363973", "9606.ENSP00000369497", "9606.ENSP00000215832"),
+                                  string_db = string_db_full,
+                                  min_comb_score = 800,
+                                  STRING_id_vec = STRING_id_vec,
+                                  disease_group_df = max_groups_full,
+                                  max_level = 2)
+
+ial_plot3 <- plot_network_by_level(index_genes = c("9606.ENSP00000363973", "9606.ENSP00000369497", "9606.ENSP00000215832"),
+                                   string_db = string_db_full,
+                                   min_comb_score = 600,
+                                   STRING_id_vec = STRING_id_vec,
+                                   disease_group_df = max_groups_full,
+                                   max_level = 1)
 
 # TODO: correct Error if edgelist is empty, e.g.:
 # ia_plot2 <- plot_network_of_index_gene(index_gene = "9606.ENSP00000239891",
@@ -190,5 +194,3 @@ ia_plot2 <- plot_network_of_index_gene(index_gene = "9606.ENSP00000363973",
 #                                        min_comb_score = 890,
 #                                        STRING_id_vec = STRING_id_vec,
 #                                        disease_group_df = max_groups_full)
-
-# TODO: add a maximum edge option
