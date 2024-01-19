@@ -241,8 +241,7 @@ plot_interaction_network <- function(edgelist, disease_group_df, index_gene_symb
   
   # get unique vertex names
   unique_vertices <- unique(c(edgelist[, 1], edgelist[, 2]))
-  print(length(unique_vertices))
-  
+
   # define a custom (colorblind readable) color palette for kidney_disease_group_short
   custom_colors <- c("tubulopathy" = "#88CCEE", 
                      "glomerulopathy" = "#CC6677", 
