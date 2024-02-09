@@ -130,7 +130,7 @@ get_direct_contacts <- function(index_gene, connection_df, min_comb_score){
 
 
 # function to get all direct and indirect contacts of an index gene (without recursive call, faster)
-# get_all_contacts <- function(index_gene, connection_df, min_comb_score){
+get_all_contacts <- function(index_gene, connection_df, min_comb_score){
   # get direct contacts of index_gene
   con_list <- get_direct_contacts(index_gene, connection_df, min_comb_score)
   
@@ -327,7 +327,7 @@ plot_interaction_network <- function(edgelist, disease_group_df, index_gene_symb
 
 # function to create a plotly plot of a network of direct and indirect contacts with a of an index gene
 # minimum combined score in STRING
-# plot_network_of_index_gene <- function(index_gene, string_db, min_comb_score, STRING_id_vec, disease_group_df){
+plot_network_of_index_gene <- function(index_gene, string_db, min_comb_score, STRING_id_vec, disease_group_df){
   
   # get all STRING interactions between all genes in STRING_id_vec with a minimum combined score in STRING
   all_interactions <- get_all_interactions_above_score(STRING_id_vec = STRING_id_vec,
