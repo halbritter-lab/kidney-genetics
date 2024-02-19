@@ -7,6 +7,7 @@ library(plotly)
 library(network)
 library(ggplot2)
 library(GGally)
+library(progress)
 ############################################
 
 # TODO: set in config?
@@ -106,6 +107,7 @@ string_db_full <- STRINGdb::STRINGdb$new(version = string_db_version,
                                     score_threshold = 100,
                                     input_directory = string_db_files_path)
 
+
 # get STRING IDs of genes that have a kidney disease group
 STRING_id_vec <- unique(kid_groups$STRING_id)
 
@@ -137,6 +139,10 @@ write_csv(cluster_index_df,
 
 gzip(paste0("results/STRING_cluster_indices_min_gene_number-", min_gene_number_per_cluster, "-", current_date, ".csv"),
      overwrite = TRUE)
+
+
+cluster_index_df <- read.csv("results/STRING_cluster_indices_min_gene_number-60-2024-02-09.csv.gz") # TODO: remove as soon as instantiation of new STRING db reference class works again 
+
 ############################################
 
 
@@ -157,6 +163,9 @@ write_csv(max_groups_full,
 
 gzip(paste0("results/disease_group_STRING_cluster_indices_min_gene_number-", min_gene_number_per_cluster, "-", current_date, ".csv"),
      overwrite = TRUE)
+
+max_groups_full <- read.csv("results/disease_group_STRING_cluster_indices_min_gene_number-60-2024-02-09.csv.gz") # TODO: remove as soon as instantiation of new STRING db reference class works again 
+
 
 # example plot of kidney disease group distribution within subcluster
 ex1 <- plot_disease_group_distribution(subcluster="3-1", max_groups_full)
@@ -194,3 +203,16 @@ ial_plot3 <- plot_network_by_level(index_genes = c("9606.ENSP00000363973", "9606
 #                                        min_comb_score = 890,
 #                                        STRING_id_vec = STRING_id_vec,
 #                                        disease_group_df = max_groups_full)
+
+
+############################################
+## plot all genes in clusters
+agc_plot <- plot_all_genes_in_clusters(disease_group_df = max_groups_full,
+                                       cluster_center_circle_radius = 1.4,
+                                       min_euc_dist = 0.12,
+                                       max_rad = 1)
+
+# save the plot as html
+filename <- paste0("results/all_genes_in_clusters_", current_date, ".html")
+htmlwidgets::saveWidget(agc_plot, file = filename)
+
