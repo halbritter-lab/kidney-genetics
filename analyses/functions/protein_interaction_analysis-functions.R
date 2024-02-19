@@ -112,7 +112,6 @@ get_all_interactions_above_score <- function(STRING_id_vec, string_db, min_comb_
 }
 
 
-
 # function to get direct contacts of a gene and remove corresponding rows in connection df
 get_direct_contacts <- function(index_gene, connection_df, min_comb_score){
   # get all connections of the index gene above a minimum combined score
@@ -159,6 +158,7 @@ get_all_contacts <- function(index_gene, connection_df, min_comb_score){
   
   return(res)
 }
+
 
 # function to get all direct and indirect contacts of a vector of index genes with at least the mininum combined
 # score in STRING and a maximum distance (level) from the index_genes
@@ -232,7 +232,7 @@ create_edgelist <- function(connection_df, all_contacts, min_comb_score, symbol_
 
 # function to plot the interaction network given by an edgelist. The index gene symbols have a square marker
 plot_interaction_network <- function(edgelist, disease_group_df, index_gene_symbols){
-  
+  print(edgelist)
   # create a network from the edgelist
   netw <- network(edgelist, directed = F)
   
@@ -325,6 +325,7 @@ plot_interaction_network <- function(edgelist, disease_group_df, index_gene_symb
   return(p_plotly)
 }
 
+
 # function to create a plotly plot of a network of direct and indirect contacts with a of an index gene
 # minimum combined score in STRING
 plot_network_of_index_gene <- function(index_gene, string_db, min_comb_score, STRING_id_vec, disease_group_df){
@@ -351,6 +352,7 @@ plot_network_of_index_gene <- function(index_gene, string_db, min_comb_score, ST
   
   return(interaction_plot)
 }
+
 
 # function to create a plotly object of a network of direct and indirect contacts a of an index gene vector with
 # minimum combined score in STRING and a maximum contact distance (level) of the index genes
@@ -388,5 +390,263 @@ plot_network_by_level <- function(index_genes, string_db, min_comb_score, STRING
                                                index_gene_symbols = index_gene_symbols)
   
   return(interaction_plot)
+}
+
+
+# function to return x-/y-coordinates randomly drawn from a disk with given radius 'max_rad'
+get_random_coordinates_on_disk <- function(max_rad){
+  r <- sqrt(runif(1, min=0, max=max_rad^2) )
+  alpha <- runif(1, min=0, max=2*pi)
+  x_c <- r*cos(alpha)
+  y_c <- r*sin(alpha)
+  return(list(x=x_c, y=y_c))
+}
+
+
+# function to add a new point on a disk with radius 'max_rad' that has a minimum euclidean distance form the other points
+add_new_point_with_min_dist <- function(coordinates_df, min_euc_dist, max_rad){
+  any_true <- TRUE
+  
+  while(any_true){
+    new_point_coord <- get_random_coordinates_on_disk(max_rad=max_rad)
+    coordinates_df_m <- coordinates_df %>% 
+      mutate(euc_dist = euclidean_distance(x, y, new_point_coord$x, new_point_coord$y),
+             small_euc_dist = euc_dist < min_euc_dist)
+    any_true <- any(coordinates_df_m$small_euc_dist)
+  }
+  
+  coordinates_df <- rbind(coordinates_df, data.frame(x=new_point_coord$x, y=new_point_coord$y))
+  return(coordinates_df)
+}
+
+
+# function to calculate Euclidean distance
+euclidean_distance <- function(x1, y1, x2, y2) {
+  sqrt((x2 - x1)^2 + (y2 - y1)^2)
+}
+
+
+# function to equally distribute n points on a cirlce with given radius
+get_circle_coordinates <- function(n, radius=1) {
+  angles <- seq(0, 2*pi, length.out = n+1)[-1]  # equally spaced angles
+  coordinates <- data.frame(
+    x = cos(angles) * radius,
+    y = sin(angles) * radius
+  )
+  return(coordinates)
+}
+
+
+# function to get n random coordinates within a disk of radius 'max_red' with a minimum euclidean distance from each other
+get_n_random_coordinates_on_disk <- function(no_cluster_genes, min_euc_dist, max_rad){
+  
+  # initialize the progress bar
+  pb <- progress::progress_bar$new(
+    format = "  progress [:bar] :percent eta: :eta",
+    total = no_cluster_genes
+  )
+  
+  # print out options in case of slow progess
+  cat("\033[1;31mIf progress is too slow: Decrease 'min_euc_dist' or increase 'max_rad'!\033[0m\n")
+  
+  cluster_coordinates <- data.frame(x=numeric(), y=numeric())
+  for (i in seq(no_cluster_genes)){
+    cluster_coordinates <- add_new_point_with_min_dist(coordinates_df = cluster_coordinates, 
+                                                       min_euc_dist = min_euc_dist, 
+                                                       max_rad = max_rad)
+    
+    # increment the progress bar
+    pb$tick()
+  }
+  
+  # close the progress bar
+  pb$terminate()
+  
+  return(cluster_coordinates)
+}
+
+
+# function to get coordinates of n points evenly distributed on a circle with given radius
+get_cluster_center_coordinates <- function(no_clusters, cluster_center_circle_radius){
+  center_coordinates <- data.frame(x=numeric(), y=numeric())
+  
+  if (no_clusters > 4){
+    # place one cluster center in the center (0,0)
+    center_coordinates <- data.frame(x=0, y=0)
+    
+    # equally distribute the remaining clusters in a circle with given radius
+    circle_coordinates <- get_circle_coordinates(n = no_clusters - 1, radius = cluster_center_circle_radius)
+    
+  } else {
+    # equally distribute clusters in a circle with given radius
+    circle_coordinates <- get_circle_coordinates(n = no_clusters, radius = cluster_center_circle_radius)
+  }
+  center_coordinates <- rbind(center_coordinates, circle_coordinates)
+  
+  # randomly assign each cluster coordinates
+  cluster_center_coordinates <- cbind(data.frame(cluster=sample(seq(no_clusters), no_clusters, replace=FALSE)), center_coordinates)
+  
+  return(cluster_center_coordinates)
+}
+
+
+# function to assign genes of a cluster to random coordinates
+assign_cluster_coordinates <- function(cluster_center, cluster_genes, min_euc_dist, max_rad){
+  # get coordinates of cluster genes evenly distributed on a circle with radius 'max_rad'
+  cluster_coordinates <- get_n_random_coordinates_on_disk(no_cluster_genes = length(cluster_genes), 
+                                                          min_euc_dist = min_euc_dist, 
+                                                          max_rad = max_rad)
+  
+  # bind with gene symbols
+  cluster_coordinates <- cbind(data.frame(gene_symbol=cluster_genes), cluster_coordinates)
+  
+  # add center coordinates
+  cluster_coordinates <- cluster_coordinates %>% 
+    mutate(x = x + cluster_center$x,
+           y = y + cluster_center$y)
+  
+  return(cluster_coordinates)
+  
+}
+
+
+# function to assign all genes in disease_group_df coordinates for a plot of all gene clusters
+get_all_coordinates <- function(cluster_center_circle_radius,
+                                min_euc_dist,
+                                max_rad,
+                                disease_group_df){
+  
+  # get main clusters
+  clusters <- unique(disease_group_df$main_cluster)
+  
+  # get cluster center coordinates
+  cluster_center_coordinates <- get_cluster_center_coordinates(no_clusters = length(clusters), 
+                                                               cluster_center_circle_radius = cluster_center_circle_radius)
+  
+  # create empty df
+  all_coordinates <- data.frame(gene_symbol = character(), x = numeric(), y = numeric())
+  
+  # get number of genes of largest cluster
+  max_cluster_genes <- disease_group_df %>% group_by(main_cluster) %>% summarise(count=n()) %>% .$count %>% max()
+  
+  for (cluster in clusters){
+    # get genes of this cluster
+    cluster_genes <- disease_group_df %>% 
+      dplyr::filter(main_cluster == cluster) %>% 
+      .$symbol
+    
+    # get the radius of this cluster (lager cluster => larger radius, radius of largest cluster = 1)
+    cluster_rad <- sqrt(length(cluster_genes)/max_cluster_genes)
+    
+    # get coordinates of this cluster's center
+    cluster_center <- list(x = cluster_center_coordinates[cluster_center_coordinates$cluster == cluster, "x"],
+                           y = cluster_center_coordinates[cluster_center_coordinates$cluster == cluster, "y"])
+    
+    # get coordinates for all genes of this cluster
+    cluster_coordinates <- assign_cluster_coordinates(cluster_center = cluster_center, 
+                                                      cluster_genes = cluster_genes,
+                                                      min_euc_dist = min_euc_dist,
+                                                      max_rad = cluster_rad)
+    
+    # add coordinates of this cluster to the dataframe with all coordinates
+    all_coordinates <- rbind(all_coordinates, cluster_coordinates)
+  }
+  
+  return(all_coordinates)
+}
+
+
+# function to plot all genes in clusters
+plot_all_genes_in_clusters <- function(disease_group_df, cluster_center_circle_radius, min_euc_dist, max_rad){
+  
+  # add column with main cluster of each gene
+  disease_group_df <- disease_group_df %>%
+    rowwise %>%
+    mutate(main_cluster = as.numeric(strsplit(cluster_index, "-")[[1]][1]))
+  
+  # define a custom (colorblind readable) color palette for kidney_disease_group_short
+  custom_colors <- c("tubulopathy" = "#88CCEE", 
+                     "glomerulopathy" = "#CC6677", 
+                     "cancer" = "#DDCC77", 
+                     "cakut" = "#44AA99", 
+                     "cyst_cilio" = "#AA4499", 
+                     "complement" = "#999933",
+                     "nephrocalcinosis" = "#888888")
+  
+  disease_group_df$color <- custom_colors[disease_group_df$kidney_disease_group_short]
+  
+  all_coordinates <- get_all_coordinates(cluster_center_circle_radius = cluster_center_circle_radius,
+                                         min_euc_dist = min_euc_dist,
+                                         max_rad = max_rad,
+                                         disease_group_df = disease_group_df)
+  
+  df <- all_coordinates %>% 
+    left_join(disease_group_df[, c('symbol', 'color')], by=c("gene_symbol" = "symbol"), relationship = "many-to-many")
+  
+  # Create a scatter plot with circles and names inside
+  p_plotly <- plot_ly() %>%
+    add_trace(
+      x = df$x,
+      y = df$y,
+      type = 'scatter',
+      mode = 'markers',
+      marker = list(symbol = 'circle', size = 30, color = df$color),
+      text = df$gene_symbol,
+      showlegend = FALSE,
+      hoverinfo = 'text'
+      
+    ) %>%
+    add_trace(
+      x = df$x,
+      y = df$y,
+      type = 'scatter',
+      mode = 'text',
+      text = df$gene_symbol,
+      textposition = 'middle center',
+      textfont = list(size = 8),
+      showlegend = FALSE,
+      hoverinfo ='none'
+      
+    ) %>%
+    layout(title = 'Gene clusters',
+           xaxis = list(title = ''),
+           yaxis = list(title = ''))
+  
+  
+  # add legend to the plot
+  p_plotly <- p_plotly %>%
+    add_trace(
+      x = rep(-2, length(custom_colors)),
+      y = seq(-2, length.out = length(custom_colors), by = -0.15),
+      type = "scatter",
+      mode = "markers+text",
+      marker = list(color = unname(custom_colors)), 
+      text = names(custom_colors),
+      marker = list(size = 12),
+      showlegend = TRUE, 
+      legendgroup = "vertex_colors",
+      textposition = "middle right",
+      textfont = list(size = 15, color = "black"),
+      hoverinfo ='none'
+    ) 
+  
+  # remove axis ticks and tick labels
+  p_plotly <- p_plotly %>%
+    layout(
+      xaxis = list(
+        showticklabels = FALSE,
+        showline = FALSE,
+        showgrid = FALSE,
+        zeroline = FALSE
+      ),
+      yaxis = list(
+        showticklabels = FALSE,
+        showline = FALSE,
+        showgrid = FALSE,
+        zeroline = FALSE
+      )
+    )
+  
+  return(p_plotly)
 }
 
