@@ -21,7 +21,6 @@ ComplexUpset::upset(merge_analyses_sources_with_evidence, analyses,
 height_ratio = 0.5, width_ratio = 0.3, )
 ```
 
-
 ## Bar plot of PanelApp results
 
 > Below you can see a Bar plot of the PanelApp analysis.  
@@ -47,14 +46,13 @@ PanelApp_genes_counts_plot <- ggplot(PanelApp_genes_counts , aes(x = source_coun
 ggplotly(PanelApp_genes_counts_plot)
 ```
 
-
 ## Bar plot of Literature results
 
 > Below you can see a Bar plot of the Literature analysis.  
 
 We identified Genes associated with kidney disease in a systematic Literature search using the following search query:  
-      *(1)	"Kidney"[Mesh] OR "Kidney Diseases"[Mesh] OR kidney OR renal* AND  
-      *(2)	"Genetic Structures"[Mesh] OR "Genes"[Mesh] OR genetic test OR gene panel OR gene panels OR multigene panel* OR targeted panel*  
+      *(1) "Kidney"[Mesh] OR "Kidney Diseases"[Mesh] OR kidney OR renal* AND  
+      *(2) "Genetic Structures"[Mesh] OR "Genes"[Mesh] OR genetic test OR gene panel OR gene panels OR multigene panel* OR targeted panel*  
 
 - The y axis shows the number of Genes in different publications, which is also visualized by the height of the bars.  
 - The x axis displays the number of publications (source_count), i.e. in how many different publications a single Gene occurred.  
@@ -74,7 +72,6 @@ Literature_genes_counts_plot <- ggplot(Literature_genes_counts , aes(x = source_
 # convert to interactive using ggplotly
 ggplotly(Literature_genes_counts_plot)
 ```
-
 
 ## Bar plot of Diagnostic panels results
 
@@ -100,7 +97,6 @@ DiagnosticPanels_genes_counts_plot <- ggplot(DiagnosticPanels_genes_counts , aes
 # convert to interactive using ggplotly
 ggplotly(DiagnosticPanels_genes_counts_plot)
 ```
-
 
 ## Bar plot of HPO in rare disease databases results
 
@@ -128,7 +124,6 @@ HPO_genes_counts_plot <- ggplot(HPO_genes_counts , aes(x = source_count, y = num
 # convert to interactive using ggplotly
 ggplotly(HPO_genes_counts_plot)
 ```
-
 
 ## Bar plot of PubTator results
 

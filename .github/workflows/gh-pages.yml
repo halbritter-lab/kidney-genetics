@@ -22,7 +22,6 @@ on:
 env:
     DRAWIO_DISABLE_UPDATE: true
     DISPLAY: :99.0
-    CONFIG_FILE: config.yml
     R_ENVIRONMENT: github
 
 jobs:

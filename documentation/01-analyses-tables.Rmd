@@ -34,7 +34,6 @@ datatable(merge_analyses_sources_reformat,
         )
 ```
 
-
 ## Result table: PanelApp
 
 This table shows results of the first analysis searching kidney disease associated genes from the PanelApp project in the UK and Australia.
@@ -53,7 +52,6 @@ datatable(PanelApp_genes_reformat,
           filter = 'top', # this argument positions the filtering input at the top of the table
           escape = FALSE) # this argument renders the links as HTML
 ```
-
 
 ## Result table: Literature
 
@@ -74,7 +72,6 @@ datatable(Literature_genes_reformat,
           escape = FALSE) # this argument renders the links as HTML
 ```
 
-
 ## Result table: Diagnostic panels
 
 This table shows results of the third analysis searching kidney disease associated genes from clinical diagnostic panels for kidney disease.
@@ -94,7 +91,6 @@ datatable(DiagnosticPanels_genes_reformat,
           escape = FALSE) # this argument renders the links as HTML
 ```
 
-
 ## Result table: HPO in rare disease databases
 
 This table shows results of the fourth analysis searching kidney disease associated genes from a Human Phenotype Ontology (HPO)-based search in rare disease databases (OMIM, Orphanet).
@@ -113,7 +109,6 @@ datatable(HPO_genes_reformat,
           filter = 'top', # this argument positions the filtering input at the top of the table
           escape = FALSE) # this argument renders the links as HTML
 ```
-
 
 ## Result table: PubTator
 
