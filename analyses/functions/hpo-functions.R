@@ -32,9 +32,9 @@ require(ontologyIndex) # Load the ontologyIndex package before using the functio
 #' }
 #'
 #' @export
-hpo_children_from_term <- function(term_input_id) {
+hpo_children_from_term <- function(term_input_id, hpo) {
   # Query the ontology for children of the given term
-  children_terms <- get_term_property(ontology = hpo, property = "children", term = term_input_id)
+  children_terms <- get_term_property(hpo, "children", term_input_id)
 
   # Convert the result into a tibble and add the current query date
   children_tibble <- children_terms %>%
@@ -59,10 +59,10 @@ hpo_children_from_term <- function(term_input_id) {
 #' hpo_all_children_from_term("HP:0000001")
 #' }
 #' @export
-hpo_all_children_from_term <- function(term_input_id, all_children_list = tibble()) {
+hpo_all_children_from_term <- function(term_input_id, hpo, all_children_list = tibble()) {
 
   # Retrieve the immediate children of the current term
-  children_tibble <- hpo_children_from_term(term_input_id)
+  children_tibble <- hpo_children_from_term(term_input_id, hpo)
 
   # Add the current term to the results
   all_children_list <- bind_rows(all_children_list, tibble(term = term_input_id, query_date = Sys.Date()))
@@ -70,7 +70,7 @@ hpo_all_children_from_term <- function(term_input_id, all_children_list = tibble
   # If there are children, recursively get their children
   if (nrow(children_tibble) > 0) {
     for (child_id in children_tibble$term) {
-      all_children_list <- hpo_all_children_from_term(child_id, all_children_list)
+      all_children_list <- hpo_all_children_from_term(child_id, hpo, all_children_list)
     }
   }
 
