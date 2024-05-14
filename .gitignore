@@ -11,3 +11,6 @@ analyses/03_DiagnosticPanels/data/downloads
 analyses/B_AnnotationHGNC/data
 analyses/B_AnnotationHGNC/results/clinvar_table*
 analyses/shared/data/downloads
+
+# anything containg the string "TEST" in filename
+*TEST*
