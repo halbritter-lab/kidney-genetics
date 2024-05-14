@@ -1,19 +1,34 @@
 #### This file holds analyses functions for PubTator requests
 
 
-#' This function finds genes from a PubTator API request.
+#' Retrieve Gene-Related Data from PubTator API v2
 #'
-#' @param query Character. The query string to be searched in PubTator.
-#' @param page Numeric. The page number for the search results.
-#' @param filter_type Character. The type of entity to be filtered from the
-#' results. Default is "Gene".
+#' This function queries the PubTator v2 API to retrieve gene-related data based on a given query string.
+#' It constructs the API request URL using parameters for the base URL, endpoint, and query formatting.
+#' The function handles pagination and can retry requests in case of temporary API issues.
 #'
-#' @return A tibble with the PubMed ID, text, text identifier, text part,
-#' source, and text part count for each entry matching the filter type.
-#' Returns NULL if no results found.
+#' @param query Character: The search query string for PubTator.
+#' @param page Numeric: The page number for the API response (for pagination).
+#' @param max_retries Numeric: Maximum number of retries for the API request in case of failure. Defaults to 3.
+#' @param api_base_url Character: Base URL of the PubTator API. Defaults to the v2 API URL.
+#' @param endpoint Character: API endpoint for the search query. Defaults to "search".
+#' @param query_parameter Character: URL parameter for the search query. Defaults to "?q=".
+#' @param filter_type Character: Type of entity to filter from the results. Defaults to "Gene".
+#'
+#' @return A tibble containing gene-related data from PubTator. Each row represents a unique gene-related entry
+#'   with fields including PubMed ID (pmid), text of the gene mention (text), gene identifier (text_identifier),
+#'   part of the article where the gene is mentioned (text_part), source of the mention (source), and count of 
+#'   text parts mentioning the gene (text_part_count). Returns NULL if no results are found.
 #'
 #' @examples
-#' genes <- pubtator_genes_in_request(query = "BRCA1", page = 1)
+#' genes <- pubtator_v2_genes_in_request(query = "BRCA1", page = 10)
+#' # Example output:
+#' # A tibble: 93 × 6
+#' #      pmid text     text_identifier text_part source text_part_count
+#' #     <int> <chr>    <chr>           <chr>     <chr>            <int>
+#' # 1 37794204 BRCA     672             title     Gene                 1
+#' # 2 37794204 BRCA1/2  672;675         title     Gene                 1
+#' # ... with more rows
 #'
 #' @export
 pubtator_genes_in_request <- function(query, page, filter_type = "Gene", max_retries = 3) {
