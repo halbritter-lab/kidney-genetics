@@ -106,6 +106,7 @@ cegat_kidney_diseases_genes <- cegat_kidney_diseases %>%
   mutate(Source = url) %>%
   mutate(Genes = str_remove_all(Genes, "[\\*\\#]")) %>%
   mutate(hgnc_id = hgnc_id_from_symbol_grouped(Genes)) %>%
+  filter(!is.na(hgnc_id)) %>%
   mutate(approved_symbol = symbol_from_hgnc_id_grouped(hgnc_id)) %>%
   select(approved_symbol, hgnc_id, gene_name_reported = Genes, source = Source, panel = Panel)
 
@@ -168,6 +169,7 @@ invitae_expanded_renal_disease_panel_genes <- invitae_expanded_renal_disease_pan
   mutate(approved_symbol = symbol_from_hgnc_id_grouped(hgnc_id)) %>%
   select(approved_symbol, hgnc_id, gene_name_reported = Genes, source = Source, panel = Panel)
 
+
 ## 6) mgz_nephrologie
 url <- (diagnostic_panels %>%
   filter(diagnostic_panel_name == "mgz_nephrologie"))$filename_download
@@ -190,16 +192,20 @@ mgz_nephrologie_genes <- mgz_nephrologie %>%
 
 
 ## 7) mvz_nierenerkrankungen
-# TODO: implement loading directly from downloaded file
 url <- (diagnostic_panels %>%
-  filter(diagnostic_panel_name == "mvz_nierenerkrankungen"))$diagnostic_panel_source
+  filter(diagnostic_panel_name == "mvz_nierenerkrankungen"))$filename_download
 
-mvz_nierenerkrankungen <- fromJSON(url)
+mvz_nierenerkrankungen <- read_html(url)
 
-mvz_nierenerkrankungen_genes <- tibble(mvz_nierenerkrankungen$Gene) %>%
-  select(`Genes` = Genname) %>%
+mvz_nierenerkrankungen_genes <- mvz_nierenerkrankungen %>%
+    html_nodes(xpath = '//div[contains(@class,"items-start")]') %>%
+  html_text() %>%
+  str_remove_all(., "[\\n\\r ]+") %>%
+  tibble(`Genes` = .) %>%
   mutate(Panel = "mvz_nierenerkrankungen") %>%
   mutate(Source = url) %>%
+  mutate(Genes = str_remove_all(Genes, "[\\*\\#]")) %>%
+  filter(!str_detect(Genes, "zumAuftrag")) %>%
   mutate(hgnc_id = hgnc_id_from_symbol_grouped(Genes)) %>%
   mutate(approved_symbol = symbol_from_hgnc_id_grouped(hgnc_id)) %>%
   select(approved_symbol, hgnc_id, gene_name_reported = Genes, source = Source, panel = Panel) %>%
@@ -232,6 +238,7 @@ natera_renasight_comprehensive_kidney_gene_panel_genes <- natera_renasight_compr
 
 
 ## 9) mayocliniclabs_renal_genetics
+## TODO: Fix the download somehow (error 403)
 url <- (diagnostic_panels %>%
   filter(diagnostic_panel_name == "mayocliniclabs_renal_genetics"))$filename_download
 

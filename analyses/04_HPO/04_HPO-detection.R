@@ -65,7 +65,7 @@ if (check_file_age("hpo_obo", "../shared/data/downloads/", 1)) {
 hpo <- get_ontology(
     hpo_obo_filename,
     propagate_relationships = "is_a",
-    extract_tags = "minimal",
+    extract_tags = "everything",
     merge_equivalent_terms = TRUE
 )
 ############################################
@@ -82,7 +82,7 @@ hpo <- get_ontology(
 if (check_file_age("hpo_list_kidney", "../shared/", 1)) {
   hpo_list_kidney <- read_csv(get_newest_file("hpo_list_kidney", "../shared"))
 } else {
-  all_hpo_children_list_kidney <- hpo_all_children_from_term("HP:0010935")
+  all_hpo_children_list_kidney <- hpo_all_children_from_term("HP:0010935", hpo)
 
   # transform the list into a tibble
   hpo_list_kidney <- all_hpo_children_list_kidney %>%

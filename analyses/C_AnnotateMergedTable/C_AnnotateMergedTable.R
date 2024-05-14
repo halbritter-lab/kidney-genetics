@@ -129,7 +129,7 @@ mpo <- get_ontology(
 if (check_file_age("hpo_list_kidney", "../shared/", 1)) {
   hpo_list_kidney <- read_csv(get_newest_file("hpo_list_kidney", "../shared"))
 } else {
-  hpo_list_kidney <- hpo_all_children_from_term("HP:0010935")
+  hpo_list_kidney <- hpo_all_children_from_term("HP:0010935", hpo)
 
   write_csv(hpo_list_kidney,
     file = paste0("../shared/hpo_list_kidney.",
@@ -151,7 +151,7 @@ if (check_file_age("hpo_list_adult", "../shared/", 1) && check_file_age("hpo_lis
 } else {
   # walk through the ontology tree and add all unique terms descending from
   # Adult onset (HP:0003581)
-  hpo_list_adult <- hpo_all_children_from_term("HP:0003581")
+  hpo_list_adult <- hpo_all_children_from_term("HP:0003581", hpo)
 
   write_csv(hpo_list_adult,
     file = paste0("../shared/hpo_list_adult.",
@@ -164,8 +164,8 @@ if (check_file_age("hpo_list_adult", "../shared/", 1) && check_file_age("hpo_lis
 
   # walk through the ontology tree and add all unique terms descending from
   # Antenatal onset HP:0030674 or Congenital onset HP:0003577
-  hpo_list_antenatal_or_congenital <- dplyr::union(hpo_all_children_from_term("HP:0030674"),
-    hpo_all_children_from_term("HP:0003577"))
+  hpo_list_antenatal_or_congenital <- dplyr::union(hpo_all_children_from_term("HP:0030674", hpo),
+    hpo_all_children_from_term("HP:0003577", hpo))
 
   write_csv(hpo_list_antenatal_or_congenital,
     file = paste0("../shared/hpo_list_antenatal_or_congenital.",
@@ -178,8 +178,8 @@ if (check_file_age("hpo_list_adult", "../shared/", 1) && check_file_age("hpo_lis
 
   # walk through the ontology tree and add all unique terms descending from
   # Neonatal onset HP:0003623 or Pediatric onset HP:0410280
-  hpo_list_neonatal_or_pediatric <- dplyr::union(hpo_all_children_from_term("HP:0003623"),
-    hpo_all_children_from_term("HP:0410280"))
+  hpo_list_neonatal_or_pediatric <- dplyr::union(hpo_all_children_from_term("HP:0003623", hpo),
+    hpo_all_children_from_term("HP:0410280", hpo))
 
   write_csv(hpo_list_neonatal_or_pediatric,
     file = paste0("../shared/hpo_list_neonatal_or_pediatric.",
@@ -205,19 +205,19 @@ if (check_file_age("hpo_list_syndromic", "../shared/", 1)) {
 } else {
   # walk through the ontology tree and add all unique terms descending from
   # Growth abnormality (HP:0001507)
-  all_hpo_children_list_growth <- hpo_all_children_from_term("HP:0001507")
+  all_hpo_children_list_growth <- hpo_all_children_from_term("HP:0001507", hpo)
 
   # walk through the ontology tree and add all unique terms descending from
   # Skeletal system abnormality (HP:0000924)
-  all_hpo_children_list_skeletal <- hpo_all_children_from_term("HP:0000924")
+  all_hpo_children_list_skeletal <- hpo_all_children_from_term("HP:0000924", hpo)
 
   # walk through the ontology tree and add all unique terms descending from
   # Neurologic abnormality (HP:0000707)
-  all_hpo_children_list_neurologic <- hpo_all_children_from_term("HP:0000707")
+  all_hpo_children_list_neurologic <- hpo_all_children_from_term("HP:0000707", hpo)
 
   # walk through the ontology tree and add all unique terms descending from
   # Head and neck abnormality (HP:0000152)
-  all_hpo_children_list_head_and_neck <- hpo_all_children_from_term("HP:0000152")
+  all_hpo_children_list_head_and_neck <- hpo_all_children_from_term("HP:0000152", hpo)
 
   # add the base term name and term id to each list
   # safe the lists as csv and gzip them
@@ -597,9 +597,9 @@ tubulopathy_gene_list <- tubulopathy_page %>%
     kidney_disease_group_short)
 
 # 6) Hereditary Cancer Gene Curation Expert Panel: https://clingen.info/affiliation/40023/
-# API call: https://search.clinicalgenome.org/api/affiliates/10023?queryParams
+# API call: https://search.clinicalgenome.org/api/affiliates/40023?queryParams
 
-api_call <- "https://search.clinicalgenome.org/api/affiliates/10023?queryParams"
+api_call <- "https://search.clinicalgenome.org/api/affiliates/40023?queryParams"
 
 hereditary_cancer_response <- fromJSON(api_call)
 
@@ -1034,7 +1034,7 @@ if (check_file_age("merge_analyses_sources_high_evidence_expression", "results",
   # 6. dark blue: >2100.0 TPM
   # use EBI categorization for Descartes
   # use GTEx categorization for GTEx
-  # category should be three  classes, e.h. low, medium and high and associate them with 0 (< light blue category), 0.5 (>= light blue category) or 1 (>= dark blue category) scoring points
+  # category should be three  classes, e.g. low, medium and high and associate them with 0 (< light blue category), 0.5 (>= light blue category) or 1 (>= dark blue category) scoring points
   # the points are assigned if either GTEx or Descartes is above the cutoff
   # select the columns we want to keep for the final table join
   merge_analyses_sources_high_evidence_expression <- merge_analyses_sources_high_evidence_gencode %>%
@@ -1092,6 +1092,7 @@ merge_analyses_sources_high_evidence_annotated <- merge_analyses_sources_high_ev
 # TODO: maybe annotate with publications (from OMIM) and GeneReviews
 # TODO: annotate phenotypes as phenopackets for each entity?
 # TODO: use MONDO instead of OMIM as primary disease ontology in the manual curation effort
+# TODO: all hardcoded values should be set in a config (urls, paths, cutoffs, terms, etc.)
 ############################################
 
 
