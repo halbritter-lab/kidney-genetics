@@ -232,7 +232,6 @@ create_edgelist <- function(connection_df, all_contacts, min_comb_score, symbol_
 
 # function to plot the interaction network given by an edgelist. The index gene symbols have a square marker
 plot_interaction_network <- function(edgelist, disease_group_df, index_gene_symbols){
-  print(edgelist)
   # create a network from the edgelist
   netw <- network(edgelist, directed = F)
   
@@ -348,7 +347,8 @@ plot_network_of_index_gene <- function(index_gene, string_db, min_comb_score, ST
   
   # plot interaction network of index gene
   interaction_plot <- plot_interaction_network(edgelist = edgelist,
-                                               disease_group_df = disease_group_df)
+                                               disease_group_df = disease_group_df,
+                                               index_gene_symbols = c(index_gene))
   
   return(interaction_plot)
 }

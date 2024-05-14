@@ -169,6 +169,7 @@ max_groups_full <- read.csv("results/disease_group_STRING_cluster_indices_min_ge
 
 # example plot of kidney disease group distribution within subcluster
 ex1 <- plot_disease_group_distribution(subcluster="3-1", max_groups_full)
+ex1
 ############################################
 
 
@@ -198,11 +199,11 @@ ial_plot3 <- plot_network_by_level(index_genes = c("9606.ENSP00000363973", "9606
                                    max_level = 1)
 
 # TODO: correct Error if edgelist is empty, e.g.:
-# ia_plot2 <- plot_network_of_index_gene(index_gene = "9606.ENSP00000239891",
-#                                        string_db = string_db_full,
-#                                        min_comb_score = 890,
-#                                        STRING_id_vec = STRING_id_vec,
-#                                        disease_group_df = max_groups_full)
+ia_plot_error <- plot_network_of_index_gene(index_gene = "9606.ENSP00000239891",
+                                       string_db = string_db_full,
+                                       min_comb_score = 810, #810 works, 820 error,  890 different error
+                                       STRING_id_vec = STRING_id_vec,
+                                       disease_group_df = max_groups_full)
 
 
 ############################################
