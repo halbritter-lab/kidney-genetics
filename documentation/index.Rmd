@@ -1,0 +1,272 @@
+--- 
+title: "The Kidney-Genetics Documentation"
+author: "Bernt Popp, Nina Rank, Constantin Wolff, Jan Halbritter"
+date: "`r Sys.Date()`"
+site: bookdown::bookdown_site
+output: bookdown::gitbook
+bibliography: [kidney-genetics.bib]
+csl: apa.csl
+link-citations: yes
+colorlinks: yes
+description: "This documentation is intended to describe the Kidney-Genetics project"
+graphics: yes
+github-repo: halbritter-lab/kidney-genetics
+url: https://halbritter-lab.github.io/kidney-genetics/
+---
+
+<!-- here we load required libraries -->
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+## Load libraries
+library(readr)        # needed to import CSV result files
+library(dplyr)    # needed to transform the tables
+library(DT)           # needed to generate nice data tables in html
+library(plotly)       # needed for upset plots
+library(knitr)        # needed for draw.io files
+library(knitrdrawio)  # needed for draw.io files
+library(config)       # needed to load the config file
+library(ggplot2)      # needed for plots
+library(ComplexUpset) # needed for upset plots
+library(snakecase)    # needed for string functions
+library(readxl)       # needed to load Excel files
+library(shinyLP)      # needed to plot presentations
+```
+
+<!-- here we load the config file -->
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
+project_topic <- "nephrology"
+project_name <- "kidney-genetics"
+script_path <- "/documentation/"
+
+## read configs
+config_vars_proj <- config::get(file = Sys.getenv("CONFIG_FILE"),
+    config = project_topic)
+
+## conditionally set working directory based on environment
+if (Sys.getenv("R_ENVIRONMENT") != "github") {
+  setwd(paste0(config_vars_proj$projectsdir, project_name, script_path))
+}
+```
+
+<!-- here we load global functions libraries -->
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
+# load global functions
+# file functions
+source("../analyses/functions/file-functions.R", local = TRUE)
+source("../analyses/functions/string-functions.R", local = TRUE)
+```
+
+<!-- TODO: also compute other numbers with placeholders -->
+<!-- TODO: version the image files with their computation date -->
+<!-- TODO: create output folder if not existent -->
+
+<!-- here we load the result csv file and compute numbers to update the diagrams -->
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
+## load the CSV data
+## load and filter the (newest) files automatically
+
+# the merge_analyses_sources table
+merge_analyses_sources <- read_csv(get_newest_file("A_MergeAnalysesSources", "../analyses/A_MergeAnalysesSources/results"))
+
+# the other analyses tables
+# 1. PanelApp_genes
+PanelApp_genes <- read_csv(get_newest_file("01_PanelApp_genes", "../analyses/01_PanelApp/results"))
+
+# 2. Literature_genes
+Literature_genes <- read_csv(get_newest_file("02_Literature_genes", "../analyses/02_Literature/results"))
+
+# TODO: the file location should be a config variable
+pub_file <- "../analyses/02_Literature/data/230220_Kidney_Genes_Publication_List.xlsx"
+
+kidney_genes_publication_list <- read_excel(pub_file, skip = 4, na = "NA") %>%
+  mutate(Citation = paste0('- [@',
+    Bib,
+    ']')) %>%
+  select(Citation)
+
+# 3. DiagnosticPanels_genes
+DiagnosticPanels_genes <- read_csv(get_newest_file("03_DiagnosticPanels_genes", "../analyses/03_DiagnosticPanels/results"))
+DiagnosticPanels_list <- read_csv(get_newest_file("03_DiagnosticPanels_list", "../analyses/03_DiagnosticPanels/results"))
+
+DiagnosticPanels_list_table <- DiagnosticPanels_list %>%
+  filter(method != "curl") %>%
+  mutate(diagnostic_panel_name = to_sentence_case(diagnostic_panel_name)) %>%
+  mutate(Panel = paste0('- [',
+    diagnostic_panel_name,
+    '](',
+    diagnostic_panel_source,
+    ')'),
+    , .before = diagnostic_panel_name) %>%
+  select(Panel)
+
+# 4. HPO_genes
+HPO_genes <- read_csv(get_newest_file("04_HPO_genes", "../analyses/04_HPO/results"))
+
+# 5. PubTator_genes
+PubTator_genes <- read_csv(get_newest_file("05_PubTator_genes", "../analyses/05_PubTator/results"))
+
+# the high_evidence_annotated_table
+high_evidence_annotated_table <- read_csv(get_newest_file("C_high_evidence_annotated_csv_table", "../analyses/C_AnnotateMergedTable/results"))
+
+# compute numbers for the diagrams
+all_genes <- merge_analyses_sources %>%
+    nrow()
+
+high_evidence_genes <- merge_analyses_sources %>%
+    filter(evidence_count > 1)
+
+high_evidence_genes_count <- high_evidence_genes %>%
+    nrow()
+
+low_evidence_genes <- merge_analyses_sources %>%
+    filter(evidence_count <= 1)
+
+low_evidence_genes_count <- low_evidence_genes %>%
+    nrow()
+
+clingen_genes <- high_evidence_annotated_table %>%
+    filter(clingen_summary != "NULL")
+
+clingen_genes_count <- clingen_genes %>%
+    nrow()
+
+manualscoring_genes <- high_evidence_annotated_table %>%
+    filter(clingen_summary == "NULL")
+
+manualscoring_genes_count <- manualscoring_genes %>%
+    nrow()
+
+replace_strings("static/img/figures/raw/curation_flow_diagram_raw.drawio",
+    "static/img/figures/updated/curation_flow_diagram_current.drawio",
+    c("ALL_GENES", "HIGHEVIDENCE_GENES", "LOWEVIDENCE_GENES", "CLINGEN_GENES", "MANUALSCORING_GENES"),
+    c(all_genes, high_evidence_genes_count, low_evidence_genes_count, clingen_genes_count, manualscoring_genes_count))
+
+# compute per source numbers with placeholders
+summary_counts <- merge_analyses_sources %>%
+  summarize(across(starts_with("01_PanelApp"):(ncol(merge_analyses_sources)), 
+                   ~sum(!is.null(.x) & (.x == TRUE | .x == FALSE)), .names = "count_{.col}"))
+
+# join the merge_analyses_sources and DiagnosticPanels_genes tables and filter for evidence_count > 1
+filtered_merge <- merge_analyses_sources %>%
+  left_join(DiagnosticPanels_genes, by = "hgnc_id") %>%
+  filter(evidence_count > 1)
+
+# Compute the number of unique genes in all panels
+genes_all_diagnostic_panels <- filtered_merge %>%
+  filter(source_count == 10) %>%
+    nrow()
+
+# Compute the number of unique genes in at least one panel
+genes_at_least_one_diagnostic_panel <- filtered_merge %>%
+  filter(source_count >= 1) %>%
+  nrow()
+```
+
+---
+
+# Preface {-}
+
+---------------------------------------
+
+This documentation is intended to describe the [Kidney-Genetics](https://github.com/halbritter-lab/kidney-genetics) project.
+
+<!-- here we place the logo -->
+```{r, out.width='25%', fig.align='center', echo=FALSE, message=FALSE, warning=FALSE}
+knitr::include_graphics("static/img/logo/kidney-genetics_logo.svg")
+```
+
+## Objective {-}
+
+> How can we address the lack of a unified and standardized database of kidney disease-associated genes, which hampers diagnosis, treatment, and research comparability in the field of kidney diseases?  
+
+Genetic insights are becoming increasingly influential in the understanding and treatment of various kidney diseases (KD). Hundreds of genes associated with monogenic kidney disease have been identified, providing valuable insights into their diagnosis, management, and monitoring. 
+However, the lack of a unified and standardized database of genes assigned to kidney diseases has led to diagnostic blind spots and comparability issues among current studies of kidney genetics. 
+To address this gap, we created the **“Kidney-Genetics”** a regularly updated, automated and publicly accessible database which aims to provide a comprehensive list of all relevant genes associated with kidney disease.  
+
+> **Key issues:**  
+
+- Create a unified and standardized database of kidney disease-associated genes and provide a valuable resource for the diagnosis, treatment, and monitoring of those diseases  
+- Allow clinicians and researchers to gain a deeper understanding of the genetic factors underlying different KDs  
+- Compile, organize and curate important information on the genes to the identify novel candidate genes and genetic variants associated with KDs  
+- Group and sort the genes into different categories, for example into phenotypic groups, the onset, syndromic, etc.  
+- Establish genotype-phenotype correlations that can be used to assign multiple clinical entities to a single gene in order to improve understanding and treatment choices  
+- The information can be used to develop personalized treatment strategies and interventions, leading to more effective and targeted therapies for individuals with KD  
+- Researchers can freely access "Kidney-Genetics" ensuring consistency and comparability across different research projects, which can accelerate scientific progress, foster collaborations, and facilitate the development of new insights and approaches  
+
+The scientific literature highlights the need for such a database and emphasizes the importance of genetic research in kidney disease (e.g. [@boulogne_kidneynetwork_2023]).
+<!-- TODO: Scan literature that notices a scientific need for a standardized kidney gene database (see some interesting paper in the references section) -->
+
+> In summary, our research question and its approach have the potential to provide a deeper scientific understanding of KD genetics, improve diagnostic accuracy, guide treatment selection, advance precision medicine, and facilitate research collaboration. The establishment of the **"Kidney-Genetics"** database addresses an important gap in the field and provides a valuable resource for researchers, clinicians, and patients involved in the discovery and treatment of KD.  
+
+
+## Methods {-}
+
+> To create a thorough and standardized database of kidney-related genes, we employed the following methods and compiled kidney disease-associated gene information from various sources:  
+
+1. Utilized data from Genomics England and Australia PanelApp [@martin_panelapp_2019]
+2. Conducted a comprehensive literature review of published gene lists  
+3. Collected information from clinical diagnostic panels for kidney disease  
+4. Performed a Human Phenotype Ontology (HPO)-based [@kohler_human_2021]) search in rare disease databases (OMIM)  
+5. Employed a PubTator [@wei_pubtator_2013] API-based automated literature extraction from PubMed  
+
+We also developed an evidence-scoring system to differentiate highly confirmed disease genes from candidate genes. We defined the presence of a certain gene in 3 or more of the 5 resources as highly evident genes. 
+These genes were then manually curated according to predetermined criteria or, in the case of existing ClinGen curation, their data and scores were used. Genes with a score of 2 or less were accordingly more likely to be classified as candidate genes.  
+Furthermore, we grouped all genes into different categories to later match them in a genotype-phenotype correlation.    
+<!-- TODO: Provide detailed information about the different groups and categories and explain our decision for them -->
+
+To get a more transparent and thus more comprehensive understanding of our several evidence source “pillars”, we listed our different steps below and attached a flowchart for better visualization.  
+
+1. We retrieved all kidney disease related panels from both PanelApp UK and PanelApp Australia, meaning all panels that include "renal" or "kidney" in its name. That included xxx different lists. The access date was the xxx.  
+2. We identified Genes associated with kidney disease in a systematic Literature search using the following search query:  
+      *(1)	"Kidney"[Mesh] OR "Kidney Diseases"[Mesh] OR kidney OR renal* AND  
+      *(2)	"Genetic Structures"[Mesh] OR "Genes"[Mesh] OR genetic test OR gene panel OR gene panels OR multigene panel* OR targeted panel*  
+    we then screened for published lists and got xxx lists from date to date xxx.
+
+    ```{r, echo=FALSE, message=FALSE, results='asis'}
+    # TODO: add usage status
+    cat(paste(kidney_genes_publication_list$Citation, "\n", sep=""))
+    ```
+3. We used ten common diagnostic panels that can be purchased for genome analysis and extracted the screened genes from them. Those included following panels:
+
+    ```{r, echo=FALSE, message=FALSE, results='asis'}
+    cat(paste(DiagnosticPanels_list_table$Panel, "\n", sep=""))
+    ```
+  <!-- TODO: complete the list and provide the links with RMD -->
+4. We used common databases (e.g. OMIM) for rare diseases and screened them for kidney disease associated Genes from a Human Phenotype Ontology (HPO) based search query. 
+   The most comprehensive HPO term used was “Abnormality of the upper urinary tract” (HP:0010935) and included all subgroup terms. We deliberately chose these to be somewhat broader in order to fully include all relevant kidney diseases such as CAKUT, among others.  
+5. We retrieved all kidney disease associated genes from a PubTator API-based automated literature extraction of publications available on PubMed.  
+
+
+> **Kidney-Genetics Flowchart**
+
+```{drawio curation_flow_diagram, src="static/img/figures/updated/curation_flow_diagram_current.drawio", fig.cap = "Curation process flow diagram", engine.path = config_vars_proj$drawio_path}
+```
+
+
+## Results {-}
+
+> The "Kidney-Genetics" database currently contains detailed information on `r format_number(all_genes)` kidney-associated genes with detailed annotations on gene function, kidney phenotype, incidence, possible syndromic disease expression and genetic variation. 
+To automatically group the genes, we will present the results of phenotypic and functional clustering.  
+<!-- TODO: Provide clustering and grouping results with numbers and proportions -->
+
+The number of genes extracted from the five analyzed sources of information is as follows: (1) `r format_number(summary_counts$count_01_PanelApp)`, (2) `r format_number(summary_counts$count_02_Literature)`, (3) `r format_number(summary_counts$count_03_DiagnosticPanels)`, (4) `r format_number(summary_counts$count_04_HPO)`, and (5) `r format_number(summary_counts$count_05_PubTator)`  
+Notably, **`r format_number(high_evidence_genes_count)`** genes (`r percent(high_evidence_genes_count / all_genes, digits = 1)`) of the **total `r format_number(all_genes)`** genes are present in three or more of the analyzed information sources, thus meeting our evidence criteria, indicating high confidence and their potential for diagnostic use.
+Of these high evidence genes, **`r format_number(genes_at_least_one_diagnostic_panel)`** (`r percent(genes_at_least_one_diagnostic_panel / high_evidence_genes_count, digits = 1)`) are present in at least one, and **`r format_number(genes_all_diagnostic_panels)`** (`r percent(genes_all_diagnostic_panels / high_evidence_genes_count, digits = 1)`) are present in all 10 comprehensive diagnostic laboratory panels.
+
+To ensure currency, Kidney-Genetics will be updated regularly and automatically at XXX week intervals. We will also provide phenotypic and functional clustering results to facilitate gene grouping.  
+<!-- TODO: Provide information about the planned update framework -->
+
+
+## Conclusion {-}
+
+> Kidney-Genetics is a comprehensive, free and publicly accessible database that can be used by researchers to analyze genomic data related to KDs. The database will be routinely updated using an automated system and standardized pipeline to ensure that it is always up-to-date with the latest kidney research and diagnostics.  
+
+By utilizing Kidney-Genetics, clinicians, geneticists, and researchers can examine genomic data and improve their understanding of the genetic components of diverse KDs. The code and results are completely available on GitHub. A standardized pipeline and automated system keep our database on the cutting edge of kidney research and diagnostics. 
+Screening efforts toward manual curation (such as through the ClinGen initiative) and assignment of diagnostic genes to nephrologic disease groups (e.g., syndromic vs. isolated; adult vs. pediatric; cystic, nephrotic, etc.) are currently in the development process and our goals for the near future.  
+
+
+## Outlook {-}
+
+Future goals include the further manual curation of the high evident genes to acquire a more accurate individual assessment of each gene. For this purpose, we have developed a standardized curation process based on the ClinGen criteria, as previously discussed in the methods section. 
+Furthermore, diagnostic genes will be assigned to certain defined nephrological disease groups, in order to obtain a phenotype-genotype correlation and gain a better clinical understanding.  
+

@@ -48,10 +48,10 @@ The script carries out the following steps:
 12. STRING clusters and subclusters formed by the high-evidence genes are determined and saved.
 13. The most probable clinical disease group (tubulopathy, glomerulopathy, cancer, cakut, cyst_cilio, complement, nephrocalcinosis) is extracted for each high-evidence gene, the high-evidence genes are annotated with their respective cluster index and the are results saved.
 14. Example plots are generated:
-  14.1. Plot of clinical disease group distribution within a given subcluster.
-  14.2. Plot of the interaction network determined by given example index genes, the minimum combined interaction score (STRING) and only direct neighbors.
-  14.3. Plot of the interaction network determined by given example index genes, the minimum combined interaction score (STRING) and only direct neighbors and first-level indirect neighbors.
-  14.4. Plot of the interaction network determined by given example index genes, the minimum combined interaction score (STRING) and only direct neighbors.
+14.1. Plot of clinical disease group distribution within a given subcluster.
+14.2. Plot of the interaction network determined by given example index genes, the minimum combined interaction score (STRING) and only direct neighbors.
+14.3. Plot of the interaction network determined by given example index genes, the minimum combined interaction score (STRING) and only direct neighbors and first-level indirect neighbors.
+14.4. Plot of the interaction network determined by given example index genes, the minimum combined interaction score (STRING) and only direct neighbors.
 15. A cluster plot of all high-evidence genes is generated and saved.
 
 ### License
