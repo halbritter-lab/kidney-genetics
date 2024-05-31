@@ -34,7 +34,7 @@ options(scipen = 999)
 
 
 ############################################
-## load global functions
+# load global functions
 # hgnc functions
 source("../functions/file-functions.R", local = TRUE)
 # helper functions
@@ -81,7 +81,7 @@ high_evidence_annotated <- read.csv(gzfile(high_evidence_annotated_path), na.str
   mutate(kidney_disease_group_short = str_replace_all(kidney_disease_group_short, "\\s+", ""),
          hpo_id_group_p = as.numeric(hpo_id_group_p))
 
-# join annotated high evidence genes with STRING id
+# annotate high evidence genes with STRING id
 kid_groups <- high_evidence_annotated %>% 
   left_join(hgnc_annotated, by = c("hgnc_id")) %>% 
   filter(!is.na(STRING_id))
@@ -94,6 +94,7 @@ kid_groups <- high_evidence_annotated %>%
 protein_links_url <- paste0("https://stringdb-downloads.org/download/protein.links.v", string_db_version, "/9606.protein.links.v", string_db_version, ".txt.gz")
 protein_links_file <- paste0("../shared/9606.protein.links.v", string_db_version, ".txt.gz")
 
+# download file if not existent yet
 if (!file.exists(protein_links_file)) {
   download.file(protein_links_url, destfile = protein_links_file, method = "auto")
   message("STRING protein links downloaded successfully.")
@@ -111,7 +112,7 @@ string_db_full <- STRINGdb::STRINGdb$new(version = string_db_version,
 # get STRING IDs of genes that have a kidney disease group
 STRING_id_vec <- unique(kid_groups$STRING_id)
 
-# get list of sublists that contain STRING subclusters 
+# get list of sublists that contain STRING subclusters (subclusters have a minium size of 'min_number')
 STRING_clusters_list <- get_STRING_clusters(STRING_id_vec = STRING_id_vec, min_number = min_gene_number_per_cluster)
 
 # create a df that contains full index of each gene with the subclusters
@@ -139,10 +140,6 @@ write_csv(cluster_index_df,
 
 gzip(paste0("results/STRING_cluster_indices_min_gene_number-", min_gene_number_per_cluster, "-", current_date, ".csv"),
      overwrite = TRUE)
-
-
-cluster_index_df <- read.csv("results/STRING_cluster_indices_min_gene_number-60-2024-02-09.csv.gz") # TODO: remove as soon as instantiation of new STRING db reference class works again 
-
 ############################################
 
 
@@ -164,46 +161,39 @@ write_csv(max_groups_full,
 gzip(paste0("results/disease_group_STRING_cluster_indices_min_gene_number-", min_gene_number_per_cluster, "-", current_date, ".csv"),
      overwrite = TRUE)
 
-max_groups_full <- read.csv("results/disease_group_STRING_cluster_indices_min_gene_number-60-2024-02-09.csv.gz") # TODO: remove as soon as instantiation of new STRING db reference class works again 
+### Examples
 
-
-# example plot of kidney disease group distribution within subcluster
+## Kidney disease group distribution within subcluster
 ex1 <- plot_disease_group_distribution(subcluster="3-1", max_groups_full)
 ex1
-############################################
 
-
-############################################
-## plot interaction network
-
-# # examples of network plots (index genes: MAPK1, BRCA2, ALPL)
+## Interaction networks
+# index genes: MAPK1, BRCA2, ALPL, minimum combined score (STRING): 800, depth of connections = 1 (only direct neighbors)
 ial_plot1 <- plot_network_by_level(index_genes = c("9606.ENSP00000363973", "9606.ENSP00000369497", "9606.ENSP00000215832"),
                                   string_db = string_db_full,
                                   min_comb_score = 800,
                                   STRING_id_vec = STRING_id_vec,
                                   disease_group_df = max_groups_full,
                                   max_level = 1)
+ial_plot1
 
+# index genes: MAPK1, BRCA2, ALPL, minimum combined score (STRING): 800, depth of connections = 2 (direct neighbors and first-level indirect neighbors)
 ial_plot2 <- plot_network_by_level(index_genes = c("9606.ENSP00000363973", "9606.ENSP00000369497", "9606.ENSP00000215832"),
                                   string_db = string_db_full,
                                   min_comb_score = 800,
                                   STRING_id_vec = STRING_id_vec,
                                   disease_group_df = max_groups_full,
                                   max_level = 2)
+ial_plot2
 
+# index genes: MAPK1, BRCA2, ALPL, minimum combined score (STRING): 600, depth of connections = 1 (only direct neighbors)
 ial_plot3 <- plot_network_by_level(index_genes = c("9606.ENSP00000363973", "9606.ENSP00000369497", "9606.ENSP00000215832"),
                                    string_db = string_db_full,
                                    min_comb_score = 600,
                                    STRING_id_vec = STRING_id_vec,
                                    disease_group_df = max_groups_full,
                                    max_level = 1)
-
-# TODO: correct Error if edgelist is empty, e.g.:
-ia_plot_error <- plot_network_of_index_gene(index_gene = "9606.ENSP00000239891",
-                                       string_db = string_db_full,
-                                       min_comb_score = 810, #810 works, 820 error,  890 different error
-                                       STRING_id_vec = STRING_id_vec,
-                                       disease_group_df = max_groups_full)
+ial_plot3
 
 
 ############################################
@@ -216,4 +206,5 @@ agc_plot <- plot_all_genes_in_clusters(disease_group_df = max_groups_full,
 # save the plot as html
 filename <- paste0("results/all_genes_in_clusters_", current_date, ".html")
 htmlwidgets::saveWidget(agc_plot, file = filename)
+############################################
 
