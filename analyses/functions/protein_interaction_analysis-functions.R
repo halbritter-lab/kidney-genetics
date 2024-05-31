@@ -232,15 +232,33 @@ create_edgelist <- function(connection_df, all_contacts, min_comb_score, symbol_
 
 # function to plot the interaction network given by an edgelist. The index gene symbols have a square marker
 plot_interaction_network <- function(edgelist, disease_group_df, index_gene_symbols){
+  # network() throws error if edgelist is too short => in that case, append first row of edgelist to edgelist
+  if (nrow(edgelist) < 3){
+    edgelist <- rbind(edgelist, edgelist[c(1), c(1:2)], edgelist[c(1), c(1:2)])
+  }
+  
   # create a network from the edgelist
   netw <- network(edgelist, directed = F)
-  
-  # add size info
-  netw %v% "is_index_gene" = ifelse(network.vertex.names(netw) %in% index_gene_symbols, "yes", "no")
   
   # get unique vertex names
   unique_vertices <- unique(c(edgelist[, 1], edgelist[, 2]))
 
+  # count network edges
+  edgecount <- network.edgecount(netw)
+  
+  # set edgecolor
+  edgecolor <- "grey"
+  
+  # if no edges present, add a dummy edge (needed for adding traces to the plot later, else ERROR), set edgecolor to "white" -> not visible
+  if (edgecount == 0){
+    dummy_edge <- matrix(c(unique_vertices[1], "DUMMY_VERTEX"),  ncol = 2, byrow = TRUE)
+    netw <- network(rbind(edgelist, dummy_edge), directed = F)
+    edgecolor <- "white"
+  }
+  
+  # add index gene info
+  netw %v% "is_index_gene" = ifelse(network.vertex.names(netw) %in% index_gene_symbols, "yes", "no")
+  
   # define a custom (colorblind readable) color palette for kidney_disease_group_short
   custom_colors <- c("tubulopathy" = "#88CCEE", 
                      "glomerulopathy" = "#CC6677", 
@@ -256,17 +274,19 @@ plot_interaction_network <- function(edgelist, disease_group_df, index_gene_symb
     mutate(color = custom_colors[kidney_disease_group_short])
   
   vertex_color_map <- setNames(vertex_colors$color, vertex_colors$symbol)
+  vertex_color_map <- c(vertex_color_map, setNames("#FFFFFF", "DUMMY_VERTEX")) # color of dummy vertex is "white" -> not visible
   
   # assign colors to vertices based on their names
   vertex_colors <- sapply(network.vertex.names(netw), function(v) vertex_color_map[[v]])
   
   # create a plotly object
   p <- ggnet2(netw, 
+              mode = "fruchtermanreingold",
               label = TRUE, 
               color = vertex_colors, 
               label.size = 2.5, 
-              # size = "is_index_gene", 
-              # size.palette = c("yes" = 12, "no" = 8),
+              label.color = ifelse(network.vertex.names(netw) %in% unique_vertices, "black", "white"),
+              edge.color = edgecolor,
               shape = "is_index_gene",
               shape.palette = c("yes" = 15, "no" = 19))
   
@@ -274,16 +294,6 @@ plot_interaction_network <- function(edgelist, disease_group_df, index_gene_symb
   
   # remove legend for 'is_index_gene'
   p_plotly <- p_plotly %>% layout(showlegend = FALSE)
-  
-  # # Set showlegend to FALSE for all traces
-  # for (i in seq_along(p_plotly$x$data)) {
-  #   p_plotly$x$data[[i]]$showlegend <- FALSE
-  # }
-  # 
-  # # Find the trace corresponding to the "phono" variable and set showlegend to FALSE
-  # trace_index <- which(sapply(p_plotly$x$data, function(trace) "is_index_gene" %in% names(trace$data)))
-  # p_plotly$x$data[[trace_index]]$showlegend <- FALSE
-  # 
   
   # add legend to the plot
   p_plotly <- p_plotly %>%
@@ -295,7 +305,7 @@ plot_interaction_network <- function(edgelist, disease_group_df, index_gene_symb
       text = names(custom_colors),
       marker = list(size = 10),
       showlegend = TRUE, 
-      legendgroup = "vertex_colors",
+      # legendgroup = "custom_cl",
       textposition = "middle right",
       textfont = list(size = 11, color = "black")
     ) 
@@ -319,8 +329,7 @@ plot_interaction_network <- function(edgelist, disease_group_df, index_gene_symb
   
   # disable hover info
   p_plotly <- style(p_plotly, hoverinfo = "none") 
-  
-  
+
   return(p_plotly)
 }
 
@@ -333,8 +342,8 @@ plot_network_of_index_gene <- function(index_gene, string_db, min_comb_score, ST
   all_interactions <- get_all_interactions_above_score(STRING_id_vec = STRING_id_vec,
                                                        string_db = string_db,
                                                        min_comb_score = min_comb_score)
-  # get all contacts of the index_gene above the minimum combined score in STRING
   
+  # get all contacts of the index_gene above the minimum combined score in STRING
   all_contacts_to_index <- get_all_contacts(index_gene = index_gene,
                                             connection_df = all_interactions,
                                             min_comb_score = min_comb_score)
